@@ -21,14 +21,10 @@ const LoginPage = () => {
     console.log('Sign up pressed');
   }
 
-  const goToLogin = () => {
-    console.log('Login pressed');
-  }
-
   return (
     <KeyboardAvoidingView style={styles.container1}>
       <Image source={require('../../assets/logoOnly.jpeg')} />
-      <Text style={styles.text1}>Welcome. Sign Up now!</Text>
+      <Text style={styles.text1}>Log in now!</Text>
       <TextInput
         style={styles.text2}
         placeholder='Enter your email address'
@@ -45,14 +41,16 @@ const LoginPage = () => {
         onChangeText={handlePasswordChange}
         value={password}
       />
-      <TouchableOpacity style={styles.pressable1} onPress={() => console.log('Signup pressed')}>
-        <Text style={styles.text3}>Sign up</Text>
+      <TouchableOpacity style={styles.pressable1} onPress={() => console.log('Login pressed')}>
+        <Text style={styles.text3}>Login</Text>
       </TouchableOpacity>
-      <Text style={{marginBottom: 20}}>------------------------------------------------------</Text>
+      <TouchableOpacity onPress={forgotPassword}>
+        <Text style={styles.text4}>Forgot your password?</Text>
+      </TouchableOpacity>
       <View style={styles.container2}>
-        <Text style={styles.text4}>Already a user?</Text>
-        <TouchableOpacity onpress={goToLogin}>
-            <Text style={styles.text5}>Login</Text>
+        <Text style={styles.text5}>Don't have an account?</Text>
+        <TouchableOpacity style={styles.pressable2} onPress={signUp}>
+          <Text style={styles.text6}>Sign up</Text>
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
@@ -94,14 +92,21 @@ const styles = StyleSheet.create({
   text4: {
     fontSize: 12,
     color: 'gray',
-    marginRight: 10,
+    marginBottom: 16,
   },
   text5: {
-    fontSize: 12,
+    fontSize: 14,
     color: 'gray',
-    textDecorationLine: 'underline',
+    marginRight: 50,
   },
-    pressable1: {
+  text6: {
+    fontSize: 14,
+    color: '#710EF1',
+    fontWeight: 'bold',
+    textDecorationLine: 'underline',
+    padding: 5,
+  },
+  pressable1: {
     width: 325,
     height: 40,
     MarginTop: 30,
