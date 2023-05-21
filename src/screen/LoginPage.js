@@ -1,5 +1,15 @@
-import React, { useState } from 'react';
-import { TouchableOpacity, StyleSheet, View, Text, StatusBar, Image, TextInput, Pressable, KeyboardAvoidingView } from 'react-native';
+import React, { useState } from "react";
+import {
+  TouchableOpacity,
+  StyleSheet,
+  View,
+  Text,
+  StatusBar,
+  Image,
+  TextInput,
+  Pressable,
+  KeyboardAvoidingView,
+} from "react-native";
 
 const LoginPage = () => {
   const [name, setName] = useState("");
@@ -14,34 +24,37 @@ const LoginPage = () => {
   };
 
   const forgotPassword = () => {
-    console.log('Forgot Password Pressed');
-  }
+    console.log("Forgot Password Pressed");
+  };
 
   const signUp = () => {
-    console.log('Sign up pressed');
-  }
+    console.log("Sign up pressed");
+  };
 
   return (
     <KeyboardAvoidingView style={styles.container1}>
-      <Image source={require('../../assets/logoOnly.jpeg')} />
+      <Image source={require("../../assets/logoOnly.jpeg")} />
       <Text style={styles.text1}>Log in now!</Text>
       <TextInput
         style={styles.text2}
-        placeholder='Enter your email address'
-        textAlign='left'
+        placeholder="Enter your email address"
+        textAlign="left"
         keyboardType="email-address"
         onChangeText={handleNameChange}
         value={name}
       />
       <TextInput
         style={styles.text2}
-        placeholder='Enter your password'
-        textAlign='left'
+        placeholder="Enter your password"
+        textAlign="left"
         secureTextEntry={true}
         onChangeText={handlePasswordChange}
         value={password}
       />
-      <TouchableOpacity style={styles.pressable1} onPress={() => console.log('Login pressed')}>
+      <TouchableOpacity
+        style={styles.pressable1}
+        onPress={() => console.log("Login pressed")}
+      >
         <Text style={styles.text3}>Login</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={forgotPassword}>
@@ -60,24 +73,24 @@ const LoginPage = () => {
 const styles = StyleSheet.create({
   container1: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     marginBottom: 20,
   },
   container2: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   text1: {
     fontSize: 30,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 20,
   },
   text2: {
     width: 325,
     height: 40,
     fontSize: 14,
-    borderColor: 'gray',
+    borderColor: "gray",
     borderWidth: 1,
     borderRadius: 10,
     padding: 10,
@@ -86,34 +99,34 @@ const styles = StyleSheet.create({
 
   text3: {
     fontSize: 14,
-    color: 'white',
-    fontWeight: 'bold'
+    color: "white",
+    fontWeight: "bold",
   },
   text4: {
     fontSize: 12,
-    color: 'gray',
+    color: "gray",
     marginBottom: 16,
   },
   text5: {
     fontSize: 14,
-    color: 'gray',
+    color: "gray",
     marginRight: 50,
   },
   text6: {
     fontSize: 14,
-    color: '#710EF1',
-    fontWeight: 'bold',
-    textDecorationLine: 'underline',
+    color: "#710EF1",
+    fontWeight: "bold",
+    textDecorationLine: "underline",
     padding: 5,
   },
   pressable1: {
     width: 325,
     height: 40,
     MarginTop: 30,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     padding: 10,
-    backgroundColor: '#710EF1',
+    backgroundColor: "#710EF1",
     marginBottom: 16,
     borderRadius: 10,
   },
