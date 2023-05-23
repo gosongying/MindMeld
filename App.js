@@ -2,16 +2,25 @@ import React from 'react';
 import { SafeAreaView, StyleSheet, View, Text, StatusBar, Image, TextInput, Pressable } from 'react-native';
 import LandingPage from './src/screen/LandingPage'
 import LoginPage from './src/screen/LoginPage'
-import RegisterPage from './src/screen/RegisterPage'
+import SignupPage from './src/screen/SignupPage'
 import HomePage from './src/screen/HomePage'
 import LandingTabs from './src/components/LandingTabs'
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
 
 const App = () => {
 
+  const Stack = createStackNavigator();
+
   return (
-    <View style={styles.container}>
-      <HomePage/>
-    </View>
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName='Landing' screenOptions={{headerShown:false}}>
+        <Stack.Screen name="Landing" component={LandingPage} />
+        <Stack.Screen name="Login" component={LoginPage} />
+        <Stack.Screen name="Signup" component={SignupPage} />
+        <Stack.Screen name="Home" component={HomePage} />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
 

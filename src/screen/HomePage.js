@@ -47,7 +47,6 @@ const Tab = createBottomTabNavigator();
 
 const HomePage = () => {
   return (
-    <NavigationContainer>
         <Tab.Navigator
             screenOptions={({ route }) => ({
                 tabBarIcon: ({ focused, color, size }) => {
@@ -73,7 +72,6 @@ const HomePage = () => {
             <Tab.Screen name={'Achievements'} component={Achievements} options={{ tabBarLabel: 'Achievement', headerShown:false }}/>
             <Tab.Screen name={'Menu'} component={Menu} options={{ tabBarLabel: 'Settings', headerShown:false }}/>
         </Tab.Navigator>
-    </NavigationContainer>
   )
 }
 
