@@ -9,9 +9,11 @@ import {
   TextInput,
   Pressable,
   KeyboardAvoidingView,
+  Button,
 } from "react-native";
 
-const LoginPage = () => {
+const LoginPage = ({navigation}) => {
+  
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
 
@@ -27,13 +29,18 @@ const LoginPage = () => {
     console.log("Forgot Password Pressed");
   };
 
-  const signUp = () => {
-    console.log("Sign up pressed");
-  };
+  const goToSignup = () => navigation.navigate("Signup");
+
+  const goToHome = () => navigation.navigate("Home");
+
+  const goToLanding = () => navigation.navigate("Landing");
 
   return (
-    <KeyboardAvoidingView style={styles.container1}>
-      <Image source={require("../../assets/logoOnly.jpeg")} />
+    <KeyboardAvoidingView style={styles.container1} >
+      <TouchableOpacity style={styles.button} onPress={goToLanding}>
+        <Text style={styles.text7} >back</Text >
+      </TouchableOpacity>
+      <Image source={require("../../assets/logoOnly.png")} />
       <Text style={styles.text1}>Log in now!</Text>
       <TextInput
         style={styles.text2}
@@ -42,6 +49,7 @@ const LoginPage = () => {
         keyboardType="email-address"
         onChangeText={handleNameChange}
         value={name}
+        autoCapitalize="none"
       />
       <TextInput
         style={styles.text2}
@@ -50,10 +58,11 @@ const LoginPage = () => {
         secureTextEntry={true}
         onChangeText={handlePasswordChange}
         value={password}
+        autoCapitalize="none"
       />
       <TouchableOpacity
         style={styles.pressable1}
-        onPress={() => console.log("Login pressed")}
+        onPress={goToHome}
       >
         <Text style={styles.text3}>Login</Text>
       </TouchableOpacity>
@@ -62,7 +71,7 @@ const LoginPage = () => {
       </TouchableOpacity>
       <View style={styles.container2}>
         <Text style={styles.text5}>Don't have an account?</Text>
-        <TouchableOpacity style={styles.pressable2} onPress={signUp}>
+        <TouchableOpacity style={styles.pressable2} onPress={goToSignup}>
           <Text style={styles.text6}>Sign up</Text>
         </TouchableOpacity>
       </View>
@@ -119,6 +128,10 @@ const styles = StyleSheet.create({
     textDecorationLine: "underline",
     padding: 5,
   },
+  text7: {
+    fontSize: 18,
+    color: "#710EF1",
+  },
   pressable1: {
     width: 325,
     height: 40,
@@ -130,6 +143,11 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     borderRadius: 10,
   },
+  button: {
+    position: 'relative',
+    bottom: 150,
+    right: 150
+  }
 });
 
 export default LoginPage;

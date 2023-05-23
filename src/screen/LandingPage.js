@@ -13,10 +13,11 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import LandingTabs from '../components/LandingTabs';
 
-const LandingPage = () => {
-  const goToLogin = () => {};
-  const goToRegister = () => {};
-  const continueAsGuest = () => {};
+const LandingPage = ({navigation}) => {
+
+  const goToLogin = () => navigation.navigate("Login")
+  const goToSignup = () => navigation.navigate("Signup");
+  const continueAsGuest = () => navigation.navigate("Home");
 
   return (
     <SafeAreaView style={styles.container}>
@@ -31,8 +32,8 @@ const LandingPage = () => {
         <TouchableOpacity style={styles.pressableOne} onPress={goToLogin}>
           <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.pressableTwo} onPress={goToRegister}>
-          <Text style={styles.buttonText}>Register</Text>
+        <TouchableOpacity style={styles.pressableTwo} onPress={goToSignup}>
+          <Text style={styles.buttonText}>Signup</Text>
         </TouchableOpacity>
         <TouchableOpacity onpress={continueAsGuest}>
           <Text style={styles.guest}>Continue as a guest</Text>

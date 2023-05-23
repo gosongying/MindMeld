@@ -11,7 +11,7 @@ import {
   KeyboardAvoidingView,
 } from "react-native";
 
-const LoginPage = () => {
+const SignupPage = ({navigation}) => {
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
 
@@ -27,17 +27,18 @@ const LoginPage = () => {
     console.log("Forgot Password Pressed");
   };
 
-  const signUp = () => {
-    console.log("Sign up pressed");
-  };
+  const goToHome = () => navigation.navigate("Home");
 
-  const goToLogin = () => {
-    console.log("Login pressed");
-  };
+  const goToLogin = () => navigation.navigate("Login");
+
+  const goToLanding = () => navigation.navigate("Landing");
 
   return (
     <KeyboardAvoidingView style={styles.container1}>
-      <Image source={require("../../assets/logoOnly.jpeg")} />
+      <TouchableOpacity style={styles.button} onPress={goToLanding}>
+        <Text style={styles.text6} >back</Text >
+      </TouchableOpacity>
+      <Image source={require("../../assets/logoOnly.png")} />
       <Text style={styles.text1}>Welcome. Sign Up now!</Text>
       <TextInput
         style={styles.text2}
@@ -57,7 +58,7 @@ const LoginPage = () => {
       />
       <TouchableOpacity
         style={styles.pressable1}
-        onPress={() => console.log("Signup pressed")}
+        onPress={goToHome}
       >
         <Text style={styles.text3}>Sign up</Text>
       </TouchableOpacity>
@@ -66,7 +67,7 @@ const LoginPage = () => {
       </Text>
       <View style={styles.container2}>
         <Text style={styles.text4}>Already a user?</Text>
-        <TouchableOpacity onpress={goToLogin}>
+        <TouchableOpacity onPress={goToLogin}>
           <Text style={styles.text5}>Login</Text>
         </TouchableOpacity>
       </View>
@@ -116,6 +117,10 @@ const styles = StyleSheet.create({
     color: "gray",
     textDecorationLine: "underline",
   },
+  text6: {
+    fontSize: 18,
+    color: "#710EF1",
+  },
   pressable1: {
     width: 325,
     height: 40,
@@ -127,6 +132,11 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     borderRadius: 10,
   },
+  button: {
+    position: 'relative',
+    bottom: 150,
+    right: 150
+  }
 });
 
-export default LoginPage;
+export default SignupPage;
