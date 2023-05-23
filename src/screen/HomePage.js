@@ -9,10 +9,13 @@ import {
     TextInput,
     Pressable,
     KeyboardAvoidingView,
+    FlatList
   } from "react-native";
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import LandingPage from './LandingPage';
+import Details from '../components/Details';
 
 //TODO: The 4 Screens
 const StudyDashBoard = () => {
@@ -36,12 +39,37 @@ const Achievements = () => {
     )
 }
 
-const Menu = () => {
-    return(
-        <View style={styles.container}>
-        </View>
-    )
-}
+//screen 1,2,3 not implemented yet
+const Menu = ( {navigation} ) => {
+    const options = [
+    { id: '1', title: 'Profile Settings', screen: 'ProfileSettingsScreen' }, // Set up avatar, username, pw, etc.
+    { id: '2', title: 'Privacy Settings', screen: 'PrivacySettingsScreen' }, // Notifications, app collection? etc.
+    { id: '3', title: 'About', screen: 'AboutScreen' },
+    { id: '4', title: 'Logout', screen:'LandingPage' }
+    ];
+
+    const navigateToScreen = (screen) => {
+        navigation.navigate(screen);
+      };
+
+    const renderOption = ({ item }) => (
+        <TouchableOpacity onPress={() => navigateToScreen(item.screen)}>
+          <Text>{item.title}</Text>
+        </TouchableOpacity>
+      );
+    
+      //TODO: 
+    return (
+    <View>
+        <Text> Some details </Text> {/*A component to showcase the details of the user, ref to ../components/details */}
+        <FlatList
+        data={options}
+        renderItem={renderOption}
+        keyExtractor={(item) => item.id}
+        />
+    </View>
+    );
+};
 
 const Tab = createBottomTabNavigator();
 

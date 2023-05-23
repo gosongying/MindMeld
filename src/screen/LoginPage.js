@@ -38,7 +38,7 @@ const LoginPage = ({navigation}) => {
   return (
     <KeyboardAvoidingView style={styles.container1} >
       <TouchableOpacity style={styles.button} onPress={goToLanding}>
-        <Text style={styles.text7} >back</Text >
+        <Text style={styles.text7} >{'\u2190'}</Text >
       </TouchableOpacity>
       <Image source={require("../../assets/logoOnly.png")} />
       <Text style={styles.text1}>Log in now!</Text>
@@ -129,8 +129,9 @@ const styles = StyleSheet.create({
     padding: 5,
   },
   text7: {
-    fontSize: 18,
+    fontSize: 35,
     color: "#710EF1",
+    fontWeight: "bold",
   },
   pressable1: {
     width: 325,
