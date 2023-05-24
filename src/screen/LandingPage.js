@@ -11,7 +11,7 @@ import {
   Pressable,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import LandingTabs from '../components/LandingTabs';
+import Slider from './src/components/Slider'
 
 const LandingPage = ({navigation}) => {
 
@@ -26,7 +26,7 @@ const LandingPage = ({navigation}) => {
         <Text style={styles.welcome}>Welcome!</Text>
       </View>
       <View style={styles.center}>
-        <Text> TODO: Interactive Navigator (Refer to ../components/LandingTabs) </Text>
+        <Slider />
       </View>
       <View style={styles.bottom}>
         <TouchableOpacity style={styles.pressableOne} onPress={goToLogin}>
@@ -54,6 +54,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 16,
     paddingTop: 16,
+    flex: 0.25
   },
   title: {
     fontSize: 24,
@@ -67,6 +68,8 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    position: 'relative',
+    bottom: 50
   },
   navigator: {
     fontSize: 18,
@@ -75,6 +78,7 @@ const styles = StyleSheet.create({
   bottom: {
     paddingBottom: 16,
     paddingHorizontal: 16,
+    flex: 0.25
   },
   pressableOne: {
     alignItems: "center",
