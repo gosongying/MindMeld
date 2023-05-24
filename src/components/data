@@ -1,0 +1,8 @@
+const data =[
+    {id: 1, title: "firsttab", image: require("../../assets/firsttab.jpg")},
+      {id: 2, title: "secondtab", image: require("../../assets/secondtab.jpeg")},
+      {id: 3, title: "thirdtab", image: require("../../assets/thirdtab.jpeg")},
+      {id: 4, title: "forthtab", image: require("../../assets/forthtab.jpeg")}
+];
+
+export default data;
