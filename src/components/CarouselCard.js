@@ -15,7 +15,6 @@ import {
     ImageBackground,
   } from "react-native";
 
-  //import data from "./data"
   import Carousel, { Pagination } from 'react-native-snap-carousel'
 
   const data =[
