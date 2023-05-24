@@ -11,7 +11,7 @@ import {
   Pressable,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import Slider from '../component/Slider'
+import Slider from '../components/Slider'
 
 const LandingPage = ({navigation}) => {
 
