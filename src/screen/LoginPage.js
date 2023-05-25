@@ -4,16 +4,12 @@ import {
   StyleSheet,
   View,
   Text,
-  StatusBar,
   Image,
   TextInput,
-  Pressable,
   KeyboardAvoidingView,
-  Button,
 } from "react-native";
 
-const LoginPage = ({navigation}) => {
-  
+const LoginPage = ({ navigation }) => {
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
 
@@ -36,14 +32,14 @@ const LoginPage = ({navigation}) => {
   const goToLanding = () => navigation.navigate("Landing");
 
   return (
-    <KeyboardAvoidingView style={styles.container1} >
-      <TouchableOpacity style={styles.button} onPress={goToLanding}>
-        <Text style={styles.text7} >{'\u2190'}</Text >
+    <KeyboardAvoidingView style={styles.container}>
+      <TouchableOpacity style={styles.backButton} onPress={goToLanding}>
+        <Text style={styles.backButtonText}>&larr;</Text>
       </TouchableOpacity>
-      <Image source={require("../../assets/logoOnly.png")} />
-      <Text style={styles.text1}>Log in now!</Text>
+      <Image source={require("../../assets/logoOnly.png")} style={styles.logo} />
+      <Text style={styles.title}>Log in now!</Text>
       <TextInput
-        style={styles.text2}
+        style={styles.input}
         placeholder="Enter your email address"
         textAlign="left"
         keyboardType="email-address"
@@ -52,7 +48,7 @@ const LoginPage = ({navigation}) => {
         autoCapitalize="none"
       />
       <TextInput
-        style={styles.text2}
+        style={styles.input}
         placeholder="Enter your password"
         textAlign="left"
         secureTextEntry={true}
@@ -60,19 +56,16 @@ const LoginPage = ({navigation}) => {
         value={password}
         autoCapitalize="none"
       />
-      <TouchableOpacity
-        style={styles.pressable1}
-        onPress={goToHome}
-      >
-        <Text style={styles.text3}>Login</Text>
+      <TouchableOpacity style={styles.loginButton} onPress={goToHome}>
+        <Text style={styles.loginButtonText}>Login</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={forgotPassword}>
-        <Text style={styles.text4}>Forgot your password?</Text>
+        <Text style={styles.forgotPasswordText}>Forgot your password?</Text>
       </TouchableOpacity>
-      <View style={styles.container2}>
-        <Text style={styles.text5}>Don't have an account?</Text>
-        <TouchableOpacity style={styles.pressable2} onPress={goToSignup}>
-          <Text style={styles.text6}>Sign up</Text>
+      <View style={styles.signupContainer}>
+        <Text style={styles.signupText}>Don't have an account?</Text>
+        <TouchableOpacity style={styles.signupButton} onPress={goToSignup}>
+          <Text style={styles.signupButtonText}>Sign up</Text>
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
@@ -80,22 +73,32 @@ const LoginPage = ({navigation}) => {
 };
 
 const styles = StyleSheet.create({
-  container1: {
+  container: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 20,
   },
-  container2: {
-    flexDirection: "row",
-    alignItems: "center",
+  backButton: {
+    position: "absolute",
+    top: 40,
+    left: 20,
   },
-  text1: {
+  backButtonText: {
+    fontSize: 35,
+    color: "#710EF1",
+    fontWeight: "bold",
+  },
+  logo: {
+    marginBottom: 20,
+  },
+  title: {
     fontSize: 30,
     fontWeight: "bold",
     marginBottom: 20,
+    textAlign: "center",
   },
-  text2: {
+  input: {
     width: 325,
     height: 40,
     fontSize: 14,
@@ -105,38 +108,10 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 10,
   },
-
-  text3: {
-    fontSize: 14,
-    color: "white",
-    fontWeight: "bold",
-  },
-  text4: {
-    fontSize: 12,
-    color: "gray",
-    marginBottom: 16,
-  },
-  text5: {
-    fontSize: 14,
-    color: "gray",
-    marginRight: 50,
-  },
-  text6: {
-    fontSize: 14,
-    color: "#710EF1",
-    fontWeight: "bold",
-    textDecorationLine: "underline",
-    padding: 5,
-  },
-  text7: {
-    fontSize: 35,
-    color: "#710EF1",
-    fontWeight: "bold",
-  },
-  pressable1: {
+  loginButton: {
     width: 325,
     height: 40,
-    MarginTop: 30,
+    marginTop: 30,
     alignItems: "center",
     justifyContent: "center",
     padding: 10,
@@ -144,11 +119,34 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     borderRadius: 10,
   },
-  button: {
-    position: 'relative',
-    bottom: 150,
-    right: 150
-  }
+  loginButtonText: {
+    fontSize: 14,
+    color: "white",
+    fontWeight: "bold",
+  },
+  forgotPasswordText: {
+    fontSize: 12,
+    color: "gray",
+    marginBottom: 16,
+  },
+  signupContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  signupText: {
+    fontSize: 14,
+    color: "gray",
+    marginRight: 50,
+  },
+  signupButton: {
+    padding: 5,
+  },
+  signupButtonText: {
+    fontSize: 14,
+    color: "#710EF1",
+    fontWeight: "bold",
+    textDecorationLine: "underline",
+  },
 });
 
 export default LoginPage;

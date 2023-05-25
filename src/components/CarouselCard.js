@@ -1,15 +1,8 @@
-import React, {useRef} from 'react';
+import React from 'react';
 import {
-    TouchableOpacity,
     StyleSheet,
     View,
     Text,
-    StatusBar,
-    Image,
-    TextInput,
-    Pressable,
-    KeyboardAvoidingView,
-    FlatList,
     Dimensions,
     SafeAreaView,
     ImageBackground,
@@ -117,7 +110,7 @@ const styles = StyleSheet.create({
     justifyContent:'center',
     alignItems:'center',
    //height:20,
-   marginBottom:420,
+   marginBottom:435,
   },
   title: {
     fontSize:20,

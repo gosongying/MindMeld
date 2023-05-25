@@ -11,7 +11,6 @@ import {
   Pressable,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import Slider from '../components/Slider'
 import CarouselCard from "../components/CarouselCard";
 
 const LandingPage = ({navigation}) => {
@@ -58,11 +57,11 @@ const styles = StyleSheet.create({
     //flex: 0.25
   },
   title: {
-    fontSize: 24,
+    fontSize: 30,
     fontWeight: "bold",
   },
   welcome: {
-    fontSize: 24,
+    fontSize: 30,
     fontWeight: "bold",
   },
   center: {

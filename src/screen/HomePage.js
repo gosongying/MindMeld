@@ -4,26 +4,54 @@ import {
     StyleSheet,
     View,
     Text,
-    StatusBar,
-    Image,
-    TextInput,
-    Pressable,
-    KeyboardAvoidingView,
-    FlatList
+    FlatList,
+    SafeAreaView
   } from "react-native";
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { NavigationContainer } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import LandingPage from './LandingPage';
-import Details from '../components/Details';
+import Details from '../components/Details'
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import Features from '../components/Features';
+import StudyMode from '../components/StudyMode';
+import StudyWhat from '../components/StudyWhat';
+import HelloName from '../components/HelloName';
 
-//TODO: The 4 Screens
 const StudyDashBoard = () => {
-    return(
-        <View style={styles.container}>
+    const DATA = [
+      {
+        id: '1',
+        title: 'studyWhat',
+        component: StudyWhat,
+      },
+      {
+        id: '2',
+        title: 'studyMode',
+        component: StudyMode,
+      },
+      {
+        id: '3',
+        title: 'Features',
+        component: Features,
+      },
+    ];
+  
+    const renderOption = ({ item }) => (
+        <View style={styles.optionContainer}>
+            <item.component />
         </View>
-    )
-}
+      );
+  
+    return (
+      <SafeAreaView style={styles.container}>
+        <HelloName />
+        <FlatList
+          data={DATA}
+          renderItem={renderOption}
+          keyExtractor={item => item.id}
+          contentContainerStyle={styles.listContentContainer}
+        />
+      </SafeAreaView>
+    );
+  };
 
 const StudyCommunity = () => {
     return(
@@ -39,38 +67,68 @@ const Achievements = () => {
     )
 }
 
-//screen 1,2,3 not implemented yet
-const Menu = ( {navigation} ) => {
+const Menu = ({ navigation }) => {
     const options = [
-    { id: '1', title: 'Profile Settings', screen: 'ProfileSettingsScreen' }, // Set up avatar, username, pw, etc.
-    { id: '2', title: 'Privacy Settings', screen: 'PrivacySettingsScreen' }, // Notifications, app collection? etc.
-    { id: '3', title: 'About', screen: 'AboutScreen' },
-    { id: '4', title: 'Logout', screen:'LandingPage' }
+      { id: '1', title: 'Profile Settings', screen: 'Profile' },
+      { id: '2', title: 'Privacy Settings', screen: 'Privacy' },
+      { id: '3', title: 'About', screen: 'About' },
+      { id: '4', title: 'Logout', screen: 'Landing' },
     ];
-
+  
     const navigateToScreen = (screen) => {
-        navigation.navigate(screen);
-      };
-
+      navigation.navigate(screen);
+    };
+  
+    const icon = (item) => {
+      let iconName;
+      if (item.id === '1') {
+        iconName = 'people';
+      } else if (item.id === '2') {
+        iconName = 'key';
+      } else if (item.id === '3') {
+        iconName = 'information-circle';
+      } else if (item.id === '4') {
+        iconName = 'log-out';
+      }
+      return iconName;
+    };
+  
     const renderOption = ({ item }) => (
-        <TouchableOpacity onPress={() => navigateToScreen(item.screen)}>
-          <Text>{item.title}</Text>
-        </TouchableOpacity>
-      );
-    
-      //TODO: 
-    return (
-    <View>
-        <Text> Some details </Text> {/*A component to showcase the details of the user, ref to ../components/details */}
-        <FlatList
-        data={options}
-        renderItem={renderOption}
-        keyExtractor={(item) => item.id}
+      <TouchableOpacity onPress={() => navigateToScreen(item.screen)}>
+        <View style={styles.optionContainer}>
+          <View style={styles.leftContainer}>
+            <Ionicons name={icon(item)} size={25} style={styles.icon} />
+            <Text style={styles.optionTitle}>{item.title}</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={25} style={styles.icon} />
+        </View>
+        <View
+            style={{
+                borderBottomColor: 'black',
+                borderBottomWidth: StyleSheet.hairlineWidth,
+                width: '88%',
+                alignSelf: 'center',
+            }}
         />
-    </View>
+      </TouchableOpacity>
     );
-};
-
+  
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.detailsContainer}>
+          <Details />
+        </View>
+        <View style={styles.separator} />
+        <View style={styles.optionListContainer}>
+          <FlatList
+            data={options}
+            renderItem={renderOption}
+            keyExtractor={(item) => item.id}
+          />
+        </View>
+      </SafeAreaView>
+    );
+  };
 const Tab = createBottomTabNavigator();
 
 const HomePage = () => {
@@ -106,9 +164,49 @@ const HomePage = () => {
 const styles = StyleSheet.create({
     container: {
       flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
     },
+    listContentContainer: {
+        flexGrow: 1,
+        justifyContent: 'space-between',
+      },
+      optionContainer: {
+        flex: 1,
+        alignItems: 'stretch',
+        justifyContent: 'center',
+        marginVertical: 10,
+      },
+      detailsContainer: {
+        marginBottom: 10,
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+      },
+      separator: {
+        borderBottomColor: 'black',
+        borderBottomWidth: StyleSheet.hairlineWidth,
+      },
+      optionListContainer: {
+        flex: 1,
+      },
+      optionContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+      },
+      leftContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+      },
+      icon: {
+        marginRight: 10,
+        color: 'black',
+      },
+      optionTitle: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: 'black',
+      },
   })
 
 export default HomePage

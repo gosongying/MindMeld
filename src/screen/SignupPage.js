@@ -4,14 +4,12 @@ import {
   StyleSheet,
   View,
   Text,
-  StatusBar,
   Image,
   TextInput,
-  Pressable,
   KeyboardAvoidingView,
 } from "react-native";
 
-const SignupPage = ({navigation}) => {
+const SignupPage = ({ navigation }) => {
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
 
@@ -34,14 +32,14 @@ const SignupPage = ({navigation}) => {
   const goToLanding = () => navigation.navigate("Landing");
 
   return (
-    <KeyboardAvoidingView style={styles.container1}>
-      <TouchableOpacity style={styles.button} onPress={goToLanding}>
-        <Text style={styles.text6} >{'\u2190'}</Text >
+    <KeyboardAvoidingView style={styles.container}>
+      <TouchableOpacity style={styles.backButton} onPress={goToLanding}>
+        <Text style={styles.backButtonText}>&larr;</Text>
       </TouchableOpacity>
-      <Image source={require("../../assets/logoOnly.png")} />
-      <Text style={styles.text1}>Welcome. Sign Up now!</Text>
+      <Image source={require("../../assets/logoOnly.png")} style={styles.logo} />
+      <Text style={styles.title}>Welcome. Sign Up now!</Text>
       <TextInput
-        style={styles.text2}
+        style={styles.input}
         placeholder="Enter your email address"
         textAlign="left"
         keyboardType="email-address"
@@ -49,26 +47,21 @@ const SignupPage = ({navigation}) => {
         value={name}
       />
       <TextInput
-        style={styles.text2}
+        style={styles.input}
         placeholder="Enter your password"
         textAlign="left"
         secureTextEntry={true}
         onChangeText={handlePasswordChange}
         value={password}
       />
-      <TouchableOpacity
-        style={styles.pressable1}
-        onPress={goToHome}
-      >
-        <Text style={styles.text3}>Sign up</Text>
+      <TouchableOpacity style={styles.signupButton} onPress={goToHome}>
+        <Text style={styles.signupButtonText}>Sign up</Text>
       </TouchableOpacity>
-      <Text style={{ marginBottom: 15 }}>
-        ___________________________________________
-      </Text>
-      <View style={styles.container2}>
-        <Text style={styles.text4}>Already a user?</Text>
+      <View style={styles.divider} />
+      <View style={styles.loginContainer}>
+        <Text style={styles.loginText}>Already a user?</Text>
         <TouchableOpacity onPress={goToLogin}>
-          <Text style={styles.text5}>Login</Text>
+          <Text style={styles.loginLink}>Login</Text>
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
@@ -76,22 +69,32 @@ const SignupPage = ({navigation}) => {
 };
 
 const styles = StyleSheet.create({
-  container1: {
+  container: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 20,
   },
-  container2: {
-    flexDirection: "row",
-    alignItems: "center",
+  backButton: {
+    position: "absolute",
+    top: 40,
+    left: 20,
   },
-  text1: {
+  backButtonText: {
+    fontSize: 35,
+    color: "#710EF1",
+    fontWeight: "bold",
+  },
+  logo: {
+    marginBottom: 20,
+  },
+  title: {
     fontSize: 30,
     fontWeight: "bold",
     marginBottom: 20,
+    textAlign: "center",
   },
-  text2: {
+  input: {
     width: 325,
     height: 40,
     fontSize: 14,
@@ -101,31 +104,10 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 10,
   },
-
-  text3: {
-    fontSize: 14,
-    color: "white",
-    fontWeight: "bold",
-  },
-  text4: {
-    fontSize: 12,
-    color: "gray",
-    marginRight: 10,
-  },
-  text5: {
-    fontSize: 12,
-    color: "gray",
-    textDecorationLine: "underline",
-  },
-  text6: {
-    fontSize: 35,
-    color: "#710EF1",
-    fontWeight: "bold",
-  },
-  pressable1: {
+  signupButton: {
     width: 325,
     height: 40,
-    MarginTop: 30,
+    marginTop: 30,
     alignItems: "center",
     justifyContent: "center",
     padding: 10,
@@ -133,11 +115,31 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     borderRadius: 10,
   },
-  button: {
-    position: 'relative',
-    bottom: 150,
-    right: 150
-  }
+  signupButtonText: {
+    fontSize: 14,
+    color: "white",
+    fontWeight: "bold",
+  },
+  divider: {
+    height: 1,
+    width: "80%",
+    backgroundColor: "gray",
+    marginVertical: 15,
+  },
+  loginContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  loginText: {
+    fontSize: 12,
+    color: "gray",
+    marginRight: 10,
+  },
+  loginLink: {
+    fontSize: 12,
+    color: "gray",
+    textDecorationLine: "underline",
+  },
 });
 
 export default SignupPage;
