@@ -18,9 +18,9 @@ import {
   import Carousel, { Pagination } from 'react-native-snap-carousel'
 
   const data =[
-    {id: 1, title: "Boost Productivity", des:"Effortless Study with MindMeld", image: require("../../assets/firsttab.jpg")},
+    {id: 1, title: "Boost Productivity", des:"Effortless Study with MindMeld", image: require("../../assets/firsttab2.jpg")},
       {id: 2, title: "Study Smart", des: "Achieve More with MindMeld's Effective Techniques", image: require("../../assets/secondtab.jpeg")},
-      {id: 3, title: "Unlock Potential", des: "Maximize Learning Abilities with MindMeld's Tools", image: require("../../assets/thirdtab.jpeg")},
+      {id: 3, title: "Unlock Potential", des: "Maximize Learning Abilities with MindMeld's Tools", image: require("../../assets/thirdtab2.jpg")},
       {id: 4, title: "Join the Community", des: "Connect, Learn, and Succeed Together with MindMeld", image: require("../../assets/forthtab.jpeg")}
 ];
 
@@ -79,7 +79,8 @@ export default function CarouselCard() {
     height: 10,
     borderRadius: 5,
     marginHorizontal: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.92)'
+    backgroundColor: 'rgba(0, 0, 0, 0.92)',
+    bottom:40
   }}
   inactiveDotOpacity={0.4}
   inactiveDotScale={0.7}
@@ -116,7 +117,7 @@ const styles = StyleSheet.create({
     justifyContent:'center',
     alignItems:'center',
    //height:20,
-   marginBottom:350,
+   marginBottom:420,
   },
   title: {
     fontSize:20,
