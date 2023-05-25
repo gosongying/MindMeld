@@ -8,6 +8,7 @@ import LandingTabs from './src/components/LandingTabs'
 import Slider from './src/components/Slider'
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import CarouselCard from './src/components/CarouselCard.js'
 
 const App = () => {
 
@@ -22,13 +23,15 @@ const App = () => {
         <Stack.Screen name="Home" component={HomePage} />
       </Stack.Navigator>
     </NavigationContainer>
-   );
+    
+  )
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  
 });
 
 export default App;
