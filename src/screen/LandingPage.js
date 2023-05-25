@@ -6,9 +6,6 @@ import {
   View,
   Text,
   StatusBar,
-  Image,
-  TextInput,
-  Pressable,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import CarouselCard from "../components/CarouselCard";

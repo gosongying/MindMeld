@@ -27,7 +27,7 @@ const Features = () => {
       </View>
       <View style={styles.row}>
         <TouchableOpacity style={styles.iconContainer}>
-          <Ionicons name="newspaper-outline" style={styles.con} />
+          <Ionicons name="newspaper-outline" style={styles.icon} />
           <Text style={styles.text}>Notes</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.iconContainer}>
