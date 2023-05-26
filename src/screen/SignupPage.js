@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   TouchableOpacity,
   StyleSheet,
@@ -9,11 +9,20 @@ import {
   TextInput,
   Pressable,
   KeyboardAvoidingView,
+  Alert,
+  ActivityIndicator,
 } from "react-native";
+
+import { auth } from "../../firebase"
+
+import { createUserWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
 
 const SignupPage = ({navigation}) => {
   const [name, setName] = useState("");
+
   const [password, setPassword] = useState("");
+
+  const [loading, setLoading] = useState(false);
 
   const handleNameChange = (text) => {
     setName(text);
@@ -25,6 +34,42 @@ const SignupPage = ({navigation}) => {
 
   const forgotPassword = () => {
     console.log("Forgot Password Pressed");
+  };
+
+  useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        navigation.navigate("Home");
+      } 
+    })
+  }, []);
+
+  
+  const signupUser = () => {
+
+    setLoading(true);
+
+    createUserWithEmailAndPassword(auth, name, password)
+    .then((userCredential) => {
+      setLoading(false);
+      console.log(userCredential.email)
+    })
+    .catch((error) => {
+      setLoading(false);
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      if (errorCode === "auth/invalid-email") {
+        Alert.alert("Invalid email address");
+      } else if (errorCode === "auth/email-already-in-use") {
+        Alert.alert("Email address is already used by other account");
+      } else if (errorCode === "auth/missing-password") {
+        Alert.alert("Password cannot be empty");
+      } else if (errorCode === "auth/missing-email") {
+        Alert.alert("Email cannot be empty");
+      } else {
+        console.log(errorMessage);
+      }
+    })
   };
 
   const goToHome = () => navigation.navigate("Home");
@@ -47,6 +92,8 @@ const SignupPage = ({navigation}) => {
         keyboardType="email-address"
         onChangeText={handleNameChange}
         value={name}
+        autoCapitalize="none"
+        editable={!loading}
       />
       <TextInput
         style={styles.text2}
@@ -55,13 +102,23 @@ const SignupPage = ({navigation}) => {
         secureTextEntry={true}
         onChangeText={handlePasswordChange}
         value={password}
+        autoCapitalize="none"
+        editable={!loading}
       />
-      <TouchableOpacity
-        style={styles.pressable1}
-        onPress={goToHome}
-      >
+      {loading ? (
+        <View style={styles.loading}>
+          <ActivityIndicator size="small" color="#0000ff" />
+        </View>
+      )
+        : (
+        <TouchableOpacity
+          style={styles.pressable1}
+          onPress={signupUser}>
         <Text style={styles.text3}>Sign up</Text>
       </TouchableOpacity>
+      )
+        }
+      
       <Text style={{ marginBottom: 15 }}>
         ___________________________________________
       </Text>
@@ -74,6 +131,7 @@ const SignupPage = ({navigation}) => {
     </KeyboardAvoidingView>
   );
 };
+
 
 const styles = StyleSheet.create({
   container1: {
@@ -125,13 +183,16 @@ const styles = StyleSheet.create({
   pressable1: {
     width: 325,
     height: 40,
-    MarginTop: 30,
     alignItems: "center",
     justifyContent: "center",
     padding: 10,
     backgroundColor: "#710EF1",
     marginBottom: 10,
     borderRadius: 10,
+  },
+  loading: {
+    height: 40,
+    marginBottom: 10
   },
   button: {
     position: 'relative',

@@ -4,8 +4,6 @@ import LandingPage from './src/screen/LandingPage'
 import LoginPage from './src/screen/LoginPage'
 import SignupPage from './src/screen/SignupPage'
 import HomePage from './src/screen/HomePage'
-import LandingTabs from './src/components/LandingTabs'
-import Slider from './src/components/Slider'
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import CarouselCard from './src/components/CarouselCard.js'
