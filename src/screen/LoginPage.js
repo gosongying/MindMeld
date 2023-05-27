@@ -124,32 +124,22 @@ const LoginPage = ({navigation}) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
+  container1: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 20,
   },
-  backButton: {
-    position: "absolute",
-    top: 40,
-    left: 20,
+  container2: {
+    flexDirection: "row",
+    alignItems: "center",
   },
-  backButtonText: {
-    fontSize: 35,
-    color: "#710EF1",
-    fontWeight: "bold",
-  },
-  logo: {
-    marginBottom: 20,
-  },
-  title: {
+  text1: {
     fontSize: 30,
     fontWeight: "bold",
     marginBottom: 20,
-    textAlign: "center",
   },
-  input: {
+  text2: {
     width: 325,
     height: 40,
     fontSize: 14,
@@ -159,10 +149,37 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 10,
   },
-  loginButton: {
+
+  text3: {
+    fontSize: 14,
+    color: "white",
+    fontWeight: "bold",
+  },
+  text4: {
+    fontSize: 12,
+    color: "gray",
+    marginBottom: 16,
+  },
+  text5: {
+    fontSize: 14,
+    color: "gray",
+    marginRight: 50,
+  },
+  text6: {
+    fontSize: 14,
+    color: "#710EF1",
+    fontWeight: "bold",
+    textDecorationLine: "underline",
+    padding: 5,
+  },
+  text7: {
+    fontSize: 35,
+    color: "#710EF1",
+    fontWeight: "bold",
+  },
+  pressable1: {
     width: 325,
     height: 40,
-    marginTop: 30,
     alignItems: "center",
     justifyContent: "center",
     padding: 10,
@@ -170,34 +187,15 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     borderRadius: 10,
   },
-  loginButtonText: {
-    fontSize: 14,
-    color: "white",
-    fontWeight: "bold",
-  },
-  forgotPasswordText: {
-    fontSize: 12,
-    color: "gray",
+  loading: {
+    height: 40,
     marginBottom: 16,
   },
-  signupContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  signupText: {
-    fontSize: 14,
-    color: "gray",
-    marginRight: 50,
-  },
-  signupButton: {
-    padding: 5,
-  },
-  signupButtonText: {
-    fontSize: 14,
-    color: "#710EF1",
-    fontWeight: "bold",
-    textDecorationLine: "underline",
-  },
-});
-
+  button: {
+    position: 'relative',
+    bottom: 150,
+    right: 150
+  }
+}); 
+ 
 export default LoginPage;
