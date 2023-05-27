@@ -10,14 +10,18 @@
   },
   "dependencies": {
     "@react-native-community/checkbox": "^0.5.15",
+    "@react-native-firebase/app": "^17.5.0",
     "@react-navigation/bottom-tabs": "^6.5.7",
     "@react-navigation/native": "^6.1.6",
     "@react-navigation/stack": "^6.3.16",
+    "@supabase/supabase-js": "^2.22.0",
     "expo": "~48.0.15",
     "expo-status-bar": "~1.4.4",
+    "firebase": "^9.22.0",
     "react": "18.2.0",
     "react-native": "0.71.8",
     "react-native-checkbox": "^2.0.0",
+    "react-native-dotenv": "^3.4.8",
     "react-native-snap-carousel": "^4.0.0-beta.6",
     "react-native-svg": "13.4.0"
   },

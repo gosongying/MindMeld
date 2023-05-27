@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   TouchableOpacity,
   SafeAreaView,
@@ -9,12 +9,40 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import CarouselCard from "../components/CarouselCard";
+import { signInAnonymously, onAuthStateChanged } from "firebase/auth";
+import { auth } from "../../firebase"
+
 
 const LandingPage = ({navigation}) => {
 
-  const goToLogin = () => navigation.navigate("Login")
+  const [loading, setLoading] = useState(false);
+
+  const goToLogin = () => navigation.navigate("Login");
+
   const goToSignup = () => navigation.navigate("Signup");
-  const continueAsGuest = () => navigation.navigate("Home");
+
+  const continueAsGuest = () => {
+
+    setLoading(true);
+
+    signInAnonymously(auth)
+    .then((userCredential) => {
+      console.log("Anon");
+      setLoading(false)})
+    .catch((error) => {
+    setLoading(false)
+    console.error('An error occurred during anonymous sign-in:', error);
+    })
+  };
+
+  useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        navigation.navigate("Home");
+        console.log(user);
+      } 
+    })
+  }, []);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -26,13 +54,19 @@ const LandingPage = ({navigation}) => {
         <CarouselCard />
       </View>
       <View style={styles.bottom}>
-        <TouchableOpacity style={styles.pressableOne} onPress={goToLogin}>
+        <TouchableOpacity 
+          style={styles.pressableOne} 
+          onPress={goToLogin}
+          disabled={loading}>
           <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.pressableTwo} onPress={goToSignup}>
+        <TouchableOpacity 
+          style={styles.pressableTwo} 
+          onPress={goToSignup}
+          disabled={loading}>
           <Text style={styles.buttonText}>Signup</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={continueAsGuest}>
+        <TouchableOpacity onPress={continueAsGuest} disabled={loading}>
           <Text style={styles.guest}>Continue as a guest</Text>
         </TouchableOpacity>
       </View>
@@ -65,7 +99,7 @@ const styles = StyleSheet.create({
     //flex: 1,
     //justifyContent: "center",
     //alignItems: "center",
-    bottom:50
+    bottom:30
   },
   navigator: {
     fontSize: 18,
@@ -74,7 +108,7 @@ const styles = StyleSheet.create({
   bottom: {
     paddingBottom: 16,
     paddingHorizontal: 16,
-    bottom:50
+    bottom:70
    // flex: 0.25
   },
   pressableOne: {
