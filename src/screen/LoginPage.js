@@ -9,12 +9,16 @@ import {
   KeyboardAvoidingView,
 } from "react-native";
 
-const LoginPage = ({ navigation }) => {
-  const [name, setName] = useState("");
+const LoginPage = ({navigation}) => {
+  
+  const [email, setEmail] = useState("");
+
   const [password, setPassword] = useState("");
 
-  const handleNameChange = (text) => {
-    setName(text);
+  const[loading, setLoading] = useState(false);
+
+  const handleEmailChange = (text) => {
+    setEmail(text);
   };
 
   const handlePasswordChange = (text) => {
@@ -27,45 +31,92 @@ const LoginPage = ({ navigation }) => {
 
   const goToSignup = () => navigation.navigate("Signup");
 
-  const goToHome = () => navigation.navigate("Home");
+  useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        navigation.navigate("Home");
+        console.log(user.displayName);
+      } 
+    })
+  }, []);
+
+  const loginUser = () => {
+
+    setLoading(true);
+
+    signInWithEmailAndPassword(auth, email, password)
+    .then((userCredential) => {
+      setLoading(true);
+      console.log("HI")
+    })
+    .catch((error) => {
+      setLoading(false);
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      if (errorCode === "auth/invalid-email") {
+        Alert.alert("Invalid email address");
+      } else if (errorCode === "auth/wrong-password") {
+        Alert.alert("Wrong password");
+      } else if (errorCode === "auth/user-not-found") {
+        Alert.alert("Account does not exist")
+      } else if (errorCode === "auth/missing-password") {
+        Alert.alert("Password cannot be empty");
+      } else {
+        console.log(errorMessage);
+      }
+    })
+  };
 
   const goToLanding = () => navigation.navigate("Landing");
 
   return (
-    <KeyboardAvoidingView style={styles.container}>
-      <TouchableOpacity style={styles.backButton} onPress={goToLanding}>
-        <Text style={styles.backButtonText}>&larr;</Text>
+    <KeyboardAvoidingView style={styles.container1} >
+      <TouchableOpacity style={styles.button} onPress={goToLanding}>
+        <Text style={styles.text7} >{'\u2190'}</Text >
       </TouchableOpacity>
-      <Image source={require("../../assets/logoOnly.png")} style={styles.logo} />
-      <Text style={styles.title}>Log in now!</Text>
+      <Image source={require("../../assets/logoOnly.png")} />
+      <Text style={styles.text1}>Log in now!</Text>
       <TextInput
-        style={styles.input}
+        style={styles.text2}
         placeholder="Enter your email address"
         textAlign="left"
         keyboardType="email-address"
-        onChangeText={handleNameChange}
-        value={name}
+        onChangeText={handleEmailChange}
+        value={email}
         autoCapitalize="none"
+        editable={!loading}
       />
       <TextInput
-        style={styles.input}
+        style={styles.text2}
         placeholder="Enter your password"
         textAlign="left"
         secureTextEntry={true}
         onChangeText={handlePasswordChange}
         value={password}
         autoCapitalize="none"
+        editable={!loading}
       />
-      <TouchableOpacity style={styles.loginButton} onPress={goToHome}>
-        <Text style={styles.loginButtonText}>Login</Text>
+      
+
+      {loading ? (
+        <View style={styles.loading}>  
+          <ActivityIndicator size="small" color="#0000ff" />
+        </View>
+      ) : (
+      <TouchableOpacity 
+        style={styles.pressable1}
+        onPress={loginUser}>
+          <Text style={styles.text3}>Login</Text>
       </TouchableOpacity>
+      )}
       <TouchableOpacity onPress={forgotPassword}>
-        <Text style={styles.forgotPasswordText}>Forgot your password?</Text>
+        <Text style={styles.text4}>Forgot your password?</Text>
       </TouchableOpacity>
-      <View style={styles.signupContainer}>
-        <Text style={styles.signupText}>Don't have an account?</Text>
-        <TouchableOpacity style={styles.signupButton} onPress={goToSignup}>
-          <Text style={styles.signupButtonText}>Sign up</Text>
+      
+      <View style={styles.container2}>
+        <Text style={styles.text5}>Don't have an account?</Text>
+        <TouchableOpacity style={styles.pressable2} onPress={goToSignup}>
+          <Text style={styles.text6}>Sign up</Text>
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
