@@ -1,17 +1,24 @@
 import React from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
+import { SafeAreaView, StyleSheet } from 'react-native';
+import Leaderboard from '../../../components/Home/Achievement/Leaderboard';
+import SignupPage2 from '../../Authentication/SignupPage2';
+import SignupPage from '../../Authentication/SignupPage';
+import LandingPage from '../../Authentication/LandingPage';
+import LoginPage from '../../Authentication/LoginPage';
 
-const Achievements = () => {
-    return(
-        <View style={styles.container}>
-        </View>
-    )
-}
+const Achievement = () => {
+  return (
+    <SafeAreaView style={styles.container}>
+        <SignupPage2/>
+    </SafeAreaView>
+  );
+};
 
 const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      },
-  })
-  
-export default Achievements
+  container: {
+    flex: 1,
+    padding: 20,
+  }
+});
+
+export default Achievement;

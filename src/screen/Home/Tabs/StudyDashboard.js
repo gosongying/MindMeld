@@ -39,6 +39,7 @@ const StudyDashboard = () => {
         renderItem={renderOption}
         keyExtractor={(item) => item.title}
         contentContainerStyle={styles.listContentContainer}
+        showsVerticalScrollIndicator={false}
       />
     </SafeAreaView>
   );
@@ -57,13 +58,6 @@ const styles = StyleSheet.create({
     alignItems: 'stretch',
     justifyContent: 'center',
     marginVertical: 10,
-  },
-  optionItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
   },
 });
 

@@ -1,75 +1,80 @@
 import React from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
-import PropTypes from 'prop-types';
+import { View, Text, StyleSheet, FlatList } from 'react-native';
+import { TouchableOpacity } from 'react-native-gesture-handler';
+import Groups from '../../../components/Home/Community/Groups';
+import FriendList from '../../../components/Home/Community/FriendList';
+import CommunityHeader from '../../../components/Home/Community/CommunityHeader';
+import CommunityTab from '../../../components/Home/Community/CommunityTab';
 
-const StudyCommunity = ({ friendListData }) => {
-  const renderFriendListItem = ({ item }) => {
-    return (
-      <TouchableOpacity style={styles.friendItem}>
-        <Text style={styles.friendName}>{item.name}</Text>
-      </TouchableOpacity>
-    );
-  };
+const StudyCommunity = () => {
+  const DATA = [
+    {
+      id: '1',
+      title: 'Tab',
+      component: CommunityTab,
+    },
+    {
+      id: '2',
+      title: 'Groups',
+      component: Groups,
+    },
+    {
+      id: '3',
+      title: 'FriendList',
+      component: FriendList,
+    },
+  ];
+
+  const renderOption = ({ item }) => (
+    <View style={styles.optionContainer}>
+      <item.component />
+    </View>
+  );
 
   return (
     <View style={styles.container}>
-      <View style={styles.friendListContainer}>
-        <Text style={styles.sectionTitle}>Friend List</Text>
-        <FlatList
-          data={friendListData}
-          renderItem={renderFriendListItem}
-          keyExtractor={(item) => item.id}
-        />
-      </View>
-      <View style={styles.chatContainer}>
-        <Text style={styles.sectionTitle}>Chat</Text>
-        {/* Add your chat component here */}
-      </View>
-      <View style={styles.forumContainer}>
-        <Text style={styles.sectionTitle}>Forum</Text>
-        {/* Add your forum component here */}
-      </View>
+      <CommunityHeader/>
+      <FlatList
+        data={DATA}
+        renderItem={renderOption}
+        keyExtractor={(item) => item.id}
+      />
     </View>
   );
-};
-
-StudyCommunity.propTypes = {
-  friendListData: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-    })
-  ).isRequired,
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
   },
-  sectionTitle: {
+  topContainer: {
+    backgroundColor: '#f1f1f1',
+    padding: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  title: {
     fontSize: 20,
     fontWeight: 'bold',
-    marginBottom: 10,
+  },
+  myGroupsContainer: {
+    backgroundColor: '#e8e8e8',
+    flex: 1,
+    paddingTop: 20,
+    paddingHorizontal: 20,
   },
   friendListContainer: {
+    backgroundColor: '#e8e8e8',
     flex: 1,
-    marginBottom: 20,
+    paddingTop: 20,
+    paddingHorizontal: 20,
   },
-  friendItem: {
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#CCCCCC',
-  },
-  friendName: {
-    fontSize: 16,
-  },
-  chatContainer: {
+  optionContainer: {
     flex: 1,
-    marginBottom: 20,
-  },
-  forumContainer: {
-    flex: 1,
+    alignItems: 'stretch',
+    justifyContent: 'center',
+    marginVertical: 10,
+    marginHorizontal: 10,
   },
 });
 

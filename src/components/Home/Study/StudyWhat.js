@@ -43,7 +43,7 @@ const styles = StyleSheet.create({
   },
   image: {
     height: 200,
-    width: 350,
+    width: 330,
     borderRadius: 10,
   },
   button: {
@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#DC582A',
     padding: 10,
     borderRadius: 10,
-    width: 125,
+    width: 130,
     height: 50,
     justifyContent: 'center',
     alignItems: 'center',
