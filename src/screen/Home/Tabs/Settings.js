@@ -14,7 +14,8 @@ const Settings = ({ navigation }) => {
     { id: '7', title: 'Feedback', screen: 'Feedback' },
     { id: '8', title: 'Terms and Conditions', screen: 'TermsAndConditions' },
     { id: '9', title: 'Help & Support', screen: 'HelpAndSupport' },
-    { id: '10', title: 'Logout', screen: 'Landing' },
+    { id: '10', title: 'About', screen: 'About' },
+    { id: '11', title: 'Logout', screen: 'Landing' },
   ];
 
   const navigateToScreen = (screen) => {
@@ -42,7 +43,9 @@ const Settings = ({ navigation }) => {
     } else if (item.id === '9') {
       iconName = 'help-circle';
     } else if (item.id === '10') {
-      iconName = 'log-out';
+      iconName = 'information-circle';
+    } else if (item.id === '11') {
+      iconName = 'log-out'
     }
     return iconName;
   };
@@ -70,7 +73,8 @@ const Settings = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.detailsContainer}>
-        <Details />
+        <Details navigation={navigation} /> 
+        {/* Pass the navigation prop */}
       </View>
       <View style={styles.separator} />
       <View style={styles.optionListContainer}>
@@ -115,12 +119,6 @@ const styles = StyleSheet.create({
   listContentContainer: {
     flexGrow: 1,
     justifyContent: 'space-between',
-  },
-  optionContainer: {
-    flex: 1,
-    alignItems: 'stretch',
-    justifyContent: 'center',
-    marginVertical: 10,
   },
   detailsContainer: {
     marginBottom: 10,
