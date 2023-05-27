@@ -6,7 +6,9 @@ import {
   View,
   Text,
   StatusBar,
+  ActivityIndicator
 } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 import CarouselCard from "../../components/Authentication/CarouselCard";
 import { signInAnonymously, onAuthStateChanged } from "firebase/auth";
 import { auth } from "../../../firebase"
@@ -16,11 +18,11 @@ const LandingPage = ({navigation}) => {
 
   const [loading, setLoading] = useState(false);
 
-  const goToLogin = () => navigation.navigate("Login");
+  const goToLogin = () => navigation.replace("Login");  //go to login screen
 
-  const goToSignup = () => navigation.navigate("Signup");
+  const goToSignup = () => navigation.replace("Signup");  //go to signup screen
 
-  const continueAsGuest = () => {
+  const continueAsGuest = () => {  //to signin anonymously
 
     setLoading(true);
 
@@ -37,7 +39,7 @@ const LandingPage = ({navigation}) => {
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (user) {
-        navigation.navigate("Home");
+        navigation.replace("Home");  //if signin successfully, navigate to Home screen
         console.log(user);
       } 
     })
@@ -84,7 +86,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 16,
     paddingTop: 16,
-    //flex: 0.25
   },
   title: {
     fontSize: 30,
@@ -95,9 +96,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   center: {
-    //flex: 1,
-    //justifyContent: "center",
-    //alignItems: "center",
     bottom:30
   },
   navigator: {
@@ -108,7 +106,6 @@ const styles = StyleSheet.create({
     paddingBottom: 16,
     paddingHorizontal: 16,
     bottom:70
-   // flex: 0.25
   },
   pressableOne: {
     alignItems: "center",

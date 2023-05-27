@@ -7,7 +7,7 @@ import {
   } from "react-native";
 
   const SessionsSetting = ({navigation}) => {
-    const goToHome = () => navigation.navigate("Home") 
+    const goToHome = () => navigation.replace("Home") 
 
     return (
         <SafeAreaView>

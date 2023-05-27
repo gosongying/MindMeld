@@ -2,6 +2,7 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 
+
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -12,7 +13,7 @@ const firebaseConfig = {
   projectId: "orbital-d8bd4",
   storageBucket: "orbital-d8bd4.appspot.com",
   messagingSenderId: "378839224959",
-  appId: "1:378839224959:web:bfecb7074d1902e4af654a"
+  appId: "1:378839224959:web:bfecb7074d1902e4af654a",
 };
 
 // Initialize Firebase

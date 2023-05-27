@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
 import Details from '../../../components/Home/Settings/Details';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { auth } from "../../../../firebase"
 
 const Settings = ({ navigation }) => {
   const options = [
@@ -19,8 +21,21 @@ const Settings = ({ navigation }) => {
   ];
 
   const navigateToScreen = (screen) => {
-    navigation.navigate(screen);
+    if (screen === 'Landing') {  //when Logout is clicked.
+      signOut(auth)
+      .then(() => console.log("signed out succesfully"))
+      .catch((error) => console.log(error));
+      return;
+    }     
+     navigation.replace(screen);
   };
+
+  useEffect(() => 
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        navigation.replace("Landing");
+      }
+    }));
 
   const icon = (item) => {
     let iconName;

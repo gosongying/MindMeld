@@ -6,6 +6,7 @@ import StudyDashboard from './Tabs/StudyDashboard';
 import StudyCommunity from './Tabs/StudyCommunity';
 import Achievements from './Tabs/Achievement';
 import Settings from './Tabs/Settings';
+import { TouchableWithoutFeedback } from 'react-native';
 
 
 const Tab = createBottomTabNavigator();
@@ -35,7 +36,7 @@ const HomePage = () => {
             <Tab.Screen name={'StudyDashboard'} component={StudyDashboard} options={{ tabBarLabel: 'Study', headerShown:false }}/>
             <Tab.Screen name={'StudyCommunity'} component={StudyCommunity} options={{ tabBarLabel: 'Community', headerShown:false }}/>
             <Tab.Screen name={'Achievements'} component={Achievements} options={{ tabBarLabel: 'Achievement', headerShown:false }}/>
-            <Tab.Screen name={'Menu'} component={Settings} options={{ tabBarLabel: 'Settings', headerShown:false }}/>
+            <Tab.Screen name={'Menu'} component={Settings} options={{ headerShown:false }}/>
         </Tab.Navigator>
   )
 }

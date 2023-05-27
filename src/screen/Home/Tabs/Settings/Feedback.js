@@ -7,7 +7,7 @@ import {
   } from "react-native";
 
   const Feedback = ({navigation}) => {
-    const goToHome = () => navigation.navigate("Home") 
+    const goToHome = () => navigation.replace("Home") 
 
     return (
         <SafeAreaView>

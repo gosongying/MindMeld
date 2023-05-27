@@ -6,7 +6,7 @@ import {
     SafeAreaView
   } from "react-native";
 
-  const About = ( {navigation} ) => {
+  const TermsAndCondition = ({navigation}) => {
     const goToHome = () => navigation.replace("Home") 
 
     return (
@@ -24,17 +24,11 @@ import {
         color: "#710EF1",
         fontWeight: "bold",
       },
-    horizontal: {
-        flexDirection: 'row',
-    },
-    text: {
-        alignContent: 'center',
-    },
-    button: {
+      button: {
         position: 'relative',
         bottom: 0,
-        left: 20,
+        left: 20
       }
   })
 
-  export default About
+  export default TermsAndCondition

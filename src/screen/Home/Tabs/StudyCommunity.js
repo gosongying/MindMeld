@@ -7,6 +7,7 @@ import CommunityHeader from '../../../components/Home/Community/CommunityHeader'
 import CommunityTab from '../../../components/Home/Community/CommunityTab';
 
 const StudyCommunity = () => {
+  //item to be shown
   const DATA = [
     {
       id: '1',

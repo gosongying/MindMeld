@@ -30,14 +30,11 @@ const SignupPage = ({navigation}) => {
     setPassword(text);
   };
 
-  const forgotPassword = () => {
-    console.log("Forgot Password Pressed");
-  };
-
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (user) {
-        navigation.navigate("Home");
+        //if user signup successfully, go to Home screen
+        navigation.replace("Home");
       } 
     })
   }, []);
@@ -49,10 +46,12 @@ const SignupPage = ({navigation}) => {
 
     createUserWithEmailAndPassword(auth, name, password)
     .then((userCredential) => {
+      //signup successfully
       setLoading(false);
-      console.log(userCredential.email)
+      console.log(userCredential.user.email)
     })
     .catch((error) => {
+      //handle error when signup
       setLoading(false);
       const errorCode = error.code;
       const errorMessage = error.message;
@@ -64,20 +63,23 @@ const SignupPage = ({navigation}) => {
         Alert.alert("Password cannot be empty");
       } else if (errorCode === "auth/missing-email") {
         Alert.alert("Email cannot be empty");
+      } else if (errorCode === "auth/weak-password") {
+        Alert.alert("Password must be at least 6 characters");
       } else {
         console.log(errorMessage);
       }
     })
   };
 
-  const goToHome = () => navigation.navigate("Home");
+  const goToHome = () => navigation.replace("Home");
 
-  const goToLogin = () => navigation.navigate("Login");
+  const goToLogin = () => navigation.replace("Login");
 
-  const goToLanding = () => navigation.navigate("Landing");
+  const goToLanding = () => navigation.replace("Landing");
 
   return (
     <KeyboardAvoidingView style={styles.container1}>
+      {/* Button for going back to the home screen */}
       <TouchableOpacity style={styles.button} onPress={goToLanding}>
         <Text style={styles.text6} >{'\u2190'}</Text >
       </TouchableOpacity>
@@ -103,6 +105,8 @@ const SignupPage = ({navigation}) => {
         autoCapitalize="none"
         editable={!loading}
       />
+      
+      {/* If it is loading, show the ActivityIndicator, else show the signup button */} 
       {loading ? (
         <View style={styles.loading}>
           <ActivityIndicator size="small" color="#0000ff" />

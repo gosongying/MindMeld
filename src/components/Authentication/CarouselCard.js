@@ -19,6 +19,7 @@ import {
 
 
 function CarouselItem({item}) {
+  //Item to be shown in each page of the carousel
     return (
         <View>
             <ImageBackground source={item.image} style={styles.image} borderRadius={50}>
@@ -36,14 +37,14 @@ export default function CarouselCard() {
    
     const isCarousel = React.useRef(null);
 
-    const [index, setIndex] = React.useState(0);
+    const [index, setIndex] = React.useState(0); //to keep track of currently active dot
 
     const renderDot = (index, active) => {
       const dotStyle = [styles.dot];
       if (active) {
         dotStyle.push(styles.activeDot);
       }
-      return <View style={dotStyle} />;
+      return <View/>;
     };
 
 
@@ -63,6 +64,7 @@ export default function CarouselCard() {
       scrollEnabled={true}
       autoplay={true}
 />
+{/* for creating pagination */}
     <Pagination
   dotsLength={data.length}
   activeDotIndex={index}

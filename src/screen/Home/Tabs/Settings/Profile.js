@@ -7,7 +7,7 @@ import {
   } from "react-native";
 
   const Profile = ({navigation}) => {
-    const goToHome = () => navigation.navigate("Home") 
+    const goToHome = () => navigation.replace("Home") 
 
     return (
         <SafeAreaView>

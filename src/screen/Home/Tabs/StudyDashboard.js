@@ -8,6 +8,7 @@ import HelloName from '../../../components/Home/Study/HelloName';
 
 const StudyDashboard = () => {
   const DATA = [
+    //item to be shown 
     {
       id: '1',
       title: 'studyWhat',
