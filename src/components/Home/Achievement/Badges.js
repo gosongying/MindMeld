@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
-const Leaderboard = () => {
+const Badges = () => {
     return (
         <Text>
 
@@ -11,4 +11,4 @@ const Leaderboard = () => {
 }
 
 
-export default Leaderboard;
+export default Badges;

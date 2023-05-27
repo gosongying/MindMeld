@@ -27,7 +27,15 @@ const Forums = () => {
 
 const CommunityTabs = () => {
   return (
-    <Tab.Navigator>
+    <Tab.Navigator
+    tabBarOptions={{
+        labelStyle: styles.tabLabel,
+        indicatorStyle: styles.tabIndicator,
+        style: styles.tabBar,
+        activeTintColor: '#710ef1',
+        inactiveTintColor: '#000000',
+      }}
+    >
       <Tab.Screen name="Feed" component={CommunityFeed} />
       <Tab.Screen name="Sessions" component={Sessions} />
       <Tab.Screen name="Forums" component={Forums} />
@@ -47,8 +55,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#ffffff',
-    padding: 20,
-    height: 300
+    padding: 5,
+    height: 300,
   },
   header: {
     fontSize: 24,
@@ -59,6 +67,16 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 10,
+  },
+  tabBar: {
+    backgroundColor: '#ffffff',
+
+  },
+  tabLabel: {
+    textTransform: 'none', // Disable Uppercase
+  },
+  tabIndicator: {
+    backgroundColor: '#710ef1',
   },
 });
 
