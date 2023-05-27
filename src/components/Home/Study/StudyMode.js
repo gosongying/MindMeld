@@ -9,7 +9,7 @@ const StudyMode = () => {
   };
 
   return (
-    <ImageBackground source={require('../../assets/studyModeBG.webp')} style={styles.container}>
+    <ImageBackground source={require('../../../../assets/studyModeBG.webp')} style={styles.container}>
       <View style={styles.overlay}>
         <Text style={styles.title}>Study Mode</Text>
         <Text style={styles.description}>
@@ -42,6 +42,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.1)', 
     borderRadius: 10,
     padding: 20,
+    
   },
   title: {
     fontSize: 24,

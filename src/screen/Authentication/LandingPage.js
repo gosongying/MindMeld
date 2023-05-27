@@ -7,10 +7,9 @@ import {
   Text,
   StatusBar,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
-import CarouselCard from "../components/CarouselCard";
+import CarouselCard from "../../components/Authentication/CarouselCard";
 import { signInAnonymously, onAuthStateChanged } from "firebase/auth";
-import { auth } from "../../firebase"
+import { auth } from "../../../firebase"
 
 
 const LandingPage = ({navigation}) => {

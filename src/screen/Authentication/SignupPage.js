@@ -4,16 +4,14 @@ import {
   StyleSheet,
   View,
   Text,
-  StatusBar,
   Image,
   TextInput,
-  Pressable,
   KeyboardAvoidingView,
   Alert,
   ActivityIndicator,
 } from "react-native";
 
-import { auth } from "../../firebase"
+import { auth } from "../../../firebase"
 
 import { createUserWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
 
@@ -83,7 +81,7 @@ const SignupPage = ({navigation}) => {
       <TouchableOpacity style={styles.button} onPress={goToLanding}>
         <Text style={styles.text6} >{'\u2190'}</Text >
       </TouchableOpacity>
-      <Image source={require("../../assets/logoOnly.png")} />
+      <Image source={require("../../../assets/logoOnly.png")} />
       <Text style={styles.text1}>Welcome. Sign Up now!</Text>
       <TextInput
         style={styles.text2}

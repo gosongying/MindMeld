@@ -8,7 +8,7 @@ const Details = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <View style={styles.horizontal}>
-        <Image source={require('../../assets/profileholder.png')} style={styles.profile} />
+        <Image source={require('../../../../assets/profileholder.png')} style={styles.profile} />
         <View style={styles.detailsContainer}>
           <Text style={styles.name}>Your Name</Text>
           <View style={styles.levelContainer}>

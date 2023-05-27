@@ -9,7 +9,7 @@ const HelloName = () => {
         <Text style={styles.nameText}>Your Name</Text>
       </View>
       <Image
-        source={require('../../assets/logoOnly.png')}
+        source={require('../../../../assets/logoOnly.png')}
         style={styles.logo}
       />
     </View>

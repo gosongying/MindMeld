@@ -1,12 +1,12 @@
 import React from 'react';
 import {StyleSheet} from 'react-native';
-import LandingPage from './src/screen/LandingPage'
-import LoginPage from './src/screen/LoginPage'
-import SignupPage from './src/screen/SignupPage'
-import HomePage from './src/screen/HomePage'
-import About from './src/screen/settingScreen/About'
-import Privacy from './src/screen/settingScreen/Privacy'
-import Profile from './src/screen/settingScreen/Profile'
+import LandingPage from './src/screen/Authentication/LandingPage'
+import LoginPage from './src/screen/Authentication/LoginPage'
+import SignupPage from './src/screen/Authentication/SignupPage';
+import HomePage from './src/screen/Home/HomePage'
+import About from './src/screen/Home/Tabs/About';
+import Privacy from './src/screen/Home/Tabs/Privacy';
+import Profile from './src/screen/Home/Tabs/Profile';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 

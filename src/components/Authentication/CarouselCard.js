@@ -11,10 +11,10 @@ import {
   import Carousel, { Pagination } from 'react-native-snap-carousel'
 
   const data =[
-    {id: 1, title: "Boost Productivity", des:"Effortless Study with MindMeld", image: require("../../assets/firsttab2.jpg")},
-      {id: 2, title: "Study Smart", des: "Achieve More with MindMeld's Effective Techniques", image: require("../../assets/secondtab.jpeg")},
-      {id: 3, title: "Unlock Potential", des: "Maximize Learning Abilities with MindMeld's Tools", image: require("../../assets/thirdtab2.jpg")},
-      {id: 4, title: "Join the Community", des: "Connect, Learn, and Succeed Together with MindMeld", image: require("../../assets/forthtab.jpeg")}
+    {id: 1, title: "Boost Productivity", des:"Effortless Study with MindMeld", image: require("../../../assets/firsttab2.jpg")},
+      {id: 2, title: "Study Smart", des: "Achieve More with MindMeld's Effective Techniques", image: require("../../../assets/secondtab.jpeg")},
+      {id: 3, title: "Unlock Potential", des: "Maximize Learning Abilities with MindMeld's Tools", image: require("../../../assets/thirdtab2.jpg")},
+      {id: 4, title: "Join the Community", des: "Connect, Learn, and Succeed Together with MindMeld", image: require("../../../assets/forthtab.jpeg")}
 ];
 
 

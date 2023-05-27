@@ -14,7 +14,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 
-import { auth } from "../../firebase"
+import { auth } from "../../../firebase"
 import { signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
 
 const LoginPage = ({navigation}) => {
@@ -82,7 +82,7 @@ const LoginPage = ({navigation}) => {
       <TouchableOpacity style={styles.button} onPress={goToLanding}>
         <Text style={styles.text7} >{'\u2190'}</Text >
       </TouchableOpacity>
-      <Image source={require("../../assets/logoOnly.png")} />
+      <Image source={require("../../../assets/logoOnly.png")} />
       <Text style={styles.text1}>Log in now!</Text>
       <TextInput
         style={styles.text2}
