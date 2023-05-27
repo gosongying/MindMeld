@@ -17,9 +17,6 @@ import {
 import { auth } from "../../firebase"
 import { signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
 
-import Icon from 'react-native-vector-icons/FontAwesome';
-
-
 const LoginPage = ({navigation}) => {
   
   const [email, setEmail] = useState("");
