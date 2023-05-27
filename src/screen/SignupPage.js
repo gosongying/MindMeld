@@ -1,17 +1,28 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   TouchableOpacity,
   StyleSheet,
   View,
   Text,
+  StatusBar,
   Image,
   TextInput,
+  Pressable,
   KeyboardAvoidingView,
+  Alert,
+  ActivityIndicator,
 } from "react-native";
 
-const SignupPage = ({ navigation }) => {
+import { auth } from "../../firebase"
+
+import { createUserWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
+
+const SignupPage = ({navigation}) => {
   const [name, setName] = useState("");
+
   const [password, setPassword] = useState("");
+
+  const [loading, setLoading] = useState(false);
 
   const handleNameChange = (text) => {
     setName(text);
@@ -25,6 +36,42 @@ const SignupPage = ({ navigation }) => {
     console.log("Forgot Password Pressed");
   };
 
+  useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        navigation.navigate("Home");
+      } 
+    })
+  }, []);
+
+  
+  const signupUser = () => {
+
+    setLoading(true);
+
+    createUserWithEmailAndPassword(auth, name, password)
+    .then((userCredential) => {
+      setLoading(false);
+      console.log(userCredential.email)
+    })
+    .catch((error) => {
+      setLoading(false);
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      if (errorCode === "auth/invalid-email") {
+        Alert.alert("Invalid email address");
+      } else if (errorCode === "auth/email-already-in-use") {
+        Alert.alert("Email address is already used by other account");
+      } else if (errorCode === "auth/missing-password") {
+        Alert.alert("Password cannot be empty");
+      } else if (errorCode === "auth/missing-email") {
+        Alert.alert("Email cannot be empty");
+      } else {
+        console.log(errorMessage);
+      }
+    })
+  };
+
   const goToHome = () => navigation.navigate("Home");
 
   const goToLogin = () => navigation.navigate("Login");
@@ -32,69 +79,77 @@ const SignupPage = ({ navigation }) => {
   const goToLanding = () => navigation.navigate("Landing");
 
   return (
-    <KeyboardAvoidingView style={styles.container}>
-      <TouchableOpacity style={styles.backButton} onPress={goToLanding}>
-        <Text style={styles.backButtonText}>&larr;</Text>
+    <KeyboardAvoidingView style={styles.container1}>
+      <TouchableOpacity style={styles.button} onPress={goToLanding}>
+        <Text style={styles.text6} >{'\u2190'}</Text >
       </TouchableOpacity>
-      <Image source={require("../../assets/logoOnly.png")} style={styles.logo} />
-      <Text style={styles.title}>Welcome. Sign Up now!</Text>
+      <Image source={require("../../assets/logoOnly.png")} />
+      <Text style={styles.text1}>Welcome. Sign Up now!</Text>
       <TextInput
-        style={styles.input}
+        style={styles.text2}
         placeholder="Enter your email address"
         textAlign="left"
         keyboardType="email-address"
         onChangeText={handleNameChange}
         value={name}
+        autoCapitalize="none"
+        editable={!loading}
       />
       <TextInput
-        style={styles.input}
+        style={styles.text2}
         placeholder="Enter your password"
         textAlign="left"
         secureTextEntry={true}
         onChangeText={handlePasswordChange}
         value={password}
+        autoCapitalize="none"
+        editable={!loading}
       />
-      <TouchableOpacity style={styles.signupButton} onPress={goToHome}>
-        <Text style={styles.signupButtonText}>Sign up</Text>
+      {loading ? (
+        <View style={styles.loading}>
+          <ActivityIndicator size="small" color="#0000ff" />
+        </View>
+      )
+        : (
+        <TouchableOpacity
+          style={styles.pressable1}
+          onPress={signupUser}>
+        <Text style={styles.text3}>Sign up</Text>
       </TouchableOpacity>
-      <View style={styles.divider} />
-      <View style={styles.loginContainer}>
-        <Text style={styles.loginText}>Already a user?</Text>
+      )
+        }
+      
+      <Text style={{ marginBottom: 15 }}>
+        ___________________________________________
+      </Text>
+      <View style={styles.container2}>
+        <Text style={styles.text4}>Already a user?</Text>
         <TouchableOpacity onPress={goToLogin}>
-          <Text style={styles.loginLink}>Login</Text>
+          <Text style={styles.text5}>Login</Text>
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
   );
 };
 
+
 const styles = StyleSheet.create({
-  container: {
+  container1: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 20,
   },
-  backButton: {
-    position: "absolute",
-    top: 40,
-    left: 20,
+  container2: {
+    flexDirection: "row",
+    alignItems: "center",
   },
-  backButtonText: {
-    fontSize: 35,
-    color: "#710EF1",
-    fontWeight: "bold",
-  },
-  logo: {
-    marginBottom: 20,
-  },
-  title: {
+  text1: {
     fontSize: 30,
     fontWeight: "bold",
     marginBottom: 20,
-    textAlign: "center",
   },
-  input: {
+  text2: {
     width: 325,
     height: 40,
     fontSize: 14,
@@ -104,10 +159,30 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 10,
   },
-  signupButton: {
+
+  text3: {
+    fontSize: 14,
+    color: "white",
+    fontWeight: "bold",
+  },
+  text4: {
+    fontSize: 12,
+    color: "gray",
+    marginRight: 10,
+  },
+  text5: {
+    fontSize: 12,
+    color: "gray",
+    textDecorationLine: "underline",
+  },
+  text6: {
+    fontSize: 35,
+    color: "#710EF1",
+    fontWeight: "bold",
+  },
+  pressable1: {
     width: 325,
     height: 40,
-    marginTop: 30,
     alignItems: "center",
     justifyContent: "center",
     padding: 10,
@@ -115,31 +190,15 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     borderRadius: 10,
   },
-  signupButtonText: {
-    fontSize: 14,
-    color: "white",
-    fontWeight: "bold",
+  loading: {
+    height: 40,
+    marginBottom: 10
   },
-  divider: {
-    height: 1,
-    width: "80%",
-    backgroundColor: "gray",
-    marginVertical: 15,
-  },
-  loginContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  loginText: {
-    fontSize: 12,
-    color: "gray",
-    marginRight: 10,
-  },
-  loginLink: {
-    fontSize: 12,
-    color: "gray",
-    textDecorationLine: "underline",
-  },
+  button: {
+    position: 'relative',
+    bottom: 150,
+    right: 150
+  }
 });
 
 export default SignupPage;
