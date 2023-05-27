@@ -1,13 +1,21 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   TouchableOpacity,
   StyleSheet,
   View,
   Text,
+  StatusBar,
   Image,
   TextInput,
+  Pressable,
   KeyboardAvoidingView,
+  Button,
+  Alert,
+  ActivityIndicator,
 } from "react-native";
+
+import { auth } from "../../firebase"
+import { signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
 
 const LoginPage = ({navigation}) => {
   
