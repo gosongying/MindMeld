@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import Leaderboard from './Leaderboard';
-import Badges from './Badges'
+import Badge from './Badge'
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -19,7 +19,7 @@ const AchievementTab = () => {
         }}
       >
         <Tab.Screen name="Leaderboard" component={Leaderboard} />
-        <Tab.Screen name="Badges" component={Badges} />
+        <Tab.Screen name="Badges" component={Badge} />
       </Tab.Navigator>
     </View>
   );
