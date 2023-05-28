@@ -7,7 +7,8 @@ import {
     SafeAreaView,
     ImageBackground,
   } from "react-native";
-
+  
+  //a module that is used to buil ad carousel.
   import Carousel, { Pagination } from 'react-native-snap-carousel'
 
   const data =[

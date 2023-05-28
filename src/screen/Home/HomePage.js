@@ -14,6 +14,19 @@ const Tab = createBottomTabNavigator();
 const HomePage = () => {
   return (
         <Tab.Navigator
+        tabBarOptions={{
+            tabBarActiveTintColor: '#710ef1',
+            tabBarInactiveTintColor: '#000000',
+            tabBarLabelStyle: {
+              textTransform: 'none',
+            },
+            tabBarIndicatorStyle: {
+              backgroundColor: '#710ef1',
+            },
+            tabBarStyle: {
+              backgroundColor: '#ffffff',
+            },
+          }}
             screenOptions={({ route }) => ({
                 tabBarIcon: ({ focused, color, size }) => {
                     let iconName;

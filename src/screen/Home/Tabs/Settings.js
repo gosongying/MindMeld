@@ -5,7 +5,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { auth } from "../../../../firebase"
 
-const Settings = ({ navigation }) => {
+const Settings = ({navigation}) => {
   const options = [
     { id: '1', title: 'Profile Settings', screen: 'Profile' },
     { id: '2', title: 'Privacy Settings', screen: 'Privacy' },
@@ -20,6 +20,9 @@ const Settings = ({ navigation }) => {
     { id: '11', title: 'Logout', screen: 'Landing' },
   ];
 
+  //since we haven't completed all screen, when each button is clicked,
+  //we just make it logged onto the console, but not navigating to the page first.
+  //only when logout is clicked, the user will be signed out.
   const navigateToScreen = (screen) => {
     if (screen === 'Landing') {  //when Logout is clicked.
       signOut(auth)
@@ -27,7 +30,7 @@ const Settings = ({ navigation }) => {
       .catch((error) => console.log(error));
       return;
     }     
-     navigation.replace(screen);
+    console.log(screen);
   };
 
   useEffect(() => 

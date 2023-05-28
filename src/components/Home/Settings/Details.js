@@ -3,7 +3,11 @@ import { TouchableOpacity, StyleSheet, View, Text, Image } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 const Details = ({ navigation }) => {
-  const profileSetting = () => navigation.navigate('Profile');
+  //since the the profile settings page hasn't been done,
+  //when the detail button is clicked, it is logged onto the console,
+  //but not navigating to the page first. It will function well when the 
+  //profile page is done.
+  const profileSetting = () => console.log("Profile");
 
   return (
     <View style={styles.container}>
