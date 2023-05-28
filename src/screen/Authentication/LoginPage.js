@@ -71,9 +71,22 @@ const LoginPage = ({navigation}) => {
     setModalVisible(true); //to popup the prompt
   };
 
-  const goToSignup = () => navigation.replace("Signup");
+  const goToSignup = () => {
+    setFirstLoading(true);
+    navigation.replace("Signup");
+  };
 
-  const goToLanding = () => navigation.replace("Landing");
+  const goToLanding = () => {
+    setFirstLoading(true);
+    navigation.replace("Landing");
+  };
+  
+  //when current screen changes,
+  //firstLoading will be set to false,
+  //to disable two button works at the same time.
+  useEffect(() => {
+    setFirstLoading(false);
+  }, [navigation.getState().route]);
 
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
@@ -118,7 +131,7 @@ const LoginPage = ({navigation}) => {
   return (
     <KeyboardAvoidingView style={styles.container1} >
       {/* Button for going back to the home screen */}
-      <TouchableOpacity style={styles.button} onPress={goToLanding}>
+      <TouchableOpacity style={styles.button} onPress={goToLanding} disabled={firstLoading}>
         <Text style={styles.text7}>{'\u2190'}</Text >  
       </TouchableOpacity>
       <Image source={require("../../../assets/logoOnly.png")} />
@@ -295,7 +308,7 @@ const styles = StyleSheet.create({
   },
   prompt: {
     width: 300, 
-    backgroundColor: `#e6e6fa`, 
+    backgroundColor: 'white',
     padding: 20, 
     borderRadius: 10
   },
