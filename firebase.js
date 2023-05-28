@@ -8,12 +8,12 @@ import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyC_FiqT9R6j7DrGP6SttwGhTbzqJMZVkro",
-  authDomain: "orbital-d8bd4.firebaseapp.com",
-  projectId: "orbital-d8bd4",
-  storageBucket: "orbital-d8bd4.appspot.com",
-  messagingSenderId: "378839224959",
-  appId: "1:378839224959:web:bfecb7074d1902e4af654a",
+  apiKey: "AIzaSyBW9gyTZcDHmnAIzCXQKfKmrz1yCrot2ZQ",
+  authDomain: "orbital-265b4.firebaseapp.com",
+  projectId: "orbital-265b4",
+  storageBucket: "orbital-265b4.appspot.com",
+  messagingSenderId: "927371819112",
+  appId: "1:927371819112:web:0320800c1c8e8edf9763dd",
 };
 
 // Initialize Firebase
