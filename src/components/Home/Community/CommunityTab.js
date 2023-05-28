@@ -28,12 +28,12 @@ const Forums = () => {
 const CommunityTabs = () => {
   return (
     <Tab.Navigator
-    tabBarOptions={{
-        labelStyle: styles.tabLabel,
-        indicatorStyle: styles.tabIndicator,
-        style: styles.tabBar,
-        activeTintColor: '#710ef1',
-        inactiveTintColor: '#000000',
+      screenOptions={{
+        tabBarLabelStyle: styles.tabLabel,
+        tabBarIndicatorStyle: styles.tabIndicator,
+        tabBarStyle: styles.tabBar,
+        tabBarActiveTintColor: '#710ef1',
+        tabBarInactiveTintColor: '#000000',
       }}
     >
       <Tab.Screen name="Feed" component={CommunityFeed} />
@@ -42,6 +42,7 @@ const CommunityTabs = () => {
     </Tab.Navigator>
   );
 };
+
 
 const CommunityTab = () => {
   return (

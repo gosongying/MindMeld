@@ -10,12 +10,12 @@ const AchievementTab = () => {
   return (
     <View style={styles.container}>
       <Tab.Navigator
-        tabBarOptions={{
-          labelStyle: styles.tabLabel,
-          indicatorStyle: styles.tabIndicator,
-          style: styles.tabBar,
-          activeTintColor: '#710ef1',
-          inactiveTintColor: '#000000',
+        screenOptions={{
+          tabBarLabelStyle: styles.tabLabel,
+          tabBarIndicatorStyle: styles.tabIndicator,
+          tabBarStyle: styles.tabBar,
+          tabBarActiveTintColor: '#710ef1',
+          tabBarInactiveTintColor: '#000000',
         }}
       >
         <Tab.Screen name="Leaderboard" component={Leaderboard} />
@@ -24,6 +24,7 @@ const AchievementTab = () => {
     </View>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {
