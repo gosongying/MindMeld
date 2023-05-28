@@ -31,7 +31,7 @@ const FriendList = () => {
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
-        <Text style={styles.sectionTitle}>My Friends</Text>
+        <Text style={styles.sectionTitle}>My Study Buddies</Text>
         <TouchableOpacity>
           <Text style={styles.moreText}>More</Text>
         </TouchableOpacity>

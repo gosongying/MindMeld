@@ -9,7 +9,7 @@ const Settings = ({navigation}) => {
   const options = [
     { id: '1', title: 'Profile Settings', screen: 'Profile' },
     { id: '2', title: 'Privacy Settings', screen: 'Privacy' },
-    { id: '3', title: 'Friend List', screen: 'FriendList' },
+    { id: '3', title: 'Study Buddy List', screen: 'FriendList' },
     { id: '4', title: 'Group List', screen: 'GroupList' },
     { id: '5', title: 'Sessions Setting', screen: 'SessionsSetting' },
     { id: '6', title: 'Achievement Settings', screen: 'AchievementSettings' },
