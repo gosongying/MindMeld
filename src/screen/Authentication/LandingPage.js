@@ -8,7 +8,6 @@ import {
   StatusBar,
   ActivityIndicator
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
 import CarouselCard from "../../components/Authentication/CarouselCard";
 import { signInAnonymously, onAuthStateChanged } from "firebase/auth";
 import { auth } from "../../../firebase"
@@ -16,11 +15,17 @@ import { auth } from "../../../firebase"
 
 const LandingPage = ({navigation}) => {
 
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setLoading] = useState(false);
 
-  const goToLogin = () => navigation.replace("Login");  //go to login screen
+  const goToLogin = () => {
+    setLoading(true);
+    navigation.replace("Login");  //go to login screen
+  }
 
-  const goToSignup = () => navigation.replace("Signup");  //go to signup screen
+  const goToSignup = () => {
+    setLoading(true);
+    navigation.replace("Signup");  //go to signup screen
+  }
 
   const continueAsGuest = () => {  //to signin anonymously
 
@@ -35,6 +40,12 @@ const LandingPage = ({navigation}) => {
     console.error('An error occurred during anonymous sign-in:', error);
     })
   };
+
+  //keep track of if current screen on the stack changes,
+  //to disable login and signup together.
+  useEffect(() => {
+    setLoading(false);
+  }, [navigation.getState().route]);
 
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
@@ -58,16 +69,16 @@ const LandingPage = ({navigation}) => {
         <TouchableOpacity 
           style={styles.pressableOne} 
           onPress={goToLogin}
-          disabled={loading}>
+          disabled={isLoading}>
           <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity>
         <TouchableOpacity 
           style={styles.pressableTwo} 
           onPress={goToSignup}
-          disabled={loading}>
+          disabled={isLoading}>
           <Text style={styles.buttonText}>Signup</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={continueAsGuest} disabled={loading}>
+        <TouchableOpacity onPress={continueAsGuest} disabled={isLoading}>
           <Text style={styles.guest}>Continue as a guest</Text>
         </TouchableOpacity>
       </View>

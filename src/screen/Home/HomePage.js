@@ -6,7 +6,6 @@ import StudyDashboard from './Tabs/StudyDashboard';
 import StudyCommunity from './Tabs/StudyCommunity';
 import Achievements from './Tabs/Achievement';
 import Settings from './Tabs/Settings';
-import { TouchableWithoutFeedback } from 'react-native';
 
 
 const Tab = createBottomTabNavigator();

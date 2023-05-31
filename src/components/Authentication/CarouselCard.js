@@ -84,7 +84,6 @@ export default function CarouselCard() {
   renderDot={renderDot}
 />
   </SafeAreaView>
-  
 
     );
 }

@@ -20,7 +20,7 @@ const SignupPage = ({navigation}) => {
 
   const [password, setPassword] = useState("");
 
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setLoading] = useState(false);
 
   const handleNameChange = (text) => {
     setName(text);
@@ -39,7 +39,7 @@ const SignupPage = ({navigation}) => {
     })
   }, []);
 
-  
+
   const signupUser = () => {
 
     setLoading(true);
@@ -73,14 +73,29 @@ const SignupPage = ({navigation}) => {
 
   const goToHome = () => navigation.replace("Home");
 
-  const goToLogin = () => navigation.replace("Login");
+  const goToLogin = () => {
+    setLoading(true);
+    navigation.replace("Login");
+  };
 
-  const goToLanding = () => navigation.replace("Landing");
+  const goToLanding = () => {
+    setLoading(true);
+    navigation.replace("Landing");
+  };
+
+  useEffect(() => {
+    setLoading(false);
+  }, [navigation.getState().route]);
+
 
   return (
     <KeyboardAvoidingView style={styles.container1}>
       {/* Button for going back to the home screen */}
-      <TouchableOpacity style={styles.button} onPress={goToLanding}>
+      <TouchableOpacity 
+         style={styles.button} 
+         onPress={goToLanding}
+         disabled={isLoading}
+      >
         <Text style={styles.text6} >{'\u2190'}</Text >
       </TouchableOpacity>
       <Image source={require("../../../assets/logoOnly.png")} />
@@ -93,7 +108,7 @@ const SignupPage = ({navigation}) => {
         onChangeText={handleNameChange}
         value={name}
         autoCapitalize="none"
-        editable={!loading}
+        editable={!isLoading}
       />
       <TextInput
         style={styles.text2}
@@ -103,11 +118,11 @@ const SignupPage = ({navigation}) => {
         onChangeText={handlePasswordChange}
         value={password}
         autoCapitalize="none"
-        editable={!loading}
+        editable={!isLoading}
       />
       
       {/* If it is loading, show the ActivityIndicator, else show the signup button */} 
-      {loading ? (
+      {isLoading ? (
         <View style={styles.loading}>
           <ActivityIndicator size="small" color="#0000ff" />
         </View>
@@ -115,7 +130,8 @@ const SignupPage = ({navigation}) => {
         : (
         <TouchableOpacity
           style={styles.pressable1}
-          onPress={signupUser}>
+          onPress={signupUser}
+          >
         <Text style={styles.text3}>Sign up</Text>
       </TouchableOpacity>
       )
@@ -126,7 +142,7 @@ const SignupPage = ({navigation}) => {
       </Text>
       <View style={styles.container2}>
         <Text style={styles.text4}>Already a user?</Text>
-        <TouchableOpacity onPress={goToLogin}>
+        <TouchableOpacity onPress={goToLogin} disabled={isLoading}>
           <Text style={styles.text5}>Login</Text>
         </TouchableOpacity>
       </View>
