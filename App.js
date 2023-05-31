@@ -3,7 +3,9 @@ import {StyleSheet} from 'react-native';
 import LandingPage from './src/screen/Authentication/LandingPage'
 import LoginPage from './src/screen/Authentication/LoginPage'
 import SignupPage from './src/screen/Authentication/SignupPage';
+import SignupPage2 from './src/screen/Authentication/SignupPage2';
 import HomePage from './src/screen/Home/HomePage'
+
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
@@ -14,10 +16,11 @@ const App = () => {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName='Landing' screenOptions={{headerShown:false}}>
+      <Stack.Navigator initialRouteName='Signup2' screenOptions={{headerShown:false}}>
         <Stack.Screen name="Landing" component={LandingPage} />
         <Stack.Screen name="Login" component={LoginPage} />
         <Stack.Screen name="Signup" component={SignupPage} />
+        <Stack.Screen name ="Signup2" component={SignupPage2} />
         <Stack.Screen name="Home" component={HomePage} />
       </Stack.Navigator>
     </NavigationContainer>
