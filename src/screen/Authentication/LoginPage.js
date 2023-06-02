@@ -12,8 +12,9 @@ import {
   Modal
 } from "react-native";
 
-import { auth } from "../../../firebase"
+import { auth, database } from "../../../firebase"
 import { signInWithEmailAndPassword, onAuthStateChanged, sendPasswordResetEmail } from "firebase/auth";
+import { ref, get } from 'firebase/database';
 
 const LoginPage = ({navigation}) => {
   
@@ -52,7 +53,7 @@ const LoginPage = ({navigation}) => {
         } else if (errorCode === "auth/user-not-found") {
           Alert.alert("Account does not exist");
         } else {
-          Alert.alert('Error', error.message);
+          Alert.alert('Error', errorMessage);
         }
       });
   };
@@ -90,12 +91,23 @@ const LoginPage = ({navigation}) => {
 
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
+      console.log("hi")
       if (user) {
-        //if user login successfully, go to Home screen
-        navigation.replace("Home");
-      } 
+        const userIdRef = ref(database, '/users/' + user.uid);
+        get(userIdRef).then((snapshot) => {
+          const exists = snapshot.exists();
+          if (!exists) {
+            //if the user has not set profile yet
+            navigation.replace("Signup2");
+          } else {
+            //if the user did set profile
+            //console.log("bye")
+          }
+        }).catch((error) => console.log(error));
+      }
     })
   }, []);
+
 
   const loginUser = () => {
 
@@ -105,7 +117,7 @@ const LoginPage = ({navigation}) => {
     .then((userCredential) => {
       //user signin successfully
       setFirstLoading(false);
-      console.log(userCredential.user.email);
+      //console.log(userCredential.user.email);
     })
     .catch((error) => {
       //handle error when login
@@ -130,7 +142,7 @@ const LoginPage = ({navigation}) => {
 
   return (
     <KeyboardAvoidingView style={styles.container1} >
-      {/* Button for going back to the home screen */}
+      {/* Button for going back to the landing screen */}
       <TouchableOpacity style={styles.button} onPress={goToLanding} disabled={firstLoading}>
         <Text style={styles.text7}>{'\u2190'}</Text >  
       </TouchableOpacity>

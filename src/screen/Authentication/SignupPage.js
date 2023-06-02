@@ -34,7 +34,7 @@ const SignupPage = ({navigation}) => {
     onAuthStateChanged(auth, (user) => {
       if (user) {
         //if user signup successfully, go to Home screen
-        navigation.replace("Home");
+        navigation.replace("Signup2");
       } 
     })
   }, []);
@@ -48,7 +48,7 @@ const SignupPage = ({navigation}) => {
     .then((userCredential) => {
       //signup successfully
       setLoading(false);
-      console.log(userCredential.user.email)
+      console.log(userCredential.user.uid)
     })
     .catch((error) => {
       //handle error when signup
@@ -71,7 +71,7 @@ const SignupPage = ({navigation}) => {
     })
   };
 
-  const goToHome = () => navigation.replace("Home");
+  //const goToHome = () => navigation.replace("Home");
 
   const goToLogin = () => {
     setLoading(true);

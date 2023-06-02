@@ -1,27 +1,68 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity, FlatList, SafeAreaView } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity, FlatList, SafeAreaView, Alert } from 'react-native';
+import { auth, database } from "../../../firebase";
+import { ref, runTransaction, set, get } from 'firebase/database';
+import { useLinkProps } from '@react-navigation/native';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const SignupPage2 = ({ navigation, route }) => {
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
+
+  const [username, setUsername] = useState('');
   const [interests, setInterests] = useState([]);
-  const [username] = useState('Your Name'); // Hardcoded username from previous screen
-  const [confirmUsername, setConfirmUsername] = useState(false);
-  const [confirmPassword, setConfirmPassword] = useState('');
   const [agreeTerms, setAgreeTerms] = useState(false);
+  const [gender, setGender] = useState('');
+  const [confirmUsername, setConfirmUsername] = useState(false);
 
   const handleConfirmDetails = () => {
     // Perform any necessary actions to confirm details (e.g., API calls, data validation)
 
-    // Navigate to the next screen
-    navigation.navigate('Home');
-  };
+    const currentUser = auth.currentUser;
+    const userId = currentUser.uid;
 
-  const handleToggleConfirmUsername = () => {
-    setConfirmUsername(!confirmUsername);
+    //reference to the users node based on their uid
+    const userIdRef = ref(database, '/users/' + userId);
+    //reference to the users node based on their username
+    const usernameRef = ref(database, '/usernames/' + username);
+
+    //to handle empty username
+    if (!username) {
+      Alert.alert("Username cannot be empty");
+      return;
+    }
+
+    if (!gender) {
+      Alert.alert("Please select your gender");
+      return;
+    }
+    
+    runTransaction(usernameRef, (user) => {
+      console.log(user);
+      //if the username has not been used yet according to local cache
+      if (!user) {
+        return get(usernameRef).then((snapshot) => {
+          const exists = snapshot.exists();
+          //check if the username exists in remote database
+          if (!exists) {
+            set(usernameRef, {
+              uid: userId
+            });
+            set(userIdRef, {
+              username: username,
+              interests: interests,
+              gender: gender
+            });
+           // navigation.replace("Home");
+          }
+        }).catch((error) => console.log(error));
+      } else {
+        //if the username is already used by other users
+        Alert.alert("Username already exists");
+      }
+    });
   };
 
   const handleToggleInterest = (selectedInterest) => {
+    console.log(interests);
     if (interests.includes(selectedInterest)) {
       setInterests(interests.filter((interest) => interest !== selectedInterest));
     } else {
@@ -29,8 +70,28 @@ const SignupPage2 = ({ navigation, route }) => {
     }
   };
 
+  const handleToggleConfirmUsername = () => {
+    setConfirmUsername(!confirmUsername);
+  };
+
   const handleToggleAgreeTerms = () => {
     setAgreeTerms(!agreeTerms);
+  };
+
+  const handleToggleMale = () => {
+    if (gender === 'male') {
+      setGender('');
+    } else {
+      setGender('male');
+    }
+  };
+
+  const handleToggleFemale = () => {
+    if (gender === 'female') {
+      setGender('');
+    } else {
+      setGender('female');
+    }
   };
 
   const renderInterestItem = ({ item }) => (
@@ -62,12 +123,12 @@ const SignupPage2 = ({ navigation, route }) => {
     <SafeAreaView style={styles.container}>
       <FlatList
         showsVerticalScrollIndicator={false} // Hide the vertical scroll bar
-        data={data}
+        //data={data}
         ListHeaderComponent={
           <>
             <Text style={styles.heading}>Create your account</Text>
 
-            <View style={styles.formRow}>
+            {/*<View style={styles.formRow}>
               <Text style={styles.label}>First Name:</Text>
               <TextInput
                 style={styles.input}
@@ -75,16 +136,35 @@ const SignupPage2 = ({ navigation, route }) => {
                 onChangeText={setFirstName}
                 placeholder="Enter your first name"
               />
+        </View>*/}
+
+            <View style={styles.formRow}>
+              <Text style={styles.label}>Username:</Text>
+              <TextInput
+                style={styles.input}
+                value={username}
+                onChangeText={setUsername}
+                placeholder="Enter your username"
+                autoCapitalize='none'
+              />
             </View>
 
             <View style={styles.formRow}>
-              <Text style={styles.label}>Last Name:</Text>
-              <TextInput
-                style={styles.input}
-                value={lastName}
-                onChangeText={setLastName}
-                placeholder="Enter your last name"
-              />
+              <Text style={styles.label}>Gender:</Text>  
+              <View style={styles.genderContainer}>
+                <TouchableOpacity 
+                onPress={handleToggleMale}
+                style={[styles.toggleButton, gender === 'male' && styles.toggleMaleSelected]}
+                >
+                  <MaterialCommunityIcons name={"face-man-outline"} size={30}/>
+                </TouchableOpacity>
+                <TouchableOpacity 
+                onPress={handleToggleFemale}
+                style={[styles.toggleButton, gender === 'female' && styles.toggleFemaleSelected]}
+                >
+                  <MaterialCommunityIcons name={"face-woman-outline"} size={30} />
+                </TouchableOpacity>
+              </View>               
             </View>
 
             <View style={styles.formRow}>
@@ -118,7 +198,7 @@ const SignupPage2 = ({ navigation, route }) => {
         ListFooterComponent={
           <>
             <View style={styles.confirmationContainer}>
-              <Text style={styles.confirmationTitle}>Confirmation</Text>
+              <Text style={styles.confirmationTitle}>Confirmation:</Text>
 
               <Text style={styles.usernameText}>
                 Username: <Text style={styles.boldText}>{username}</Text>
@@ -129,7 +209,7 @@ const SignupPage2 = ({ navigation, route }) => {
                 <Text style={styles.checkboxText}>Confirm username</Text>
               </TouchableOpacity>
 
-              {confirmUsername && (
+              {/*{confirmUsername && (
                 <TextInput
                   style={styles.input}
                   value={confirmPassword}
@@ -137,7 +217,7 @@ const SignupPage2 = ({ navigation, route }) => {
                   placeholder="Confirm password"
                   secureTextEntry
                 />
-              )}
+              )}*/}
 
               <TouchableOpacity style={styles.toggleContainer} onPress={handleToggleAgreeTerms}>
                 <View style={[styles.checkbox, agreeTerms && styles.checkboxChecked]} />
@@ -148,7 +228,7 @@ const SignupPage2 = ({ navigation, route }) => {
             <TouchableOpacity
               style={[styles.nextButton, (!confirmUsername || !agreeTerms) && styles.nextButtonDisabled]}
               onPress={handleConfirmDetails}
-              disabled={!confirmUsername || !agreeTerms}
+              disabled={!agreeTerms}
             >
               <Text style={styles.nextButtonText}>Next</Text>
             </TouchableOpacity>
@@ -253,6 +333,15 @@ const styles = StyleSheet.create({
   toggleButtonSelected: {
     backgroundColor: 'rgba(0, 0, 0, 0.3)', // Darker overlay
   },
+  genderContainer: {
+    flexDirection: 'row'
+  },
+  toggleMaleSelected: {
+    backgroundColor: 'dodgerblue'
+  },
+  toggleFemaleSelected: {
+    backgroundColor: 'pink'
+  }
 });
 
 export default SignupPage2;

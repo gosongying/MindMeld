@@ -16,7 +16,7 @@ const App = () => {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName='Signup2' screenOptions={{headerShown:false}}>
+      <Stack.Navigator initialRouteName='Landing' screenOptions={{headerShown:false}}>
         <Stack.Screen name="Landing" component={LandingPage} />
         <Stack.Screen name="Login" component={LoginPage} />
         <Stack.Screen name="Signup" component={SignupPage} />
