@@ -2,10 +2,9 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ImageBackground } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
-const Features = () => {
+const Features = ( {navigation} ) => {
   const handleFeaturePress = (feature) => {
-    // Handle feature press event
-    console.log(`Feature "${feature}" pressed`);
+    navigation.navigate(feature)
   };
 
   const renderFeature = (name, icon) => (
@@ -27,11 +26,11 @@ const Features = () => {
       <View style={styles.featuresContainer}>
         <View style={styles.row}>
           {renderFeature('Calculator', 'calculator-outline')}
-          {renderFeature('To do', 'list-outline')}
+          {renderFeature('Tasks', 'list-outline')}
         </View>
         <View style={styles.row}>
           {renderFeature('Clock', 'timer-outline')}
-          {renderFeature('Flash Cards'.split(" ").join("\n"), 'copy-outline')}
+          {renderFeature('Notecards', 'copy-outline')}
         </View>
         <View style={styles.row}>
           {renderFeature('Notes', 'document-outline')}
@@ -52,9 +51,9 @@ const styles = StyleSheet.create({
     marginLeft: 20
   },
   title: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 10,
+    marginBottom: 15,
     color: 'black',
   },
   featuresContainer: {},

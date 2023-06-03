@@ -1,12 +1,16 @@
 import React from 'react';
 import { StyleSheet, View, FlatList, SafeAreaView } from 'react-native';
 
-import Features from '../../../components/Home/Study/Features';
-import StudyMode from '../../../components/Home/Study/StudyMode';
-import StudyWhat from '../../../components/Home/Study/StudyWhat';
-import HelloName from '../../../components/Home/Study/HelloName';
+import Features from '../../../../components/Home/Study/Features';
+import StudyMode from '../../../../components/Home/Study/StudyMode';
+import StudyWhat from '../../../../components/Home/Study/StudyWhat';
+import HelloName from '../../../../components/Home/Study/HelloName';
+import { useNavigation } from '@react-navigation/native';
 
 const StudyDashboard = () => {
+
+  const navigation = useNavigation(); //Access the navigation object
+
   const DATA = [
     //item to be shown 
     {
@@ -28,7 +32,8 @@ const StudyDashboard = () => {
 
   const renderOption = ({ item }) => (
     <View style={styles.optionContainer}>
-      <item.component />
+      {/* Pass the navigation prop */}
+      {React.createElement(item.component, { navigation })} 
     </View>
   );
 

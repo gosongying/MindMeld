@@ -7,7 +7,8 @@ const Details = ({ navigation }) => {
   //when the detail button is clicked, it is logged onto the console,
   //but not navigating to the page first. It will function well when the 
   //profile page is done.
-  const profileSetting = () => console.log("Profile");
+  const profileSetting = () => navigation.navigate('Profile');
+
 
   return (
     <View style={styles.container}>

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Image, TouchableWithoutFeedback, Text, StyleSheet } from 'react-native';
 
-const StudyWhat = () => {
+const StudyWhat = ({ navigation }) => {
   const [isPressed, setIsPressed] = useState(false);
 
   const handlePressIn = () => {
@@ -10,6 +10,7 @@ const StudyWhat = () => {
 
   const handlePressOut = () => {
     setIsPressed(false);
+    navigation.navigate('CreateStudySession'); // Navigate to CreateStudySession screen
   };
 
   return (

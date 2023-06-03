@@ -7,7 +7,7 @@ import {
   } from "react-native";
 
   const HelpAndSupport = ({navigation}) => {
-    const goToHome = () => navigation.replace("Home") 
+    const goToHome = () => navigation.navigate("Settings") 
 
     return (
         <SafeAreaView>
@@ -21,7 +21,6 @@ import {
   const styles = StyleSheet.create({
     back: {
         fontSize: 35,
-        color: "#710EF1",
         fontWeight: "bold",
       },
       button: {

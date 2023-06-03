@@ -1,10 +1,10 @@
 import React from 'react';
 import { View, Text, StyleSheet, FlatList } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import Groups from '../../../components/Home/Community/Groups';
-import FriendList from '../../../components/Home/Community/FriendList';
-import CommunityHeader from '../../../components/Home/Community/CommunityHeader';
-import CommunityTab from '../../../components/Home/Community/CommunityTab';
+import Groups from '../../../../components/Home/Community/Groups';
+import FriendList from '../../../../components/Home/Community/FriendList';
+import CommunityHeader from '../../../../components/Home/Community/CommunityHeader';
+import CommunityTab from '../../../../components/Home/Community/CommunityTab';
 
 const StudyCommunity = () => {
   //item to be shown

@@ -1,9 +1,9 @@
 import React, { useEffect } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
-import Details from '../../../components/Home/Settings/Details';
+import Details from '../../../../components/Home/Settings/Details';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
-import { auth } from "../../../../firebase"
+import { auth } from "../../../../../firebase"
 
 const Settings = ({navigation}) => {
   const options = [
@@ -30,7 +30,9 @@ const Settings = ({navigation}) => {
       .catch((error) => console.log(error));
       return;
     }     
-    console.log(screen);
+    else {
+      navigation.navigate(screen)
+    }
   };
 
   useEffect(() => 

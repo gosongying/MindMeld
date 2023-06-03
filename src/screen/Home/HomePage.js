@@ -2,10 +2,10 @@ import React from 'react';
 
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import StudyDashboard from './Tabs/StudyDashboard';
-import StudyCommunity from './Tabs/StudyCommunity';
-import Achievements from './Tabs/Achievement';
-import Settings from './Tabs/Settings';
+import StudyDashboardTab from './Tabs/StudyDashboardTab';
+import StudyCommunityTab from './Tabs/StudyCommunityTab';
+import AchievementTab from './Tabs/AchievementTab';
+import SettingTab from './Tabs/SettingTab';
 
 
 const Tab = createBottomTabNavigator();
@@ -23,7 +23,7 @@ const HomePage = () => {
               iconName = focused ? 'people' : 'people-outline';
             } else if (route.name === 'Achievements') {
               iconName = focused ? 'trophy' : 'trophy-outline';
-            } else if (route.name === 'Menu') {
+            } else if (route.name === 'Settings') {
               iconName = focused ? 'menu' : 'menu-outline';
             }
   
@@ -42,10 +42,10 @@ const HomePage = () => {
           },
         })}
       >
-        <Tab.Screen name={'StudyDashboard'} component={StudyDashboard} options={{ tabBarLabel: 'Study', headerShown: false }} />
-        <Tab.Screen name={'StudyCommunity'} component={StudyCommunity} options={{ tabBarLabel: 'Community', headerShown: false }} />
-        <Tab.Screen name={'Achievements'} component={Achievements} options={{ tabBarLabel: 'Achievement', headerShown: false }} />
-        <Tab.Screen name={'Menu'} component={Settings} options={{ headerShown: false }} />
+        <Tab.Screen name={'StudyDashboard'} component={StudyDashboardTab} options={{ tabBarLabel: 'Study', headerShown: false }} />
+        <Tab.Screen name={'StudyCommunity'} component={StudyCommunityTab} options={{ tabBarLabel: 'Community', headerShown: false }} />
+        <Tab.Screen name={'Achievements'} component={AchievementTab} options={{ tabBarLabel: 'Achievement', headerShown: false }} />
+        <Tab.Screen name={'Settings'} component={SettingTab} options={{ headerShown: false }} />
       </Tab.Navigator>
     );
   };

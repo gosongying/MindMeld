@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import AchievementTab from '../../../components/Home/Achievement/AchievementTab';
-import AchievementHeader from '../../../components/Home/Achievement/AchievementHeader';
+import AchievementTab from '../../../../components/Home/Achievement/AchievementTab';
+import AchievementHeader from '../../../../components/Home/Achievement/AchievementHeader';
 
 
 const Achievement = () => {
