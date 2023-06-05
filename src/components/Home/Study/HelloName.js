@@ -5,8 +5,6 @@ import { onValue, ref, get } from 'firebase/database';
 
 const HelloName = () => {
 
-  console.log("Hi")
-
   const [username, setUsername] = useState('');
 
   const currentUserId = auth.currentUser.uid;

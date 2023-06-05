@@ -28,7 +28,7 @@ const Settings = ({navigation}) => {
       signOut(auth)
       .then(() => console.log("signed out succesfully"))
       .catch((error) => console.log(error));
-      return;
+      //return;
     }     
     else {
       navigation.navigate(screen)

@@ -14,6 +14,7 @@ import Privacy from './Settings/Privacy';
 import Profile from './Settings/Profile';
 import SessionsSetting from './Settings/SessionsSetting';
 import TermsAndCondition from './Settings/TermsAndCondition';
+import LandingPage from '../../Authentication/LandingPage';
 
 const SettingTab = () => {
 
@@ -33,6 +34,7 @@ const SettingTab = () => {
         <Stack.Screen name="Profile" component={Profile} />
         <Stack.Screen name="SessionsSetting" component={SessionsSetting} />
         <Stack.Screen name="TermsAndCondition" component={TermsAndCondition} />
+        <Stack.Screen name="Landing" component={LandingPage} />
       </Stack.Navigator>
     </NavigationContainer>
    );
