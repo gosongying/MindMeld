@@ -38,7 +38,7 @@ const SignupPage = ({navigation}) => {
     setPassword2(text);
   };
 
-  useEffect(() => {
+ /* useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         //if user signup successfully, go to SignupPage2
@@ -49,7 +49,7 @@ const SignupPage = ({navigation}) => {
     return () => {
       unsubscribe();
     };
-  }, []);
+  }, []);*/
 
 
   const signupUser = () => {
@@ -75,15 +75,15 @@ const SignupPage = ({navigation}) => {
     }
 
     createUserWithEmailAndPassword(auth, name, password1)
-    .then((userCredential) => {
+    .then(() => {
       //signup successfully
-      console.log(userCredential.user.uid)
+      navigation.replace("Signup2");
+      console.log("Signup successfully");
     })
     .catch((error) => {
       //handle error when signup
       setLoading(false);
       const errorCode = error.code;
-      const errorMessage = error.message;
       if (errorCode === "auth/invalid-email") {
         Alert.alert("Invalid email address");
       } else if (errorCode === "auth/email-already-in-use") {
@@ -96,7 +96,7 @@ const SignupPage = ({navigation}) => {
       } else if (errorCode === "auth/weak-password") {
         Alert.alert("Password must be at least 6 characters");
       } else {
-        console.log(errorMessage);
+        Alert.alert("Error");
       }
     })
   };

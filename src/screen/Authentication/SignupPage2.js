@@ -1,13 +1,18 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity, FlatList, SafeAreaView, Alert } from 'react-native';
+import { View, Text, TextInput, Image, StyleSheet, TouchableOpacity, FlatList, SafeAreaView, Alert } from 'react-native';
 import { auth, database } from "../../../firebase";
 import { ref, runTransaction, set, get } from 'firebase/database';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { updateProfile } from 'firebase/auth';
+import * as ImagePicker from 'expo-image-picker';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
+
+
 
 const SignupPage2 = ({ navigation}) => {
 
-  console.log("signup2")
+  console.log("Signup2")
 
   const [username, setUsername] = useState('');
   const [interests, setInterests] = useState([]);
@@ -15,11 +20,52 @@ const SignupPage2 = ({ navigation}) => {
   const [gender, setGender] = useState('');
   const [confirmUsername, setConfirmUsername] = useState(false);
   const [isLoading, setLoading] = useState(false);
+  const [image, setImage] = useState(null);
+
+  const currentUser = auth.currentUser;
+
+  const selectImageLibrary = async () => {
+    const {status} = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert("Permission denied");
+      return;
+    }
+  
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setImage(result.assets[0].uri);
+    }
+  };
+
+  const selectImageCamera = async () => {
+    const {status} = await ImagePicker.requestCameraPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert("Permission denied");
+      return;
+    }
+  
+    const result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setImage(result.assets[0].uri);
+    }
+  };
 
   const handleConfirmDetails = () => {
     // Perform any necessary actions to confirm details (e.g., API calls, data validation)
     setLoading(true);
-    const currentUser = auth.currentUser;
+   
     const userId = currentUser.uid;
 
     //reference to the users node based on their uid
@@ -62,6 +108,10 @@ const SignupPage2 = ({ navigation}) => {
               friendList: [],
               groupList: [],
             });
+            updateProfile(currentUser, {
+              displayName: username,
+              photoURL: image
+            })
             navigation.replace("Home");
             return;
           }
@@ -142,15 +192,25 @@ const SignupPage2 = ({ navigation}) => {
           <>
             <Text style={styles.heading}>Create your account</Text>
 
-            {/*<View style={styles.formRow}>
-              <Text style={styles.label}>First Name:</Text>
-              <TextInput
-                style={styles.input}
-                value={firstName}
-                onChangeText={setFirstName}
-                placeholder="Enter your first name"
-              />
-        </View>*/}
+           <View style={styles.container}>
+              <View style={styles.outerPictureContainer}>
+                <View style={styles.pictureContainer}>
+                  {image ? (
+                    <Image source={{uri: image}} style={styles.picture} />
+                    ) : (
+                    <Image source={require("../../../assets/profileholder.png")} style={styles.picture}/> 
+                    )}
+                </View>
+                <View style={styles.libraryAndCamera}>
+                  <TouchableOpacity style={styles.pictureText} onPress={selectImageLibrary}>
+                    <FontAwesome name={'photo'} size={30} />
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.pictureText} onPress={selectImageCamera}>
+                    <MaterialCommunityIcons name={'camera-outline'} size={35} />
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
 
             <View style={styles.formRow}>
               <Text style={styles.label}>Username:</Text>
@@ -274,7 +334,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     margin: 15,
-    
   },
   heading: {
     fontSize: 30,
@@ -374,7 +433,31 @@ const styles = StyleSheet.create({
   },
   toggleFemaleSelected: {
     backgroundColor: 'pink'
+  },
+  picture: {
+    height: 100,
+    width: 100,
+    resizeMode: 'cover'
+  },
+  pictureContainer: {
+    borderRadius:50,
+    height: 100,
+    width:100, 
+    overflow: 'hidden'
+  },
+  pictureText: {
+    marginTop: 10,
+  },
+  outerPictureContainer: {
+    alignItems:'center'
+  },
+  libraryAndCamera: {
+    width:80,
+    flexDirection: 'row',
+    alignItems:'center',
+    justifyContent:'space-between',
   }
+
 });
 
 export default SignupPage2;

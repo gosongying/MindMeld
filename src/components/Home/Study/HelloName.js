@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
 import { database, auth } from '../../../../firebase';
 import { onValue, ref, get } from 'firebase/database';
@@ -7,8 +7,8 @@ const HelloName = () => {
 
   const [username, setUsername] = useState('');
 
-  //const currentUserId = auth.currentUser.uid;
-  //const userIdRef = ref(database, '/users/' + currentUserId);
+ // const currentUserId = auth.currentUser.uid;
+ // const userIdRef = ref(database, '/users/' + currentUserId);
 
   //to get the user's username from the database
   //get(userIdRef).then((snapshot) => {
@@ -16,10 +16,20 @@ const HelloName = () => {
   //    const data = snapshot.val().username;
   //    setUsername(data);
   //  } else {
-   //   setUsername('Anonymous user');
+  //    setUsername('Anonymous user');
   //  }
- // });
+  //});
+  const currentUser = auth.currentUser;
 
+  useEffect(() => {
+    if (currentUser.isAnonymous) {
+      setUsername("Anonymous user");
+    } else {
+      setUsername(currentUser.displayName);
+    }
+  }, []);
+
+  console.log(username);
   return (
     <View style={styles.container}>
       <View style={styles.textContainer}>
@@ -57,7 +67,7 @@ const styles = StyleSheet.create({
     fontSize: 25,
   },
   nameText: {
-    fontSize: 40,
+    fontSize: 35,
     fontWeight: 'bold',
   },
   logo: {

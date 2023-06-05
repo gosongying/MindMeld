@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { TouchableOpacity, StyleSheet, View, Text, Image } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { auth, database } from '../../../../firebase';
@@ -11,19 +11,17 @@ const Details = ({ navigation }) => {
   //profile page is done.
   const profileSetting = () => navigation.navigate('Profile');
 
-  const currentUserId = auth.currentUser.uid;
-  const userIdRef = ref(database, '/users/' + currentUserId);
+  const currentUser = auth.currentUser;
 
   const [username, setUsername] = useState('');
 
-  get(userIdRef).then((snapshot) => {
-    if (snapshot.exists()) {
-      const data = snapshot.val().username;
-      setUsername(data);
+  useEffect(() => {
+    if (currentUser.isAnonymous) {
+      setUsername("Anonymous user");
     } else {
-      setUsername('Anonymous user');
+      setUsername(currentUser.displayName);
     }
-  });
+  }, []);
 
 
   return (
@@ -33,9 +31,9 @@ const Details = ({ navigation }) => {
         <View style={styles.detailsContainer}>
           {username ? (
           <Text style={styles.name}>{username}</Text>
-        ) : (
+          ) : (
           <Text style={styles.name}>...Loading</Text>
-        )}
+          )}
           <View style={styles.levelContainer}>
             <Text style={styles.levelText}>Level 10</Text>
             <View style={styles.trophyContainer}>

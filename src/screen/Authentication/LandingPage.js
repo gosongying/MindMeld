@@ -35,13 +35,14 @@ const LandingPage = ({navigation}) => {
     signInAnonymously(auth)
     .then(() => {
       console.log("Anon");
+      navigation.replace("Home");
     })
     .catch((error) => {
-      console.error('An error occurred during anonymous sign-in:', error);
+      console.error('An error occurred during anonymous sign-in:');
     })
   };
 
-  useEffect(() => {
+  /*useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         navigation.replace("Home");  //if signin anonymously successfully, navigate to Home screen
@@ -52,7 +53,7 @@ const LandingPage = ({navigation}) => {
     return () => {
       unsubscribe();
     };
-  }, []);
+  }, []);*/
 
   return (
     <SafeAreaView style={styles.container}>

@@ -92,7 +92,7 @@ const LoginPage = ({navigation}) => {
     navigation.replace("Signup2");
   };
 
-  useEffect(() => {
+  /*useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         const userIdRef = ref(database, '/users/' + user.uid);
@@ -110,22 +110,28 @@ const LoginPage = ({navigation}) => {
     return () => {
       unsubscribe();
     };
-  }, []);
+  }, []);*/
 
   const loginUser = () => {
 
     setFirstLoading(true);
 
     signInWithEmailAndPassword(auth, email, password)
-    .then(() => {
+    .then((userCredential) => {
       //user signin successfully
-      console.log(userCredential.user.email);
+      const user = userCredential.user;
+      if (user.displayName) {
+        //if the user did set username
+        navigation.replace("Home");
+      } else {
+        //if the user has not set username yet
+        navigation.replace("Signup2");
+      }
     })
     .catch((error) => {
       //handle error when login
       setFirstLoading(false);
       const errorCode = error.code;
-      const errorMessage = error.message;
       if (errorCode === "auth/invalid-email") {
         Alert.alert("Invalid email address");
       } else if (errorCode === "auth/wrong-password") {
@@ -137,7 +143,7 @@ const LoginPage = ({navigation}) => {
       } else if (errorCode === "auth/too-many-requests") {
         Alert.alert("Too many attempts, please try again later")        
       } else {
-        console.log(errorMessage);
+        Alert.alert("Error");
       }
     })
   };

@@ -36,16 +36,16 @@ const Settings = ({navigation}) => {
     }
   };
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (!user) {
-        navigation.replace("Landing"); 
-      }
-    });
-    return () => {
-      unsubscribe();
-    }
-  });
+  //useEffect(() => {
+  //  const unsubscribe = onAuthStateChanged(auth, (user) => {
+  //    if (!user) {
+  //      navigation.replace("Landing"); 
+   //   }
+  //  });
+  //  return () => {
+  //    unsubscribe();
+  //  }
+  //});
 
   const icon = (item) => {
     let iconName;
