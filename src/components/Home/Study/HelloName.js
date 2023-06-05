@@ -1,12 +1,45 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
+import { database, auth } from '../../../../firebase';
+import { onValue, ref, get } from 'firebase/database';
 
 const HelloName = () => {
+
+  console.log("Hi")
+
+  const [username, setUsername] = useState('');
+
+  const currentUserId = auth.currentUser.uid;
+  const userIdRef = ref(database, '/users/' + currentUserId);
+
+  //to get the user's username 
+  /*onValue(userIdRef, (snapshot) => {
+    if (snapshot.exists()) {
+      const data = snapshot.val().username;
+      setUsername(data);
+    } else {
+      setUsername('Anonymous user');
+    }
+  }, {onlyOnce: true});*/
+  //to get the user's username 
+  get(userIdRef).then((snapshot) => {
+    if (snapshot.exists()) {
+      const data = snapshot.val().username;
+      setUsername(data);
+    } else {
+      setUsername('Anonymous user');
+    }
+  });
+
   return (
     <View style={styles.container}>
       <View style={styles.textContainer}>
         <Text style={styles.greetingText}>Hello,</Text>
-        <Text style={styles.nameText}>Your Name</Text>
+        {username ? (
+          <Text style={styles.nameText}>{username}</Text>
+        ) : (
+          <Text style={styles.nameText}>...Loading</Text>
+        )}
       </View>
       <Image
         source={require('../../../../assets/logoOnly.png')}

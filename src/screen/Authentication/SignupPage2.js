@@ -2,20 +2,23 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity, FlatList, SafeAreaView, Alert } from 'react-native';
 import { auth, database } from "../../../firebase";
 import { ref, runTransaction, set, get } from 'firebase/database';
-import { useLinkProps } from '@react-navigation/native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
-const SignupPage2 = ({ navigation, route }) => {
+const SignupPage2 = ({ navigation}) => {
+
+  console.log("signup2")
 
   const [username, setUsername] = useState('');
   const [interests, setInterests] = useState([]);
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [gender, setGender] = useState('');
   const [confirmUsername, setConfirmUsername] = useState(false);
+  const [isLoading, setLoading] = useState(false);
 
   const handleConfirmDetails = () => {
     // Perform any necessary actions to confirm details (e.g., API calls, data validation)
-
+    setLoading(true);
     const currentUser = auth.currentUser;
     const userId = currentUser.uid;
 
@@ -24,45 +27,55 @@ const SignupPage2 = ({ navigation, route }) => {
     //reference to the users node based on their username
     const usernameRef = ref(database, '/usernames/' + username);
 
-    //to handle empty username
+    //handle empty username
     if (!username) {
       Alert.alert("Username cannot be empty");
+      setLoading(false);
       return;
     }
 
+    //handle empty gender
     if (!gender) {
       Alert.alert("Please select your gender");
+      setLoading(false);
       return;
     }
     
     runTransaction(usernameRef, (user) => {
-      console.log(user);
-      //if the username has not been used yet according to local cache
-      if (!user) {
-        return get(usernameRef).then((snapshot) => {
-          const exists = snapshot.exists();
-          //check if the username exists in remote database
-          if (!exists) {
-            set(usernameRef, {
-              uid: userId
-            });
+      if (user === null) {
+        //because the data retrieved by runTransaction 
+        //might not be up-to-date, so use get() to get
+        //the latest data from remote database.
+        get(usernameRef).then((snapshot) => {
+          if (snapshot.exists()) {
+            //username exists
+            Alert.alert("Username already existed");
+            setLoading(false);
+            return;
+          } else {
+            //username does not exist
+            set(usernameRef, {uid: userId});
             set(userIdRef, {
               username: username,
               interests: interests,
-              gender: gender
+              gender: gender,
+              friendList: [],
+              groupList: [],
             });
-           // navigation.replace("Home");
+            navigation.replace("Home");
+            return;
           }
-        }).catch((error) => console.log(error));
+        })
+        .catch((error) => console.log(error));
       } else {
-        //if the username is already used by other users
-        Alert.alert("Username already exists");
+        setLoading(true);
+        Alert.alert("Username already existed");
+        return;
       }
     });
   };
 
   const handleToggleInterest = (selectedInterest) => {
-    console.log(interests);
     if (interests.includes(selectedInterest)) {
       setInterests(interests.filter((interest) => interest !== selectedInterest));
     } else {
@@ -98,6 +111,7 @@ const SignupPage2 = ({ navigation, route }) => {
     <TouchableOpacity
       style={[styles.toggleButton, interests.includes(item) && styles.toggleButtonSelected]}
       onPress={() => handleToggleInterest(item)}
+      disabled={isLoading}
     >
       <Text style={styles.toggleButtonText}>{item}</Text>
     </TouchableOpacity>
@@ -146,6 +160,7 @@ const SignupPage2 = ({ navigation, route }) => {
                 onChangeText={setUsername}
                 placeholder="Enter your username"
                 autoCapitalize='none'
+                editable={!isLoading}
               />
             </View>
 
@@ -155,12 +170,14 @@ const SignupPage2 = ({ navigation, route }) => {
                 <TouchableOpacity 
                 onPress={handleToggleMale}
                 style={[styles.toggleButton, gender === 'male' && styles.toggleMaleSelected]}
+                disabled={isLoading}
                 >
                   <MaterialCommunityIcons name={"face-man-outline"} size={30}/>
                 </TouchableOpacity>
                 <TouchableOpacity 
                 onPress={handleToggleFemale}
                 style={[styles.toggleButton, gender === 'female' && styles.toggleFemaleSelected]}
+                disabled={isLoading}
                 >
                   <MaterialCommunityIcons name={"face-woman-outline"} size={30} />
                 </TouchableOpacity>
@@ -204,31 +221,45 @@ const SignupPage2 = ({ navigation, route }) => {
                 Username: <Text style={styles.boldText}>{username}</Text>
               </Text>
 
-              <TouchableOpacity style={styles.toggleContainer} onPress={handleToggleConfirmUsername}>
-                <View style={[styles.checkbox, confirmUsername && styles.checkboxChecked]} />
+              <View style={styles.toggleContainer}>
+                <TouchableOpacity
+                  onPress={handleToggleConfirmUsername}
+                  disabled={isLoading}
+                >
+                {confirmUsername ? (
+                  <View style={styles.checkbox}>
+                    <Ionicons name={"checkmark"} size={15} />
+                  </View>
+                ) : (
+                  <View style={styles.checkbox} />
+                    )}
+                    
+                </TouchableOpacity>
                 <Text style={styles.checkboxText}>Confirm username</Text>
-              </TouchableOpacity>
+              </View>
 
-              {/*{confirmUsername && (
-                <TextInput
-                  style={styles.input}
-                  value={confirmPassword}
-                  onChangeText={setConfirmPassword}
-                  placeholder="Confirm password"
-                  secureTextEntry
-                />
-              )}*/}
-
-              <TouchableOpacity style={styles.toggleContainer} onPress={handleToggleAgreeTerms}>
-                <View style={[styles.checkbox, agreeTerms && styles.checkboxChecked]} />
+              <View style={styles.toggleContainer}>
+                <TouchableOpacity 
+                  onPress={handleToggleAgreeTerms}
+                  disabled={isLoading}
+                >
+                  {agreeTerms ? (
+                  <View style={styles.checkbox}>
+                    <Ionicons name={"checkmark"} size={15} />
+                  </View>
+                ) : (
+                  <View style={styles.checkbox} />
+                    )}
+                </TouchableOpacity>
                 <Text style={styles.checkboxText}>Agree to Terms and Conditions</Text>
-              </TouchableOpacity>
+              </View>
+
             </View>
 
             <TouchableOpacity
               style={[styles.nextButton, (!confirmUsername || !agreeTerms) && styles.nextButtonDisabled]}
               onPress={handleConfirmDetails}
-              disabled={!agreeTerms}
+              disabled={!agreeTerms || !confirmUsername || isLoading}
             >
               <Text style={styles.nextButtonText}>Next</Text>
             </TouchableOpacity>
@@ -282,6 +313,8 @@ const styles = StyleSheet.create({
     borderColor: 'gray',
     borderRadius: 5,
     marginLeft: 10,
+    justifyContent: 'center',
+    alignItems: 'center'
   },
   checkboxChecked: {
     backgroundColor: 'gray',
@@ -289,7 +322,7 @@ const styles = StyleSheet.create({
   toggleContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 15,
   },
   confirmationContainer: {
     marginBottom: 20,
@@ -331,7 +364,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   toggleButtonSelected: {
-    backgroundColor: 'rgba(0, 0, 0, 0.3)', // Darker overlay
+    backgroundColor: 'mediumpurple'
   },
   genderContainer: {
     flexDirection: 'row'

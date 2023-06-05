@@ -6,11 +6,12 @@ import StudyDashboard from './Tabs/StudyDashboard';
 import StudyCommunity from './Tabs/StudyCommunity';
 import Achievements from './Tabs/Achievement';
 import Settings from './Tabs/Settings';
+import { Text } from 'react-native';
 
+const HomePage = ({navigation}) => {
+  console.log("Home")
 
-const Tab = createBottomTabNavigator();
-
-const HomePage = () => {
+  const Tab = createBottomTabNavigator();
     return (
       <Tab.Navigator
         screenOptions={({ route }) => ({

@@ -15,6 +15,8 @@ import { auth } from "../../../firebase"
 
 const LandingPage = ({navigation}) => {
 
+  console.log("Landing")
+
   const [isLoading, setLoading] = useState(false);
 
   const goToLogin = () => {
@@ -32,28 +34,25 @@ const LandingPage = ({navigation}) => {
     setLoading(true);
 
     signInAnonymously(auth)
-    .then((userCredential) => {
+    .then(() => {
       console.log("Anon");
-      setLoading(false)})
+    })
     .catch((error) => {
-    setLoading(false)
-    console.error('An error occurred during anonymous sign-in:', error);
+      console.error('An error occurred during anonymous sign-in:', error);
     })
   };
 
-  //keep track of if current screen on the stack changes,
-  //to disable login and signup together.
   useEffect(() => {
-    setLoading(false);
-  }, [navigation.getState().route]);
-
-  useEffect(() => {
-    onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
-        navigation.replace("Home");  //if signin successfully, navigate to Home screen
+        navigation.replace("Home");  //if signin anonymously successfully, navigate to Home screen
         console.log(user);
       } 
-    })
+    });
+    //to unsubscribe from the listener
+    return () => {
+      unsubscribe();
+    };
   }, []);
 
   return (

@@ -18,10 +18,10 @@ const App = () => {
     <NavigationContainer>
       <Stack.Navigator initialRouteName='Landing' screenOptions={{headerShown:false}}>
         <Stack.Screen name="Landing" component={LandingPage} />
+        <Stack.Screen name="Home" component={HomePage} />
         <Stack.Screen name="Login" component={LoginPage} />
         <Stack.Screen name="Signup" component={SignupPage} />
-        <Stack.Screen name ="Signup2" component={SignupPage2} />
-        <Stack.Screen name="Home" component={HomePage} />
+        <Stack.Screen name="Signup2" component={SignupPage2} />
       </Stack.Navigator>
     </NavigationContainer>
    );

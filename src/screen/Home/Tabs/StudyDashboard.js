@@ -1,5 +1,6 @@
 import React from 'react';
 import { StyleSheet, View, FlatList, SafeAreaView } from 'react-native';
+import { database } from '../../../../firebase';
 
 import Features from '../../../components/Home/Study/Features';
 import StudyMode from '../../../components/Home/Study/StudyMode';

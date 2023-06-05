@@ -16,9 +16,13 @@ import { auth } from "../../../firebase"
 import { createUserWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
 
 const SignupPage = ({navigation}) => {
+
+  console.log("Signup")
   const [name, setName] = useState("");
 
-  const [password, setPassword] = useState("");
+  const [password1, setPassword1] = useState("");
+
+  const [password2, setPassword2] = useState("");
 
   const [isLoading, setLoading] = useState(false);
 
@@ -26,17 +30,25 @@ const SignupPage = ({navigation}) => {
     setName(text);
   };
 
-  const handlePasswordChange = (text) => {
-    setPassword(text);
+  const handlePassword1Change = (text) => {
+    setPassword1(text);
+  };
+  
+  const handlePassword2Change = (text) => {
+    setPassword2(text);
   };
 
   useEffect(() => {
-    onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
-        //if user signup successfully, go to Home screen
+        //if user signup successfully, go to SignupPage2
+        //to set user profile.
         navigation.replace("Signup2");
       } 
-    })
+    });
+    return () => {
+      unsubscribe();
+    };
   }, []);
 
 
@@ -44,10 +56,27 @@ const SignupPage = ({navigation}) => {
 
     setLoading(true);
 
-    createUserWithEmailAndPassword(auth, name, password)
+    if (password1 === '' && password2 !== '') {
+      Alert.alert("Enter your password")
+      setLoading(false);
+      return;
+    } 
+
+    if (password1 !== '' && password2 === '') {
+      Alert.alert("Confirm your password")
+      setLoading(false);
+      return;
+    } 
+
+    if (password1 !== password2) {
+      Alert.alert("Passwords do not match");
+      setLoading(false);
+      return;
+    }
+
+    createUserWithEmailAndPassword(auth, name, password1)
     .then((userCredential) => {
       //signup successfully
-      setLoading(false);
       console.log(userCredential.user.uid)
     })
     .catch((error) => {
@@ -60,6 +89,7 @@ const SignupPage = ({navigation}) => {
       } else if (errorCode === "auth/email-already-in-use") {
         Alert.alert("Email address is already used by other account");
       } else if (errorCode === "auth/missing-password") {
+        //to handle when both password inputs are empty
         Alert.alert("Password cannot be empty");
       } else if (errorCode === "auth/missing-email") {
         Alert.alert("Email cannot be empty");
@@ -71,7 +101,6 @@ const SignupPage = ({navigation}) => {
     })
   };
 
-  //const goToHome = () => navigation.replace("Home");
 
   const goToLogin = () => {
     setLoading(true);
@@ -82,11 +111,6 @@ const SignupPage = ({navigation}) => {
     setLoading(true);
     navigation.replace("Landing");
   };
-
-  useEffect(() => {
-    setLoading(false);
-  }, [navigation.getState().route]);
-
 
   return (
     <KeyboardAvoidingView style={styles.container1}>
@@ -115,12 +139,21 @@ const SignupPage = ({navigation}) => {
         placeholder="Enter your password"
         textAlign="left"
         secureTextEntry={true}
-        onChangeText={handlePasswordChange}
-        value={password}
+        onChangeText={handlePassword1Change}
+        value={password1}
+        autoCapitalize="none"
+        editable={!isLoading}
+      /> 
+      <TextInput
+        style={styles.text2}
+        placeholder="Confirm your password"
+        textAlign="left"
+        secureTextEntry={true}
+        onChangeText={handlePassword2Change}
+        value={password2}
         autoCapitalize="none"
         editable={!isLoading}
       />
-      
       {/* If it is loading, show the ActivityIndicator, else show the signup button */} 
       {isLoading ? (
         <View style={styles.loading}>
@@ -214,7 +247,7 @@ const styles = StyleSheet.create({
   },
   button: {
     position: 'relative',
-    bottom: 150,
+    bottom: 130,
     right: 150
   }
 });
