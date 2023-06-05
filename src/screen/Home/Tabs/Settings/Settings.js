@@ -26,21 +26,26 @@ const Settings = ({navigation}) => {
   const navigateToScreen = (screen) => {
     if (screen === 'Landing') {  //when Logout is clicked.
       signOut(auth)
-      .then(() => console.log("signed out succesfully"))
+      .then(() => {
+        console.log("signed out succesfully");
+        navigation.replace("Landing");
+      })
       .catch((error) => console.log(error));
-      //return;
-    }     
-    else {
-      navigation.navigate(screen)
+    } else {
+      navigation.replace(screen);
     }
   };
 
-  useEffect(() => 
-    onAuthStateChanged(auth, (user) => {
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (!user) {
-        navigation.replace("Landing");
+        navigation.replace("Landing"); 
       }
-    }));
+    });
+    return () => {
+      unsubscribe();
+    }
+  });
 
   const icon = (item) => {
     let iconName;

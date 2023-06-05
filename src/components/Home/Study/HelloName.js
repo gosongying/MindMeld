@@ -7,18 +7,18 @@ const HelloName = () => {
 
   const [username, setUsername] = useState('');
 
-  const currentUserId = auth.currentUser.uid;
-  const userIdRef = ref(database, '/users/' + currentUserId);
+  //const currentUserId = auth.currentUser.uid;
+  //const userIdRef = ref(database, '/users/' + currentUserId);
 
   //to get the user's username from the database
-  get(userIdRef).then((snapshot) => {
-    if (snapshot.exists()) {
-      const data = snapshot.val().username;
-      setUsername(data);
-    } else {
-      setUsername('Anonymous user');
-    }
-  });
+  //get(userIdRef).then((snapshot) => {
+  //  if (snapshot.exists()) {
+  //    const data = snapshot.val().username;
+  //    setUsername(data);
+  //  } else {
+   //   setUsername('Anonymous user');
+  //  }
+ // });
 
   return (
     <View style={styles.container}>

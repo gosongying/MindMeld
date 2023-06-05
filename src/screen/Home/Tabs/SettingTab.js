@@ -14,14 +14,12 @@ import Privacy from './Settings/Privacy';
 import Profile from './Settings/Profile';
 import SessionsSetting from './Settings/SessionsSetting';
 import TermsAndCondition from './Settings/TermsAndCondition';
-import LandingPage from '../../Authentication/LandingPage';
 
 const SettingTab = () => {
 
   const Stack = createStackNavigator();
 
   return (
-    <NavigationContainer independent={true}>
       <Stack.Navigator initialRouteName='Settings' screenOptions={{headerShown:false}}>
         <Stack.Screen name="Settings" component={Settings} />
         <Stack.Screen name="About" component={About} />
@@ -34,9 +32,7 @@ const SettingTab = () => {
         <Stack.Screen name="Profile" component={Profile} />
         <Stack.Screen name="SessionsSetting" component={SessionsSetting} />
         <Stack.Screen name="TermsAndCondition" component={TermsAndCondition} />
-        <Stack.Screen name="Landing" component={LandingPage} />
       </Stack.Navigator>
-    </NavigationContainer>
    );
 }
 
