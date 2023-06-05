@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { TouchableOpacity, StyleSheet, View, Text, Image } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { auth, database } from '../../../../firebase';
+import { onValue, ref, get } from 'firebase/database';
 
 const Details = ({ navigation }) => {
   //since the the profile settings page hasn't been done,
@@ -9,13 +11,31 @@ const Details = ({ navigation }) => {
   //profile page is done.
   const profileSetting = () => navigation.navigate('Profile');
 
+  const currentUserId = auth.currentUser.uid;
+  const userIdRef = ref(database, '/users/' + currentUserId);
+
+  const [username, setUsername] = useState('');
+
+  get(userIdRef).then((snapshot) => {
+    if (snapshot.exists()) {
+      const data = snapshot.val().username;
+      setUsername(data);
+    } else {
+      setUsername('Anonymous user');
+    }
+  });
+
 
   return (
     <View style={styles.container}>
       <View style={styles.horizontal}>
         <Image source={require('../../../../assets/profileholder.png')} style={styles.profile} />
         <View style={styles.detailsContainer}>
-          <Text style={styles.name}>Your Name</Text>
+          {username ? (
+          <Text style={styles.name}>{username}</Text>
+        ) : (
+          <Text style={styles.name}>...Loading</Text>
+        )}
           <View style={styles.levelContainer}>
             <Text style={styles.levelText}>Level 10</Text>
             <View style={styles.trophyContainer}>

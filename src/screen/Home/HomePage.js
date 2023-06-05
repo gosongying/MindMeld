@@ -7,10 +7,12 @@ import StudyCommunityTab from './Tabs/StudyCommunityTab';
 import AchievementTab from './Tabs/AchievementTab';
 import SettingTab from './Tabs/SettingTab';
 
-
-const Tab = createBottomTabNavigator();
-
 const HomePage = () => {
+
+  console.log("Home");
+
+  const Tab = createBottomTabNavigator();
+
     return (
       <Tab.Navigator
         screenOptions={({ route }) => ({

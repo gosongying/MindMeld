@@ -17,12 +17,13 @@ import { signInWithEmailAndPassword, onAuthStateChanged, sendPasswordResetEmail 
 import { ref, get } from 'firebase/database';
 
 const LoginPage = ({navigation}) => {
+  console.log("Login")
   
   const [email, setEmail] = useState("");  //email entered for login
 
   const [password, setPassword] = useState("");
 
-  const[firstLoading, setFirstLoading] = useState(false);  //loading when login
+  const [firstLoading, setFirstLoading] = useState(false);  //loading when login
 
   const [isModalVisible, setModalVisible] = useState(false);  //to pop up a prompt for entering email for resetting password
 
@@ -59,7 +60,6 @@ const LoginPage = ({navigation}) => {
   };
 
 
-
   const handleEmailChange = (text) => {
     setEmail(text);
   };
@@ -81,43 +81,45 @@ const LoginPage = ({navigation}) => {
     setFirstLoading(true);
     navigation.replace("Landing");
   };
-  
-  //when current screen changes,
-  //firstLoading will be set to false,
-  //to disable two button works at the same time.
-  useEffect(() => {
-    setFirstLoading(false);
-  }, [navigation.getState().route]);
+
+  const goToHome = () => {
+    setFirstLoading(true);
+    navigation.replace("Home");
+  };
+
+  const goToSignup2 = () => {
+    setFirstLoading(true);
+    navigation.replace("Signup2");
+  };
 
   useEffect(() => {
-    onAuthStateChanged(auth, (user) => {
-      console.log("hi")
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         const userIdRef = ref(database, '/users/' + user.uid);
         get(userIdRef).then((snapshot) => {
-          const exists = snapshot.exists();
-          if (!exists) {
-            //if the user has not set profile yet
-            navigation.replace("Signup2");
+          if (!snapshot.exists()) {
+            //if the user has not set up profile yet
+            goToSignup2();
           } else {
-            //if the user did set profile
-            //console.log("bye")
+            //if the user did set up profile
+            goToHome();
           }
         }).catch((error) => console.log(error));
       }
-    })
+    });
+    return () => {
+      unsubscribe();
+    };
   }, []);
-
 
   const loginUser = () => {
 
     setFirstLoading(true);
 
     signInWithEmailAndPassword(auth, email, password)
-    .then((userCredential) => {
+    .then(() => {
       //user signin successfully
-      setFirstLoading(false);
-      //console.log(userCredential.user.email);
+      console.log(userCredential.user.email);
     })
     .catch((error) => {
       //handle error when login
