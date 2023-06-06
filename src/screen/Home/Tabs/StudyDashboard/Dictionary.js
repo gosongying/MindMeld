@@ -6,6 +6,7 @@ import {
   SafeAreaView,
   TextInput,
   View,
+  ScrollView,
 } from 'react-native';
 import axios from 'axios';
 
@@ -13,7 +14,7 @@ const Dictionary = ({ navigation }) => {
   const goToHome = () => navigation.navigate('StudyDashboard');
 
   const [word, setWord] = useState('');
-  const [definition, setDefinition] = useState('');
+  const [definitions, setDefinitions] = useState([]);
 
   const handleSearch = async () => {
     try {
@@ -23,26 +24,35 @@ const Dictionary = ({ navigation }) => {
       const response = await axios.get(apiUrl);
       const data = response.data;
 
-      // Extract the first definition from the response
       if (Array.isArray(data) && data.length > 0) {
-        const firstEntry = data[0];
-        if (firstEntry.hasOwnProperty('shortdef')) {
-          const firstDefinition = firstEntry.shortdef[0];
-          setDefinition(firstDefinition);
-        } else {
-          setDefinition('No definition found.');
-        }
+        const wordDefinitions = data.map(entry => {
+          if (entry.hasOwnProperty('shortdef')) {
+            return entry.shortdef[0];
+          } else {
+            return 'No definition found.';
+          }
+        });
+        setDefinitions(wordDefinitions);
       } else {
-        setDefinition('No definition found.');
+        setDefinitions(['No definition found.']);
       }
     } catch (error) {
       console.log(error);
-      setDefinition('An error occurred. Please try again later.');
+      setDefinitions(['An error occurred. Please try again later.']);
     }
   };
 
   return (
     <SafeAreaView style={styles.container}>
+      <View style={styles.header}>
+        <TouchableOpacity style={styles.backButton} onPress={goToHome}>
+          <Text style={styles.back}>{'\u2190'}</Text>
+        </TouchableOpacity>
+        <Text style={styles.headerText}>Dictionary</Text>
+      </View>
+
+      
+
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}
@@ -51,27 +61,26 @@ const Dictionary = ({ navigation }) => {
           placeholder="Enter a word"
           placeholderTextColor="#777777"
         />
+        <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
+          <Text style={styles.searchButtonText}>Search</Text>
+        </TouchableOpacity>
       </View>
 
-      <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
-        <Text style={styles.searchButtonText}>Search</Text>
-      </TouchableOpacity>
-
-      <View style={styles.definitionContainer}>
-        <View style={styles.definitionBox}>
-          <Text style={styles.definition}>{definition}</Text>
+      <ScrollView>
+        <View style={styles.definitionContainer}>
+          {definitions.map((definition, index) => (
+            <View key={index} style={styles.definitionBox}>
+              <Text style={styles.definition}>{definition}</Text>
+            </View>
+          ))}
         </View>
-      </View>
+      </ScrollView>
 
       <View style={styles.attributionContainer}>
         <Text style={styles.attributionText}>
           Powered by Merriam-Webster
         </Text>
       </View>
-
-      <TouchableOpacity style={styles.backButton} onPress={goToHome}>
-        <Text style={styles.back}>{'\u2190'}</Text>
-      </TouchableOpacity>
     </SafeAreaView>
   );
 };
@@ -83,48 +92,67 @@ const styles = StyleSheet.create({
     paddingTop: 20,
     backgroundColor: '#fff',
   },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  backButton: {
+    marginRight: 10,
+  },
+  back: {
+    fontSize: 38,
+    fontWeight: 'bold',
+    color: '#333333',
+  },
+  headerText: {
+    fontSize: 34,
+    fontWeight: 'bold',
+    marginLeft: 60,
+    marginBottom: -30,
+  },
   inputContainer: {
     alignItems: 'center',
-    marginBottom: 30,
-    marginTop: 50,
+    marginTop: 35,
   },
   input: {
     paddingHorizontal: 10,
     paddingVertical: 8,
     borderRadius: 8,
-    fontSize: 30,
+    fontSize: 26,
     fontWeight: 'bold',
     textAlign: 'center',
-    width: '100%',
+    width: '80%',
     color: '#333333',
+    backgroundColor: '#f0f0f0',
   },
   searchButton: {
-    backgroundColor: '#e0e0e0',
+    backgroundColor: '#007bff',
     borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
     width: '30%',
     alignSelf: 'center',
     paddingVertical: 10,
-    marginBottom: 10,
+    marginTop: 10,
   },
   searchButtonText: {
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: 'bold',
-    color: '#333333',
+    color: '#ffffff',
   },
   definitionContainer: {
-    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    paddingVertical: 20,
   },
   definitionBox: {
     borderWidth: 1,
-    borderColor: 'purple',
+    borderColor: '#007bff',
     borderRadius: 8,
     padding: 10,
     width: '80%',
-    marginBottom: 100,
+    marginBottom: 20,
   },
   definition: {
     fontSize: 18,
@@ -140,17 +168,6 @@ const styles = StyleSheet.create({
   attributionText: {
     fontSize: 14,
     color: '#777777',
-  },
-  backButton: {
-    position: 'absolute',
-    top: 40,
-    left: 10,
-    zIndex: 1,
-  },
-  back: {
-    fontSize: 35,
-    fontWeight: 'bold',
-    color: '#333333',
   },
 });
 
