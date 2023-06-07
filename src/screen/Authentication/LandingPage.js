@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   center: {
-    bottom:30
+    bottom:40
   },
   navigator: {
     fontSize: 18,
@@ -115,7 +115,7 @@ const styles = StyleSheet.create({
   bottom: {
     paddingBottom: 16,
     paddingHorizontal: 16,
-    bottom:70
+    bottom:80
   },
   pressableOne: {
     alignItems: "center",

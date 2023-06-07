@@ -12,9 +12,8 @@ import {
   Modal
 } from "react-native";
 
-import { auth, database } from "../../../firebase"
-import { signInWithEmailAndPassword, onAuthStateChanged, sendPasswordResetEmail } from "firebase/auth";
-import { ref, get } from 'firebase/database';
+import { auth } from "../../../firebase"
+import { signInWithEmailAndPassword, sendPasswordResetEmail } from "firebase/auth";
 
 const LoginPage = ({navigation}) => {
   console.log("Login")
@@ -30,6 +29,8 @@ const LoginPage = ({navigation}) => {
   const [emailReset, setEmailReset] = useState("");  //email entered for resetting password
 
   const [secondLoading, setSecondLoading] = useState(false);  //loading when reset password
+
+  const [isLeaving, setLeaving] = useState(false); //for go to signup and landing
 
   const resetPassword = () => {
     setSecondLoading(true);
@@ -73,23 +74,13 @@ const LoginPage = ({navigation}) => {
   };
 
   const goToSignup = () => {
-    setFirstLoading(true);
+    setLeaving(true);
     navigation.replace("Signup");
   };
 
   const goToLanding = () => {
-    setFirstLoading(true);
+    setLeaving(true);
     navigation.replace("Landing");
-  };
-
-  const goToHome = () => {
-    setFirstLoading(true);
-    navigation.replace("Home");
-  };
-
-  const goToSignup2 = () => {
-    setFirstLoading(true);
-    navigation.replace("Signup2");
   };
 
   /*useEffect(() => {
@@ -115,6 +106,7 @@ const LoginPage = ({navigation}) => {
   const loginUser = () => {
 
     setFirstLoading(true);
+    setLeaving(true);
 
     signInWithEmailAndPassword(auth, email, password)
     .then((userCredential) => {
@@ -131,6 +123,7 @@ const LoginPage = ({navigation}) => {
     .catch((error) => {
       //handle error when login
       setFirstLoading(false);
+      setLeaving(false);
       const errorCode = error.code;
       if (errorCode === "auth/invalid-email") {
         Alert.alert("Invalid email address");
@@ -149,97 +142,111 @@ const LoginPage = ({navigation}) => {
   };
 
   return (
-    <KeyboardAvoidingView style={styles.container1} >
+    <View style={styles.container1}>
+    <KeyboardAvoidingView 
+    enabled= {!isModalVisible}
+    behavior= "padding"
+    style={styles.container1} >
+      {/* To make all component move up together when open keyboard */}
+      <View style={{alignItems:'center'}}>
       {/* Button for going back to the landing screen */}
-      <TouchableOpacity style={styles.button} onPress={goToLanding} disabled={firstLoading}>
-        <Text style={styles.text7}>{'\u2190'}</Text >  
-      </TouchableOpacity>
-      <Image source={require("../../../assets/logoOnly.png")} />
-      <Text style={styles.text1}>Log in now!</Text>
-      <TextInput
-        style={styles.text2}
-        placeholder="Enter your email address"
-        textAlign="left"
-        keyboardType="email-address"
-        onChangeText={handleEmailChange}
-        value={email}
-        autoCapitalize="none"
-        editable={!firstLoading}
-      />
-      <TextInput
-        style={styles.text2}
-        placeholder="Enter your password"
-        textAlign="left"
-        secureTextEntry={true}
-        onChangeText={handlePasswordChange}
-        value={password}
-        autoCapitalize="none"
-        editable={!firstLoading}
-      />
-       
-      {/* If it is loading, show the ActivityIndicator, else show the login button */} 
-      {firstLoading ? (
-        <View style={styles.loading1}>  
-          <ActivityIndicator size="small" color="#0000ff" />
-        </View>
-      ) : (
-      <TouchableOpacity 
-        style={styles.pressable1}
-        onPress={loginUser}>
-          <Text style={styles.text3}>Login</Text>
-      </TouchableOpacity>
-      )}
-
-      <TouchableOpacity onPress={forgotPassword} disabled={firstLoading}>
-        <Text style={styles.text4}>Forgot your password?</Text>
-      </TouchableOpacity>
-      
-      <View style={styles.container2}>
-        <Text style={styles.text5}>Don't have an account?</Text>
-        <TouchableOpacity onPress={goToSignup} disabled={firstLoading}>
-          <Text style={styles.text6}>Sign up</Text>
+        <TouchableOpacity 
+          style={styles.button} 
+          onPress={goToLanding} 
+          disabled={firstLoading || isLeaving}>
+          <Text style={styles.text7}>{'\u2190'}</Text >  
         </TouchableOpacity>
-      </View>
-
-      {/* Popup a prompt for entering email when user click the button forgot password */}
-      <Modal visible={isModalVisible} transparent animationType="fade">
-        <View style={styles.promptContainer}>
-          <View style={styles.prompt}>
-            <Text style={{ fontSize: 18, marginBottom: 10 }}>Forgot Password</Text>
-            <TextInput
-              placeholder="Email"
-              value={emailReset}
-              onChangeText={text => setEmailReset(text)}
-              style={styles.emailResetInput}
-              autoCapitalize="none"
-              editable={!secondLoading}
-            />
-            {/* If it is loading, show the ActivityIndicator, else show the reset password button */}
-            {secondLoading ? (
-              <View style={styles.loading2}>
-                <ActivityIndicator size="small" color="#0000ff" />
-              </View>
-            ) : (
-            <TouchableOpacity onPress={resetPassword} style={styles.pressable2}>
-               <Text style={{ color: 'white' }}>Reset Password</Text>
-            </TouchableOpacity>
-            )}
-
-            <TouchableOpacity 
-            onPress={() => {
-              setModalVisible(false);
-              setEmailReset("");
-            }} 
-            style={{ marginTop: 10, alignItems: "center"}}
-            disabled={secondLoading}
-            >
-              <Text style={{ textDecorationLine: 'underline' }}>Cancel</Text>
-            </TouchableOpacity>
+        <Image source={require("../../../assets/logoOnly.png")} />
+        <Text style={styles.text1}>Log in now!</Text>
+        <TextInput
+          style={styles.text2}
+          placeholder="Enter your email address"
+          textAlign="left"
+          keyboardType="email-address"
+          onChangeText={handleEmailChange}
+          value={email}
+          autoCapitalize="none"
+          editable={!firstLoading && !isLeaving}
+          inputMode="email"
+        />
+        <TextInput
+          style={styles.text2}
+          placeholder="Enter your password"
+          textAlign="left"
+          secureTextEntry={true}
+          onChangeText={handlePasswordChange}
+          value={password}
+          autoCapitalize="none"
+          editable={!firstLoading && !isLeaving}
+        />
+        
+        {/* If it is loading, show the ActivityIndicator, else show the login button */} 
+        {firstLoading ? (
+          <View style={styles.loading1}>  
+            <ActivityIndicator size="small" color="#0000ff" />
           </View>
+        ) : (
+        <TouchableOpacity 
+          disabled={isLeaving}
+          style={styles.pressable1}
+          onPress={loginUser}>
+            <Text style={styles.text3}>Login</Text>
+        </TouchableOpacity>
+        )}
+
+        <TouchableOpacity onPress={forgotPassword} disabled={firstLoading || isLeaving}>
+          <Text style={styles.text4}>Forgot your password?</Text>
+        </TouchableOpacity>
+        
+        <View style={styles.container2}>
+          <Text style={styles.text5}>Don't have an account?</Text>
+          <TouchableOpacity onPress={goToSignup} disabled={firstLoading || isLeaving}>
+            <Text style={styles.text6}>Sign up</Text>
+          </TouchableOpacity>
         </View>
-      </Modal>
-    </KeyboardAvoidingView>
-  );
+        </View>
+        </KeyboardAvoidingView>
+
+        {/* Popup a prompt for entering email when user click the button forgot password */}
+        <Modal visible={isModalVisible} transparent animationType="fade">
+          <View style={styles.promptContainer} >
+            <View style={styles.prompt}>
+              <Text style={{ fontSize: 18, marginBottom: 10 }}>Forgot Password</Text>
+                <TextInput
+                  placeholder="Email"
+                  value={emailReset}
+                  onChangeText={text => setEmailReset(text)}
+                  style={styles.emailResetInput}
+                  autoCapitalize="none"
+                  editable={!secondLoading}
+                  inputMode="email"
+                />
+                {/* If it is loading, show the ActivityIndicator, else show the reset password button */}
+                {secondLoading ? (
+                  <View style={styles.loading2}>
+                    <ActivityIndicator size="small" color="#0000ff" />
+                  </View>
+                ) : (
+                <TouchableOpacity onPress={resetPassword} style={styles.pressable2}>
+                  <Text style={{ color: 'white' }}>Reset Password</Text>
+                </TouchableOpacity>
+                )}
+
+                <TouchableOpacity 
+                onPress={() => {
+                  setModalVisible(false);
+                  setEmailReset("");
+                }} 
+                style={{ marginTop: 10, alignItems: "center"}}
+                disabled={secondLoading}
+                >
+                <Text style={{ textDecorationLine: 'underline' }}>Cancel</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+      </View>
+    );
 };
 
 const styles = StyleSheet.create({
@@ -317,7 +324,7 @@ const styles = StyleSheet.create({
   },
   button: {
     position: 'relative',
-    bottom: 150,
+    bottom: 130,
     right: 150
   },
   promptContainer: {
@@ -327,6 +334,7 @@ const styles = StyleSheet.create({
     backgroundColor:'rgba(0, 0, 0, 0.5)', //to make the background blur.
   },
   prompt: {
+    bottom: 30,
     width: 300, 
     backgroundColor: 'white',
     padding: 20, 
