@@ -7,17 +7,16 @@ import { auth } from "../../../../../firebase"
 
 const Settings = ({navigation}) => {
   const options = [
-    { id: '1', title: 'Profile Settings', screen: 'Profile' },
-    { id: '2', title: 'Privacy Settings', screen: 'Privacy' },
-    { id: '3', title: 'Study Buddy List', screen: 'FriendList' },
-    { id: '4', title: 'Group List', screen: 'GroupList' },
-    { id: '5', title: 'Sessions Setting', screen: 'SessionsSetting' },
-    { id: '6', title: 'Achievement Settings', screen: 'AchievementSettings' },
-    { id: '7', title: 'Feedback', screen: 'Feedback' },
-    { id: '8', title: 'Terms and Conditions', screen: 'TermsAndConditions' },
-    { id: '9', title: 'Help & Support', screen: 'HelpAndSupport' },
-    { id: '10', title: 'About', screen: 'About' },
-    { id: '11', title: 'Logout', screen: 'Landing' },
+    { id: '1', title: 'Privacy Settings', screen: 'Privacy' },
+    { id: '2', title: 'Study Buddy List', screen: 'FriendList' },
+    { id: '3', title: 'Group List', screen: 'GroupList' },
+    { id: '4', title: 'Sessions Setting', screen: 'SessionsSetting' },
+    { id: '5', title: 'Achievement Settings', screen: 'AchievementSettings' },
+    { id: '6', title: 'Feedback', screen: 'Feedback' },
+    { id: '7', title: 'Terms and Conditions', screen: 'TermsAndConditions' },
+    { id: '8', title: 'Help & Support', screen: 'HelpAndSupport' },
+    { id: '9', title: 'About', screen: 'About' },
+    { id: '10', title: 'Logout', screen: 'Landing' },
   ];
 
   //since we haven't completed all screen, when each button is clicked,
@@ -50,26 +49,24 @@ const Settings = ({navigation}) => {
   const icon = (item) => {
     let iconName;
     if (item.id === '1') {
-      iconName = 'body';
-    } else if (item.id === '2') {
       iconName = 'key';
-    } else if (item.id === '3') {
+    } else if (item.id === '2') {
       iconName = 'person';
-    } else if (item.id === '4') {
+    } else if (item.id === '3') {
       iconName = 'people';
-    } else if (item.id === '5') {
+    } else if (item.id === '4') {
       iconName = 'time';
-    } else if (item.id === '6') {
+    } else if (item.id === '5') {
       iconName = 'trophy';
-    } else if (item.id === '7') {
+    } else if (item.id === '6') {
       iconName = 'chatbubbles';
-    } else if (item.id === '8') {
+    } else if (item.id === '7') {
       iconName = 'document-text';
-    } else if (item.id === '9') {
+    } else if (item.id === '8') {
       iconName = 'help-circle';
-    } else if (item.id === '10') {
+    } else if (item.id === '9') {
       iconName = 'information-circle';
-    } else if (item.id === '11') {
+    } else if (item.id === '10') {
       iconName = 'log-out'
     }
     return iconName;
@@ -116,6 +113,7 @@ const Settings = ({navigation}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    paddingTop:30,
   },
   sectionTitle: {
     fontSize: 20,

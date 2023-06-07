@@ -1,14 +1,13 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Image, StyleSheet, TouchableOpacity, FlatList, SafeAreaView, Alert } from 'react-native';
-import { auth, database } from "../../../firebase";
-import { ref, runTransaction, set, get } from 'firebase/database';
+import { auth, database, storage } from "../../../firebase";
+import { ref as databaseRef, runTransaction, set, get, onValue } from 'firebase/database';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { updateProfile } from 'firebase/auth';
 import * as ImagePicker from 'expo-image-picker';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-
-
+import { getDownloadURL, uploadBytes, ref as storageRef, deleteObject } from 'firebase/storage';
 
 const SignupPage2 = ({ navigation}) => {
 
@@ -24,20 +23,61 @@ const SignupPage2 = ({ navigation}) => {
 
   const currentUser = auth.currentUser;
 
+  const uploadImageAsync = async (uri) => {
+    const blob = await new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.onload = function () {
+        resolve(xhr.response);
+      };
+      xhr.onerror = function (e) {
+        console.log(e);
+        reject(new TypeError("Network request failed"));
+      };
+      xhr.responseType = "blob";
+      xhr.open("GET", uri, true);
+      xhr.send(null);
+    });
+  
+    try {
+      //to make sure every profile picture in the storage belongs to exactly one user
+      const fileRef = storageRef(storage, 'Images/' + currentUser.uid);
+      const result = await uploadBytes(fileRef, blob);
+
+      blob.close();
+      return await getDownloadURL(fileRef);
+    } catch (error) {
+      console.log(error);
+      Alert.alert("Error");
+    }
+  };
+
+  const deleteImage = async () => {
+    const deleteRef = storageRef(storage, 'Images/' + currentUser.uid);
+    try {
+      await deleteObject(desertRef);
+      //image deleted successfully
+      console.log("Image deleted succesfully");
+    } catch (error) {
+      Alert.alert("Error during delete");
+    }
+  };
+
   const selectImageLibrary = async () => {
+    //request permission
     const {status} = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== 'granted') {
       Alert.alert("Permission denied");
       return;
     }
   
-    const result = await ImagePicker.launchImageLibraryAsync({
+    let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: [1, 1],
       quality: 1,
     });
 
+    //get image successfully
     if (!result.canceled) {
       setImage(result.assets[0].uri);
     }
@@ -50,7 +90,7 @@ const SignupPage2 = ({ navigation}) => {
       return;
     }
   
-    const result = await ImagePicker.launchCameraAsync({
+    let result = await ImagePicker.launchCameraAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: [1, 1],
@@ -59,19 +99,12 @@ const SignupPage2 = ({ navigation}) => {
 
     if (!result.canceled) {
       setImage(result.assets[0].uri);
-    }
+     }
   };
 
-  const handleConfirmDetails = () => {
+  const handleConfirmDetails = async () => {
     // Perform any necessary actions to confirm details (e.g., API calls, data validation)
     setLoading(true);
-   
-    const userId = currentUser.uid;
-
-    //reference to the users node based on their uid
-    const userIdRef = ref(database, '/users/' + userId);
-    //reference to the users node based on their username
-    const usernameRef = ref(database, '/usernames/' + username);
 
     //handle empty username
     if (!username) {
@@ -87,42 +120,44 @@ const SignupPage2 = ({ navigation}) => {
       return;
     }
     
-    runTransaction(usernameRef, (user) => {
-      if (user === null) {
-        //because the data retrieved by runTransaction 
-        //might not be up-to-date, so use get() to get
-        //the latest data from remote database.
-        get(usernameRef).then((snapshot) => {
-          if (snapshot.exists()) {
-            //username exists
-            Alert.alert("Username already existed");
-            setLoading(false);
-            return;
-          } else {
-            //username does not exist
-            set(usernameRef, {uid: userId});
-            set(userIdRef, {
-              username: username,
-              interests: interests,
-              gender: gender,
-              friendList: [],
-              groupList: [],
-            });
-            updateProfile(currentUser, {
-              displayName: username,
-              photoURL: image
-            })
-            navigation.replace("Home");
-            return;
-          }
-        })
-        .catch((error) => console.log(error));
-      } else {
-        setLoading(true);
-        Alert.alert("Username already existed");
-        return;
-      }
+  const userId = currentUser.uid;
+
+  //reference to the users node based on their uid
+  const userIdRef = databaseRef(database, 'users/' + userId);
+  //reference to the users node based on their username 
+  const usernameRef = databaseRef(database, 'usernames/' + username);
+
+  try {
+  runTransaction(usernameRef, (user) => {
+    if (user) {
+      setLoading(false);
+      Alert.alert("Username already existed");
+      return;
+    } else {
+      const data = {uid: userId};
+      return data;
+    }
+  }).then(async (result) => {
+    if (result.committed) {
+    //if set username successfully
+    updateProfile(currentUser, {
+      displayName: username,
+      photoURL: image ? await uploadImageAsync(image) : null
+    }).then(() => {
+      set(userIdRef, {
+        username: username,
+        interests: interests,
+        gender: gender,
+        friendList: [],
+        groupList: [],
+      });
+      navigation.replace("Home");
     });
+    }
+  });
+  } catch (error) {
+  Alert.alert("Error");
+  }
   };
 
   const handleToggleInterest = (selectedInterest) => {
@@ -195,17 +230,24 @@ const SignupPage2 = ({ navigation}) => {
            <View style={styles.container}>
               <View style={styles.outerPictureContainer}>
                 <View style={styles.pictureContainer}>
-                  {image ? (
+                  <Image source={{uri: image}}  />
+                 {image ? (
                     <Image source={{uri: image}} style={styles.picture} />
                     ) : (
                     <Image source={require("../../../assets/profileholder.png")} style={styles.picture}/> 
-                    )}
+                    )}       
                 </View>
                 <View style={styles.libraryAndCamera}>
-                  <TouchableOpacity style={styles.pictureText} onPress={selectImageLibrary}>
+                  <TouchableOpacity 
+                  style={styles.pictureText} 
+                  onPress={selectImageLibrary}
+                  disabled={isLoading}>
                     <FontAwesome name={'photo'} size={30} />
                   </TouchableOpacity>
-                  <TouchableOpacity style={styles.pictureText} onPress={selectImageCamera}>
+                  <TouchableOpacity 
+                  style={styles.pictureText} 
+                  onPress={selectImageCamera}
+                  disabled={isLoading}>
                     <MaterialCommunityIcons name={'camera-outline'} size={35} />
                   </TouchableOpacity>
                 </View>
