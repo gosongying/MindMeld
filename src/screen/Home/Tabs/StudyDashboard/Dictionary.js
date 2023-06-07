@@ -7,6 +7,7 @@ import {
   TextInput,
   View,
   ScrollView,
+  Keyboard
 } from 'react-native';
 import axios from 'axios';
 
@@ -23,6 +24,7 @@ const Dictionary = ({ navigation }) => {
 
       const response = await axios.get(apiUrl);
       const data = response.data;
+      Keyboard.dismiss(); 
 
       if (Array.isArray(data) && data.length > 0) {
         const wordDefinitions = data.map(entry => {
@@ -50,9 +52,6 @@ const Dictionary = ({ navigation }) => {
         </TouchableOpacity>
         <Text style={styles.headerText}>Dictionary</Text>
       </View>
-
-      
-
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}
@@ -98,10 +97,11 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   backButton: {
-    marginRight: 10,
+    marginRight: 0,
+    marginLeft: 10,
   },
   back: {
-    fontSize: 38,
+    fontSize: 35,
     fontWeight: 'bold',
     color: '#333333',
   },

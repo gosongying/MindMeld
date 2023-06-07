@@ -92,6 +92,8 @@ const CreateStudySession = ({ navigation }) => {
     </View>
   );
 
+  const minimumDate = new Date(new Date().getTime() + 60000); 
+
   return (
     <SafeAreaView style={styles.container}>
       <TouchableOpacity style={styles.backButton} onPress={goToHome}>
@@ -147,6 +149,7 @@ const CreateStudySession = ({ navigation }) => {
         onConfirm={handleDateConfirm}
         onCancel={hideDatePicker}
         textColor="#000000"
+        minimumDate={minimumDate}
       />
       <DateTimePickerModal
         isVisible={isStartTimePickerVisible}
@@ -154,6 +157,7 @@ const CreateStudySession = ({ navigation }) => {
         onConfirm={handleStartTimeConfirm}
         onCancel={hideStartTimePicker}
         textColor="#000000"
+        minimumDate={minimumDate}
       />
       <DateTimePickerModal
         isVisible={isEndTimePickerVisible}
