@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { TouchableOpacity, StyleSheet, View, Text, Image } from 'react-native';
+import { TouchableOpacity, StyleSheet, View, Text, Image, Alert } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { auth, database } from '../../../../firebase';
 import { onValue, ref, get } from 'firebase/database';
@@ -13,26 +13,35 @@ const Details = ({ navigation }) => {
 
   const currentUser = auth.currentUser;
 
-  const [username, setUsername] = useState('');
+  //const [username, setUsername] = useState('');
 
-  useEffect(() => {
+  const userImage = currentUser.photoURL;
+
+  const username = currentUser.displayName;
+
+  /*useEffect(() => {
     if (currentUser.isAnonymous) {
       setUsername("Anonymous user");
     } else {
       setUsername(currentUser.displayName);
     }
-  }, []);
+  }, []);*/
 
 
   return (
-    <View style={styles.container}>
-      <View style={styles.horizontal}>
-        <Image source={require('../../../../assets/profileholder.png')} style={styles.profile} />
+      <View style={styles.container}>
+        <View style={styles.photoContainer}>
+        {userImage ? (
+          <Image source={{uri: userImage}} style={styles.profile}/>
+        ) : (
+          <Image source={require('../../../../assets/profileholder.png')} style={styles.profile} />
+        )}
+        </View>
         <View style={styles.detailsContainer}>
           {username ? (
-          <Text style={styles.name}>{username}</Text>
+          <Text style={styles.name} numberOfLines={1}>{username}</Text>
           ) : (
-          <Text style={styles.name}>...Loading</Text>
+          <Text style={styles.name}>Anonymous user</Text>
           )}
           <View style={styles.levelContainer}>
             <Text style={styles.levelText}>Level 10</Text>
@@ -46,22 +55,19 @@ const Details = ({ navigation }) => {
           <Ionicons name="create" size={20} />
         </TouchableOpacity>
       </View>
-    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    padding: 10,
-  },
-  horizontal: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    padding: 10,
   },
   profile: {
-    height: 50,
-    width: 50,
+    height: 70,
+    width: 70,
     marginRight: 20,
   },
   name: {
@@ -89,6 +95,13 @@ const styles = StyleSheet.create({
   trophyIcon: {
     marginLeft: 5,
   },
+  photoContainer: {
+    borderRadius: 35,
+    height: 70,
+    width: 70,
+    overflow: 'hidden',
+    right: 10
+  }
 });
 
 export default Details;

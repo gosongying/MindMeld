@@ -4,8 +4,10 @@ import { database, auth } from '../../../../firebase';
 import { onValue, ref, get } from 'firebase/database';
 
 const HelloName = () => {
+  
+  console.log("HelloName")
 
-  const [username, setUsername] = useState('');
+  //const [username, setUsername] = useState('');
 
  // const currentUserId = auth.currentUser.uid;
  // const userIdRef = ref(database, '/users/' + currentUserId);
@@ -20,24 +22,24 @@ const HelloName = () => {
   //  }
   //});
   const currentUser = auth.currentUser;
+  const username = currentUser.displayName;
 
-  useEffect(() => {
+  /*useEffect(() => {
     if (currentUser.isAnonymous) {
       setUsername("Anonymous user");
     } else {
       setUsername(currentUser.displayName);
     }
-  }, []);
+  }, []);*/
 
-  console.log(username);
   return (
     <View style={styles.container}>
       <View style={styles.textContainer}>
         <Text style={styles.greetingText}>Hello,</Text>
         {username ? (
-          <Text style={styles.nameText}>{username}</Text>
+          <Text style={styles.nameText} numberOfLines={1}>{username}</Text>
         ) : (
-          <Text style={styles.nameText}>...Loading</Text>
+          <Text style={styles.nameText}>Anonymous user</Text>
         )}
       </View>
       <Image
@@ -64,10 +66,10 @@ const styles = StyleSheet.create({
   },
   greetingText: {
     color: 'gray',
-    fontSize: 25,
+    fontSize: 20,
   },
   nameText: {
-    fontSize: 35,
+    fontSize: 25,
     fontWeight: 'bold',
   },
   logo: {

@@ -26,6 +26,8 @@ const SignupPage = ({navigation}) => {
 
   const [isLoading, setLoading] = useState(false);
 
+  const [isLeaving, setLeaving] = useState(false);
+
   const handleNameChange = (text) => {
     setName(text);
   };
@@ -55,22 +57,26 @@ const SignupPage = ({navigation}) => {
   const signupUser = () => {
 
     setLoading(true);
+    setLeaving(true);
 
     if (password1 === '' && password2 !== '') {
       Alert.alert("Enter your password")
       setLoading(false);
+      setLeaving(false);
       return;
     } 
 
     if (password1 !== '' && password2 === '') {
       Alert.alert("Confirm your password")
       setLoading(false);
+      setLeaving(false);
       return;
     } 
 
     if (password1 !== password2) {
       Alert.alert("Passwords do not match");
       setLoading(false);
+      setLeaving(false);
       return;
     }
 
@@ -83,6 +89,7 @@ const SignupPage = ({navigation}) => {
     .catch((error) => {
       //handle error when signup
       setLoading(false);
+      setLeaving(false);
       const errorCode = error.code;
       if (errorCode === "auth/invalid-email") {
         Alert.alert("Invalid email address");
@@ -103,81 +110,86 @@ const SignupPage = ({navigation}) => {
 
 
   const goToLogin = () => {
-    setLoading(true);
+    setLeaving(true);
     navigation.replace("Login");
   };
 
   const goToLanding = () => {
-    setLoading(true);
+    setLeaving(true);
     navigation.replace("Landing");
   };
 
   return (
-    <KeyboardAvoidingView style={styles.container1}>
+    <KeyboardAvoidingView 
+    behavior='padding'
+    style={styles.container1}>
+      <View style={{alignItems: 'center'}}>
       {/* Button for going back to the home screen */}
-      <TouchableOpacity 
-         style={styles.button} 
-         onPress={goToLanding}
-         disabled={isLoading}
-      >
-        <Text style={styles.text6} >{'\u2190'}</Text >
-      </TouchableOpacity>
-      <Image source={require("../../../assets/logoOnly.png")} />
-      <Text style={styles.text1}>Welcome. Sign Up now!</Text>
-      <TextInput
-        style={styles.text2}
-        placeholder="Enter your email address"
-        textAlign="left"
-        keyboardType="email-address"
-        onChangeText={handleNameChange}
-        value={name}
-        autoCapitalize="none"
-        editable={!isLoading}
-      />
-      <TextInput
-        style={styles.text2}
-        placeholder="Enter your password"
-        textAlign="left"
-        secureTextEntry={true}
-        onChangeText={handlePassword1Change}
-        value={password1}
-        autoCapitalize="none"
-        editable={!isLoading}
-      /> 
-      <TextInput
-        style={styles.text2}
-        placeholder="Confirm your password"
-        textAlign="left"
-        secureTextEntry={true}
-        onChangeText={handlePassword2Change}
-        value={password2}
-        autoCapitalize="none"
-        editable={!isLoading}
-      />
-      {/* If it is loading, show the ActivityIndicator, else show the signup button */} 
-      {isLoading ? (
-        <View style={styles.loading}>
-          <ActivityIndicator size="small" color="#0000ff" />
-        </View>
-      )
-        : (
-        <TouchableOpacity
-          style={styles.pressable1}
-          onPress={signupUser}
-          >
-        <Text style={styles.text3}>Sign up</Text>
-      </TouchableOpacity>
-      )
-        }
-      
-      <Text style={{ marginBottom: 15 }}>
-        ___________________________________________
-      </Text>
-      <View style={styles.container2}>
-        <Text style={styles.text4}>Already a user?</Text>
-        <TouchableOpacity onPress={goToLogin} disabled={isLoading}>
-          <Text style={styles.text5}>Login</Text>
+        <TouchableOpacity 
+            style={styles.button} 
+            onPress={goToLanding}
+            disabled={isLoading || isLeaving}>
+          <Text style={styles.text6} >{'\u2190'}</Text >
         </TouchableOpacity>
+        <Image source={require("../../../assets/logoOnly.png")} />
+        <Text style={styles.text1}>Welcome. Sign Up now!</Text>
+        <TextInput
+          style={styles.text2}
+          placeholder="Enter your email address"
+          textAlign="left"
+          keyboardType="email-address"
+          onChangeText={handleNameChange}
+          value={name}
+          autoCapitalize="none"
+          editable={!isLoading && !isLeaving}
+          inputMode="email"
+        />
+        <TextInput
+          style={styles.text2}
+          placeholder="Enter your password"
+          textAlign="left"
+          secureTextEntry={true}
+          onChangeText={handlePassword1Change}
+          value={password1}
+          autoCapitalize="none"
+          editable={!isLoading && !isLeaving}
+        /> 
+        <TextInput
+          style={styles.text2}
+          placeholder="Confirm your password"
+          textAlign="left"
+          secureTextEntry={true}
+          onChangeText={handlePassword2Change}
+          value={password2}
+          autoCapitalize="none"
+          editable={!isLoading && !isLeaving}
+        />
+        {/* If it is loading, show the ActivityIndicator, else show the signup button */} 
+        {isLoading ? (
+          <View style={styles.loading}>
+            <ActivityIndicator size="small" color="#0000ff" />
+          </View>
+        )
+          : (
+          <TouchableOpacity
+            disabled={isLeaving}
+            style={styles.pressable1}
+            onPress={signupUser}
+            >
+          <Text style={styles.text3}>Sign up</Text>
+        </TouchableOpacity>
+        )
+          }
+        
+        <Text style={{ marginBottom: 15 }}>
+          ___________________________________________
+        </Text>
+        <View style={styles.container2}>
+          <Text style={styles.text4}>Already a user?</Text>
+          <TouchableOpacity onPress={goToLogin} disabled={isLeaving || isLoading}>
+            <Text style={styles.text5}>Login</Text>
+          </TouchableOpacity>
+       </View>
       </View>
     </KeyboardAvoidingView>
   );
@@ -247,7 +259,7 @@ const styles = StyleSheet.create({
   },
   button: {
     position: 'relative',
-    bottom: 130,
+    bottom: 120,
     right: 150
   }
 });
