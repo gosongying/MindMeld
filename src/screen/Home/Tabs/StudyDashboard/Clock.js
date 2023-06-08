@@ -1,43 +1,36 @@
 import React, { useState, useEffect } from 'react';
-import {
-  TouchableOpacity,
-  StyleSheet,
-  Text,
-  SafeAreaView,
-  TextInput,
-  View,
-} from 'react-native';
+import { TouchableOpacity, StyleSheet, Text, SafeAreaView, View, KeyboardAvoidingView } from 'react-native';
+import AnalogClock from 'react-native-clock-analog';
+import TimeFeature from './ClockTab';
 
 const Clock = ({ navigation }) => {
   const [currentTime, setCurrentTime] = useState('');
-  const [alarmTime, setAlarmTime] = useState(null);
-  const [isAlarmSet, setIsAlarmSet] = useState(false);
+  const [currentDate, setCurrentDate] = useState('');
 
   useEffect(() => {
+    const now = new Date();
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+    setCurrentTime(`${hours}:${minutes}:${seconds}`);
+
+    const options = { day: 'numeric', month: 'short', year: 'numeric' };
+    const formattedDate = now.toLocaleDateString(undefined, options);
+    setCurrentDate(formattedDate);
+
     const interval = setInterval(() => {
       const now = new Date();
       const hours = String(now.getHours()).padStart(2, '0');
       const minutes = String(now.getMinutes()).padStart(2, '0');
-      setCurrentTime(`${hours}:${minutes}`);
+      const seconds = String(now.getSeconds()).padStart(2, '0');
+      setCurrentTime(`${hours}:${minutes}:${seconds}`);
+
+      const formattedDate = now.toLocaleDateString(undefined, options);
+      setCurrentDate(formattedDate);
     }, 1000);
 
     return () => clearInterval(interval);
   }, []);
-
-  const setAlarm = () => {
-    const alarm = new Date(year, month, day, hours, minutes);
-    setAlarmTime(alarm);
-    setIsAlarmSet(true);
-  };
-
-  const clearAlarm = () => {
-    setAlarmTime(null);
-    setIsAlarmSet(false);
-  };
-
-  const playAlarm = () => {
-    SoundPlayer.playSoundFile('alarm.mp3', 'mp3');
-  };
 
   const goToHome = () => navigation.navigate('StudyDashboard');
 
@@ -47,28 +40,19 @@ const Clock = ({ navigation }) => {
         <Text style={styles.back}>{'\u2190'}</Text>
       </TouchableOpacity>
       <View style={styles.clockContainer}>
+        <AnalogClock
+          size={200}
+          colorClock="#333333"
+          colorCenter="#333333"
+          colorNumber="#333333"
+          showSeconds
+        />
         <Text style={styles.clockText}>{currentTime}</Text>
+        <Text style={styles.dateText}>{currentDate}</Text>
       </View>
-      <View style={styles.alarmContainer}>
-        <Text style={styles.alarmStatus}>
-          {isAlarmSet ? `Alarm set for ${alarmTime}` : 'No alarm set'}
-        </Text>
-        <View style={styles.alarmForm}>
-          <TextInput
-            style={styles.input}
-            placeholder="Set alarm (HH:MM)"
-            placeholderTextColor="#777777"
-            onChangeText={setAlarmTime}
-            value={alarmTime}
-          />
-          <TouchableOpacity style={styles.setAlarmButton} onPress={setAlarm}>
-            <Text style={styles.setAlarmButtonText}>Set Alarm</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.clearAlarmButton} onPress={clearAlarm}>
-            <Text style={styles.clearAlarmButtonText}>Clear Alarm</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+      <KeyboardAvoidingView style={styles.timeFeatureContainer} behavior="padding">
+        <TimeFeature />
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
@@ -100,57 +84,17 @@ const styles = StyleSheet.create({
     fontSize: 48,
     fontWeight: 'bold',
     color: '#333333',
-  },
-  alarmContainer: {
     marginTop: 20,
-    alignItems: 'center',
   },
-  alarmStatus: {
+  dateText: {
     fontSize: 18,
-    marginBottom: 10,
-    color: '#333333',
+    color: '#808080',
+    marginTop: 10,
+    marginLeft: 30,
   },
-  alarmForm: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  input: {
+  timeFeatureContainer: {
     flex: 1,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    borderRadius: 8,
-    fontSize: 16,
-    marginRight: 10,
-    color: '#333333',
-    borderWidth: 1,
-    borderColor: '#777777',
-  },
-  setAlarmButton: {
-    backgroundColor: '#007bff',
-    borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-  },
-  setAlarmButtonText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#fff',
-  },
-  clearAlarmButton: {
-    backgroundColor: '#dc3545',
-    borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    marginLeft: 10,
-  },
-  clearAlarmButtonText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#fff',
+    marginTop: 20,
   },
 });
 
