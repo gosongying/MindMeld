@@ -143,6 +143,7 @@ const SignupPage = ({navigation}) => {
           autoCapitalize="none"
           editable={!isLoading && !isLeaving}
           inputMode="email"
+          clearButtonMode="while-editing"
         />
         <TextInput
           style={styles.text2}
@@ -153,6 +154,7 @@ const SignupPage = ({navigation}) => {
           value={password1}
           autoCapitalize="none"
           editable={!isLoading && !isLeaving}
+          clearButtonMode="while-editing"
         /> 
         <TextInput
           style={styles.text2}
@@ -163,6 +165,7 @@ const SignupPage = ({navigation}) => {
           value={password2}
           autoCapitalize="none"
           editable={!isLoading && !isLeaving}
+          clearButtonMode="while-editing"
         />
         {/* If it is loading, show the ActivityIndicator, else show the signup button */} 
         {isLoading ? (

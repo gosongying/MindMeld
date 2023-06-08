@@ -51,17 +51,6 @@ const SignupPage2 = ({ navigation}) => {
     }
   };
 
-  const deleteImage = async () => {
-    const deleteRef = storageRef(storage, 'Images/' + currentUser.uid);
-    try {
-      await deleteObject(desertRef);
-      //image deleted successfully
-      console.log("Image deleted succesfully");
-    } catch (error) {
-      Alert.alert("Error during delete");
-    }
-  };
-
   const selectImageLibrary = async () => {
     //request permission
     const {status} = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -122,8 +111,6 @@ const SignupPage2 = ({ navigation}) => {
     
   const userId = currentUser.uid;
 
-  //reference to the users node based on their uid
-  const userIdRef = databaseRef(database, 'users/' + userId);
   //reference to the users node based on their username 
   const usernameRef = databaseRef(database, 'usernames/' + username);
 
@@ -134,7 +121,13 @@ const SignupPage2 = ({ navigation}) => {
       Alert.alert("Username already existed");
       return;
     } else {
-      const data = {uid: userId};
+      const data = {
+        uid: userId,
+        interests: interests,
+        gender: gender,
+        friendList: [],
+        groupList: [],
+      };
       return data;
     }
   }).then(async (result) => {
@@ -142,15 +135,8 @@ const SignupPage2 = ({ navigation}) => {
     //if set username successfully
     updateProfile(currentUser, {
       displayName: username,
-      photoURL: image ? await uploadImageAsync(image) : null
+      photoURL: (image ? await uploadImageAsync(image) : null)
     }).then(() => {
-      set(userIdRef, {
-        username: username,
-        interests: interests,
-        gender: gender,
-        friendList: [],
-        groupList: [],
-      });
       navigation.replace("Home");
     });
     }
@@ -230,7 +216,6 @@ const SignupPage2 = ({ navigation}) => {
            <View style={styles.container}>
               <View style={styles.outerPictureContainer}>
                 <View style={styles.pictureContainer}>
-                  <Image source={{uri: image}}  />
                  {image ? (
                     <Image source={{uri: image}} style={styles.picture} />
                     ) : (
@@ -263,6 +248,7 @@ const SignupPage2 = ({ navigation}) => {
                 placeholder="Enter your username"
                 autoCapitalize='none'
                 editable={!isLoading}
+                clearButtonMode="while-editing"
               />
             </View>
 
@@ -396,6 +382,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     paddingHorizontal: 10,
     marginBottom: 10,
+    borderRadius: 10
   },
   checkboxContainer: {
     flexDirection: 'row',

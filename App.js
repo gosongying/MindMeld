@@ -9,6 +9,7 @@ import HomePage from './src/screen/Home/HomePage'
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import Settings from './src/screen/Home/Tabs/Settings/Settings';
+import EntryPage from './src/screen/Authentication/EntryPage';
 
 
 const App = () => {
@@ -17,13 +18,14 @@ const App = () => {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName='Landing' screenOptions={{headerShown:false}}>
+      <Stack.Navigator initialRouteName='Entry' screenOptions={{headerShown:false}}>
         <Stack.Screen name="Landing" component={LandingPage} />
         <Stack.Screen name="Login" component={LoginPage} />
         <Stack.Screen name="Signup" component={SignupPage} />
         <Stack.Screen name ="Signup2" component={SignupPage2} />
         <Stack.Screen name="Home" component={HomePage} />
         <Stack.Screen name="Settings" component={Settings} />
+        <Stack.Screen name="Entry" component={EntryPage} />
       </Stack.Navigator>
     </NavigationContainer>
    );

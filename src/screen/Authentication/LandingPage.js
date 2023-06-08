@@ -8,7 +8,7 @@ import {
   StatusBar,
 } from "react-native";
 import CarouselCard from "../../components/Authentication/CarouselCard";
-import { signInAnonymously, onAuthStateChanged } from "firebase/auth";
+import { signInAnonymously, onAuthStateChanged, updateProfile } from "firebase/auth";
 import { auth } from "../../../firebase"
 
 
@@ -35,7 +35,10 @@ const LandingPage = ({navigation}) => {
     signInAnonymously(auth)
     .then(() => {
       console.log("Anon");
-      navigation.replace("Home");
+      updateProfile(auth.currentUser, {
+        displayName: "Guest"
+      }).then(() => navigation.replace("Home"))
+      .catch((error) => console.log(error));
     })
     .catch((error) => {
       console.error('An error occurred during anonymous sign-in:');

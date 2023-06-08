@@ -25,7 +25,7 @@ const HomePage = () => {
               iconName = focused ? 'people' : 'people-outline';
             } else if (route.name === 'Achievements') {
               iconName = focused ? 'trophy' : 'trophy-outline';
-            } else if (route.name === 'SettingTab') {
+            } else if (route.name === 'Setting') {
               iconName = focused ? 'menu' : 'menu-outline';
             }
   
@@ -42,12 +42,11 @@ const HomePage = () => {
           tabBarIndicatorStyle: {
             backgroundColor: '#710ef1',
           },
-        })}
-      >
+        })}>
         <Tab.Screen name={'StudyDashboard'} component={StudyDashboardTab} options={{ tabBarLabel: 'Study', headerShown: false }} />
         <Tab.Screen name={'StudyCommunity'} component={StudyCommunityTab} options={{ tabBarLabel: 'Community', headerShown: false }} />
         <Tab.Screen name={'Achievements'} component={AchievementTab} options={{ tabBarLabel: 'Achievement', headerShown: false }} />
-        <Tab.Screen name={'SettingTab'} component={SettingTab} options={{ headerShown: false }} />
+        <Tab.Screen name={'Setting'} component={SettingTab} options={{ headerShown: false }} />
       </Tab.Navigator>
     );
   };

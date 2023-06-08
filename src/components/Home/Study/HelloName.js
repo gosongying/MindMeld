@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
-import { database, auth } from '../../../../firebase';
-import { onValue, ref, get } from 'firebase/database';
+import { auth } from '../../../../firebase';
 
 const HelloName = () => {
   
@@ -66,7 +65,7 @@ const styles = StyleSheet.create({
   },
   greetingText: {
     color: 'gray',
-    fontSize: 20,
+    fontSize: 25,
   },
   nameText: {
     fontSize: 25,
