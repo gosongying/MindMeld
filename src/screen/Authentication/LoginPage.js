@@ -13,7 +13,7 @@ import {
 } from "react-native";
 
 import { auth } from "../../../firebase"
-import { signInWithEmailAndPassword, sendPasswordResetEmail } from "firebase/auth";
+import { signInWithEmailAndPassword, sendPasswordResetEmail, setPersistence, browserLocalPersistence, browserSessionPersistence } from "firebase/auth";
 
 const LoginPage = ({navigation}) => {
   console.log("Login")
@@ -168,6 +168,7 @@ const LoginPage = ({navigation}) => {
           autoCapitalize="none"
           editable={!firstLoading && !isLeaving}
           inputMode="email"
+          clearButtonMode="while-editing"
         />
         <TextInput
           style={styles.text2}
@@ -178,6 +179,7 @@ const LoginPage = ({navigation}) => {
           value={password}
           autoCapitalize="none"
           editable={!firstLoading && !isLeaving}
+          clearButtonMode="while-editing"
         />
         
         {/* If it is loading, show the ActivityIndicator, else show the login button */} 
@@ -220,6 +222,7 @@ const LoginPage = ({navigation}) => {
                   autoCapitalize="none"
                   editable={!secondLoading}
                   inputMode="email"
+                  clearButtonMode="while-editing"
                 />
                 {/* If it is loading, show the ActivityIndicator, else show the reset password button */}
                 {secondLoading ? (
