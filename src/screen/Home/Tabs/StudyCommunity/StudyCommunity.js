@@ -6,7 +6,8 @@ import FriendList from '../../../../components/Home/Community/FriendList';
 import CommunityHeader from '../../../../components/Home/Community/CommunityHeader';
 import CommunityTab from '../../../../components/Home/Community/CommunityTab';
 
-const StudyCommunity = () => {
+const StudyCommunity = ({navigation}) => {
+
   //item to be shown
   const DATA = [
     {
@@ -28,7 +29,7 @@ const StudyCommunity = () => {
 
   const renderOption = ({ item }) => (
     <View style={styles.optionContainer}>
-      <item.component />
+      <item.component navigation={navigation}/>
     </View>
   );
 

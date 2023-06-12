@@ -13,7 +13,11 @@ const friendListData = [
   { id: '8', name: 'Ava', status: 'Away' },
 ];
 
-const FriendList = () => {
+const FriendList = ({navigation}) => {
+
+  const goToFLM = () => {
+    navigation.navigate("FriendListMore");
+  }
 
   const renderFriendItem = ({ item }) => (
     <TouchableOpacity style={styles.friendItem}>
@@ -32,7 +36,7 @@ const FriendList = () => {
     <View style={styles.container}>
       <View style={styles.headerContainer}>
         <Text style={styles.sectionTitle}>My Study Buddies</Text>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={goToFLM}>
           <Text style={styles.moreText}>More</Text>
         </TouchableOpacity>
       </View>

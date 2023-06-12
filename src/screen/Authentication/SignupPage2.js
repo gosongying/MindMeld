@@ -123,19 +123,25 @@ const SignupPage2 = ({ navigation}) => {
     } else {
       const data = {
         uid: userId,
-        interests: interests,
-        gender: gender,
-        friendList: [],
-        groupList: [],
       };
       return data;
     }
   }).then(async (result) => {
     if (result.committed) {
     //if set username successfully
+    const photo = image? await uploadImageAsync(image) : null
+    set(databaseRef(database, 'userId/' + userId), {
+      username: username,
+      interests: interests,
+      gender: gender,
+      friendList: [],
+      groupList: [],
+      photo: photo,
+      uid: userId
+    });
     updateProfile(currentUser, {
       displayName: username,
-      photoURL: (image ? await uploadImageAsync(image) : null)
+      photoURL: photo
     }).then(() => {
       navigation.replace("Home");
     });

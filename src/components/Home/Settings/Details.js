@@ -2,13 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { TouchableOpacity, StyleSheet, View, Text, Image, Alert, TextInput } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { auth, database, storage } from '../../../../firebase';
-import { onValue, ref as databaseRef, get, remove, runTransaction } from 'firebase/database';
+import { onValue, ref as databaseRef, get, remove, runTransaction, update } from 'firebase/database';
 import { updateProfile } from 'firebase/auth';
 import { useRef } from 'react';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import * as ImagePicker from 'expo-image-picker';
 import { ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage"
+import Fontisto from 'react-native-vector-icons/Fontisto';
 
 const Details = ({ navigation }) => {
   //since the the profile settings page hasn't been done,
@@ -28,9 +29,22 @@ const Details = ({ navigation }) => {
 
   const [image, setImage] = useState(currentUser.photoURL);
 
+  const [gender, setGender] = useState('');
+
   const isAnonymous = currentUser.isAnonymous;
 
-  console.log(image)
+  useEffect(() => {
+    if (!isAnonymous) {
+      get(databaseRef(database, 'userId/' + currentUser.uid))
+      .then((snapshot) => {
+        setGender(snapshot.val().gender);
+      })
+      .catch((error) => {
+        console.log(error);
+        Alert.alert("An error occurs");
+      })
+    }
+  }, [])
 
   const editUsername = () => {
     setIsEditingUsername(true);
@@ -53,6 +67,7 @@ const Details = ({ navigation }) => {
     //if the username changes
     const newUsernameRef = databaseRef(database, 'usernames/' + newUsername);
     const oldUsernameRef = databaseRef(database, 'usernames/' + oldUsername);
+    const userIdRef = databaseRef(database, 'userId/' + currentUser.uid);
     try {
       //retrieve user's old data
       get(oldUsernameRef)
@@ -73,6 +88,9 @@ const Details = ({ navigation }) => {
         if (result.committed) {
           //if set username successfully
           remove(oldUsernameRef);
+          update(userIdRef, {
+            username: newUsername
+          })
           updateProfile(currentUser, {
           displayName: newUsername,
           }).then(() => {
@@ -139,7 +157,13 @@ const Details = ({ navigation }) => {
      // await deleteImage().catch((error) => console.log(error))
       const newImage = await uploadImageAsync(result.assets[0].uri)
       .catch((error) => console.log(error));
-      //await deleteImage();
+
+      update(databaseRef(database, 'userId/' + currentUser.uid), {
+        photo: newImage
+      }).catch((error) => {
+        console.log(error);
+        Alert.alert("An error occus");
+      });
       updateProfile(currentUser, {
         photoURL: newImage
       })
@@ -247,14 +271,21 @@ const Details = ({ navigation }) => {
             autoFocus={true}/>
           ) : (
             <View style={styles.nameAndEdit}>
-              <View>
-              <Text style={styles.name} numberOfLines={1}>{oldUsername}</Text>
+              <View style={{flexDirection: 'row', alignItems:'center', width: 200}}>
+                <Text style={styles.name} numberOfLines={1}>{oldUsername}</Text>
+                {gender === 'male' ? (
+                  <Fontisto name='male' size={15} color='dodgerblue' style={{marginLeft:5}}/>
+                ) : gender === 'female' ? (
+                  <Fontisto name='female' size={15} color='pink' style={{marginLeft: 5}}/>
+                ) : (
+                  <View />
+                )}
               </View>
               {/* anonymous user cannot change username */}
               { !isAnonymous && (
                 <TouchableOpacity 
                 onPress={editUsername}
-                style={{position: 'relative', left: 10}}
+                style={{left: 30}}
                 disabled={isLoading}>
                   <Ionicons name="create" size={20} />
                 </TouchableOpacity>
@@ -290,7 +321,6 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 30,
     fontWeight: 'bold',
-    width: 200
   },
   nameWhenEditing: {
     textAlign: 'left',
