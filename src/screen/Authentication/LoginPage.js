@@ -157,7 +157,7 @@ const LoginPage = ({navigation}) => {
           <Text style={styles.text7}>{'\u2190'}</Text >  
         </TouchableOpacity>
         <Image source={require("../../../assets/logoOnly.png")} />
-        <Text style={styles.text1}>Log to Your Account</Text>
+        <Text style={styles.text1}>Log In To Your Account</Text>
         <TextInput
           style={styles.text2}
           placeholder="Enter your email address"
