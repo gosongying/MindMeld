@@ -35,45 +35,60 @@ const Clock = ({ navigation }) => {
   const goToHome = () => navigation.navigate('StudyDashboard');
 
   return (
-    <SafeAreaView style={styles.container}>
-      <TouchableOpacity style={styles.backButton} onPress={goToHome}>
-        <Text style={styles.back}>{'\u2190'}</Text>
-      </TouchableOpacity>
-      <View style={styles.clockContainer}>
-        <AnalogClock
-          size={200}
-          colorClock="#333333"
-          colorCenter="#333333"
-          colorNumber="#333333"
-          showSeconds
-        />
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <TouchableOpacity style={styles.backButton} onPress={goToHome}>
+          <Text style={styles.back}>{'\u2190'}</Text>
+        </TouchableOpacity>
+        <Text style={styles.title}>Clock</Text>
+      </View>
+
+      <View style={styles.clockContainer}> 
+      <AnalogClock
+        size={160}
+        colorClock="#333333"
+        colorCenter="#333333"
+        colorNumber="#333333"
+        showSeconds
+      />
         <Text style={styles.clockText}>{currentTime}</Text>
         <Text style={styles.dateText}>{currentDate}</Text>
       </View>
-      <KeyboardAvoidingView style={styles.timeFeatureContainer} behavior="padding">
-        <TimeFeature />
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+      <TimeFeature />
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 20,
-    paddingTop: 20,
     backgroundColor: '#fff',
   },
-  backButton: {
-    position: 'absolute',
-    top: 40,
-    left: 10,
-    zIndex: 1,
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 25,
+    backgroundColor: '#8A2BE2',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    paddingTop: 50
   },
+  title: {
+    flex: 1,
+    textAlign: 'center',
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginRight: 30,
+  },
+  
   back: {
     fontSize: 35,
     fontWeight: 'bold',
-    color: '#333333',
+    color: '#fff',
+  },
+  closeButton: {
+    marginLeft: 10,
   },
   clockContainer: {
     flex: 1,
@@ -81,16 +96,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   clockText: {
-    fontSize: 48,
+    fontSize: 42,
     fontWeight: 'bold',
     color: '#333333',
     marginTop: 20,
   },
   dateText: {
-    fontSize: 18,
+    fontSize: 14,
     color: '#808080',
     marginTop: 10,
-    marginLeft: 30,
   },
   timeFeatureContainer: {
     flex: 1,

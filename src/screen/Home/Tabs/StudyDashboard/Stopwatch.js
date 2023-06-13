@@ -91,10 +91,10 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   timeText: {
-    fontSize: 42,
+    fontSize: 36,
     fontWeight: 'bold',
-    marginBottom: 50,
-    marginTop: 50,
+    marginBottom: 40,
+    marginTop: 40,
     marginLeft: 40,
   },
   line: {
@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
   },
   buttonText: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: 'bold',
     color: '#fff',
   },

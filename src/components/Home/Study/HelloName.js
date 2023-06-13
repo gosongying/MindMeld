@@ -58,6 +58,8 @@ const styles = StyleSheet.create({
     marginLeft: 20,
     marginRight: 20,
     marginBottom: 5,
+    
+
   },
   textContainer: {
     flex: 1,
@@ -76,6 +78,15 @@ const styles = StyleSheet.create({
     height: 120 / 2,
     marginRight: 20,
   },
+  backgroundPattern: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    opacity: 0.3,
+    backgroundColor: '#FFF',
+  }
 });
 
 export default HelloName;

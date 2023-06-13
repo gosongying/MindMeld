@@ -132,7 +132,7 @@ const SignupPage = ({navigation}) => {
           <Text style={styles.text6} >{'\u2190'}</Text >
         </TouchableOpacity>
         <Image source={require("../../../assets/logoOnly.png")} />
-        <Text style={styles.text1}>Welcome. Sign Up now!</Text>
+        <Text style={styles.text1}>Create Your Account</Text>
         <TextInput
           style={styles.text2}
           placeholder="Enter your email address"
@@ -238,7 +238,8 @@ const styles = StyleSheet.create({
   },
   text5: {
     fontSize: 12,
-    color: "gray",
+    color: "#710EF1",
+    fontWeight: "bold",
     textDecorationLine: "underline",
   },
   text6: {
