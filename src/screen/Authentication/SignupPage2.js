@@ -137,7 +137,7 @@ const SignupPage2 = ({ navigation}) => {
       friendList: [],
       groupList: [],
       photo: photo,
-      uid: userId
+      uid: userId,
     });
     updateProfile(currentUser, {
       displayName: username,

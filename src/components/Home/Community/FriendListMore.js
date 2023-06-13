@@ -1,92 +1,30 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, View, Text, FlatList, TouchableOpacity, Image, TextInput, Modal, Alert } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { auth, database, storage } from "../../../../firebase"
+import { auth, database } from "../../../../firebase"
 import { ref, runTransaction, set, get, onValue, update, child } from 'firebase/database';
 import Fontisto from 'react-native-vector-icons/Fontisto';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
-const FriendListmore = ({navigation}) => {
-
+const FriendListmore = ({navigation, route}) => {
 
     const currentUser = auth.currentUser;
 
     const [username, setUsername] = useState('');
-
     const [isAddingFriend, setIsAddingFriend] = useState(false);
-
     //when clicking friends' profile
     const [isCheckingFriend, setIsCheckingFriend] = useState(false);
-
     const [usernameAdded, setUsernameAdded] = useState('');
-
-    const [friendListId, setFriendListId] = useState([]);
-
-    const [friendListData, setFriendListData] = useState([]);
-
     const [friendOrFriendSearched, setFriendOrFriendSearched] = useState(null);
-
     const [friendOrFriendSearchedId, setFriedOrFriendSearchedId] = useState('');
-
-    /*  useEffect(() => {
-        const unsubscribe = onValue(ref(database, 'userId/' + currentUser.uid), (snapshot) => {
-            let friends = [];
-            const friendList = snapshot.val().friendList
-            if (friendList) {
-                setFriendListId(friendList);
-                friendList.map((id) => {
-                    get(ref(database, 'userId/' + id))
-                    .then((user) => friends.push(user.val()))
-                    .catch((error) => {
-                        console.log(error);
-                        Alert.alert("An error occurs");
-                    });
-                    return;
-                });
-                setFriendListData(friends);
-                console.log(friendListData);
-            }
-        })
-        return () => {
-            unsubscribe();
-        }
-    }, []);*/
-
-    useEffect(() => {
-        get(ref(database, 'userId/' + currentUser.uid))
-        .then((snapshot) => {
-            let friends = [];
-            const friendList = snapshot.val().friendList;
-            //console.log(friendList)
-            if (friendList) {
-                setFriendListId(friendList);
-                //turn the uid into user profile object
-                friendList.map((id) => {
-                    console.log(id)
-                    get(ref(database, 'userId/' + id))
-                    .then((user) => {
-                        friends.push(user.val());
-                    })
-                    .catch((error) => {
-                        console.log(error);
-                        Alert.alert("Error");
-                    });
-                    return;
-                });
-                setFriendListData(friends);
-            }
-        })
-        .catch((error) => {
-            console.log(error);
-            Alert.alert("An error occurs")
-        })
-    }, []);
+    const [friendListData, setFriendListData] = useState(route.params.friendListData);
+    const [friendListId, setFriendListId] = useState(route.params.friendListId);
 
     const clickUser = (user) => {
         setIsCheckingFriend(true);
         setFriendOrFriendSearched(user);
         setFriedOrFriendSearchedId(user.uid);
     }
-
 
     const renderFriendItem = ({ item }) => {
         if (item.username.startsWith(username) || !username) {
@@ -115,12 +53,70 @@ const FriendListmore = ({navigation}) => {
                             </View>
                             <Text style={styles.friendStatus}>Online</Text>
                         </View>
+                        <TouchableOpacity>
+                            <MaterialIcons 
+                            name={"delete"}
+                            size={25} 
+                            style={{right: 35}}
+                            onPress={() => deleteClicked(item)}/>
+                        </TouchableOpacity>
                     </TouchableOpacity>
                     {/* separator */}
                     <View style={styles.separator} />
                 </View>
             );
         } 
+    };
+
+    const deleteClicked = (user) => {
+        Alert.alert(
+            'Confirm Delete',
+            `Are you sure you want to delete ${user.username}?`,
+            [
+                {
+                    text: 'Cancel',
+                    style: 'cancel'
+                },
+                {
+                    text: 'Delete',
+                    style: 'destructive',
+                    onPress: () => deleteFriend(user)
+                }
+            ],
+        )
+    };
+
+    const deleteFriend = (user) => {
+        console.log(user);
+        const userRef = ref(database, 'userId/');
+        const me = child(userRef, currentUser.uid);
+        const other = child(userRef, user.uid);
+        const newFriendList = friendListId.filter((id) => id !== user.uid);
+        try {
+            runTransaction(me, (profile) => {
+                if (profile) {
+                    profile.friendList = newFriendList;
+                    return profile;
+                } else {
+                    return profile;
+                }
+            }).then(() => {
+                setFriendListId(newFriendList);
+                setFriendListData(friendListData.filter((profile) => profile !== user));
+            });
+
+            runTransaction(other, (profile) => {
+                if (profile) {
+                    profile.friendList = profile.friendList.filter((id) => id !== currentUser.uid);
+                    return profile;
+                } else {
+                    return profile;
+                }
+            })
+        } catch (error) { 
+            console.log(error);
+            Alert.alert("Error");
+        }
     };
 
     const handleSearchFriend = (username) => {
@@ -155,17 +151,15 @@ const FriendListmore = ({navigation}) => {
             const me = child(userRef, currentUser.uid);
             const other = child(userRef, id);
             const newFriendList = [...friendListId, id];
-            setFriendListId(newFriendList);
             //update current user friendlist
             runTransaction(me, (profile) => {
                 if (profile) {
                     profile.friendList = newFriendList;
                     return profile;
-                }
-                else {
+                } else {
                     return profile;
                 }
-            });
+            }).then(() => setFriendListId(newFriendList));
             //update other user friendlist
             runTransaction(other, (profile) => {
                 if (profile) {
@@ -185,6 +179,7 @@ const FriendListmore = ({navigation}) => {
             }).then(() => {
                 get(other)
                 .then((snapshot) => {
+                    //friendListData.push(snapshot.val());
                     setFriendListData([...friendListData, snapshot.val()])
                 })
             });
@@ -198,36 +193,6 @@ const FriendListmore = ({navigation}) => {
             console.log(error);
             Alert.alert("Error occurs during adding friends");
         } 
-
-
-
-
-       /* setFriendListId([...friendListId, id]);
-        console.log(friendListId)
-        try {
-            //const idRef = ref(database, 'userId/');
-            if (friendListId.length === 1) {
-                update(ref(database, 'userId/' + currentUser.uid), )
-            }
-            update(ref(database, 'userId/' + currentUser.uid), {
-                friendList: friendListId
-            }).then(() => console.log("updated"));
-            console.log('hi')
-            //console.log(id);
-            get(ref(database, 'userId/' + id))
-            .then((snapshot) => {
-                const userAdded = snapshot.val();
-                setFriendListData(...friendListData, userAdded);
-                const friendList = userAdded.friendList? userAdded.friendList: [];
-                update(ref(database, 'userId/' + id), {
-                    friendList: [...friendList, currentUser.uid]
-                });
-            });
-            console.log(friendListData);
-        } catch (error) {
-            console.log(error);
-            Alert.alert("An error occurs");
-        }*/
     };
     const cancel = () => {
         setIsAddingFriend(false);
@@ -396,9 +361,9 @@ const styles = StyleSheet.create({
         width: "100%",
     },
     avatar: {
-        width: 100,
-        height: 100,
-        borderRadius: 50,
+        width: 90,
+        height: 90,
+        borderRadius: 45,
         marginRight: 10,
     },
     flatListContent: {
@@ -408,7 +373,7 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     friendName: {
-        fontSize: 30,
+        fontSize: 24,
         fontWeight: 'bold',
     },
     friendStatus: {
@@ -548,11 +513,12 @@ const styles = StyleSheet.create({
     nameAndGender: {
         flexDirection: 'row',
         alignItems: 'center',
+        width: "80%"
     },
     text: {
         fontSize: 24,
         color: 'white',
-        fontWeight: "bold"
+        fontWeight: "bold",
     },
     text2: {
         fontSize: 20,
@@ -561,10 +527,6 @@ const styles = StyleSheet.create({
     interests: {
         top: 5,
     },
-    nameAndGender: {
-        flexDirection: 'row',
-        alignItems: 'center'
-    }
 })
 
 

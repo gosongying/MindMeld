@@ -1,36 +1,89 @@
-import React from 'react';
-import { View, Text, FlatList, Image, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, FlatList, Image, TouchableOpacity, StyleSheet, Modal } from 'react-native';
+import Fontisto from 'react-native-vector-icons/Fontisto';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
-// Hardcoded Names
-const friendListData = [
-  { id: '1', name: 'John', status: 'Online' },
-  { id: '2', name: 'Emily', status: 'Away' },
-  { id: '3', name: 'Michael', status: 'Offline' },
-  { id: '4', name: 'Sophia', status: 'Online' },
-  { id: '5', name: 'William', status: 'Offline' },
-  { id: '6', name: 'Emma', status: 'Away' },
-  { id: '7', name: 'Oliver', status: 'Online' },
-  { id: '8', name: 'Ava', status: 'Away' },
-];
+import { auth, database } from '../../../../firebase';
+import { get, onValue, ref } from 'firebase/database';
 
 const FriendList = ({navigation}) => {
 
+  const [friendClicked, setFriendClicked] = useState(null);
+  const [friendListData, setFriendListData] = useState([]);
+  const [friendListId, setFriendListId] = useState([]);
+
+  const currentUser = auth.currentUser;
+  useEffect(() => {
+    //listen to the change of friend list
+    //to get the latest friend list
+    const unsubscribe = onValue(ref(database, 'userId/' + currentUser.uid), (snapshot) => {
+      let friends = [];
+      const friendList = snapshot.val().friendList ? snapshot.val().friendList : [];
+      if (friendList) {
+        setFriendListId(friendList);
+        friendList.map(async (id) => {
+          //to make sure all datas have been added
+          await get(ref(database, 'userId/' + id))
+          .then((user) => {
+            friends.push(user.val());
+          })
+          .catch((error) => {
+            console.log(error);
+            Alert.alert("Error");
+          });
+          return;
+        });
+        setFriendListData(friends);
+        return;
+      } 
+      setFriendListId([]);
+      setFriendListData(friends);
+    });
+
+    return () => {
+      unsubscribe();
+    }
+  }, []);
+
   const goToFLM = () => {
-    navigation.navigate("FriendListMore");
-  }
+    //pass the friend list to prevent get data through network request twice
+    navigation.navigate("FriendListMore", {friendListData, friendListId});
+  };
 
   const renderFriendItem = ({ item }) => (
-    <TouchableOpacity style={styles.friendItem}>
-      <Image
-        source={require('../../../../assets/profileholder.png')} // Replace with actual image source
-        style={styles.avatar}
-      />
-      <View style={styles.friendInfo}>
-        <Text style={styles.friendName}>{item.name}</Text>
-        <Text style={styles.friendStatus}>{item.status}</Text>
-      </View>
-    </TouchableOpacity>
+    <View>
+      <TouchableOpacity 
+      onPress={() => setFriendClicked(item)}
+      style={styles.friendItem}>
+        {item.photo ? (
+          <Image 
+          source={{uri: item.photo}}
+          style={styles.avatar} />
+        ) : (
+          <Image
+          source={require('../../../../assets/profileholder.png')} //if didnt set profile picture
+          style={styles.avatar}
+        />
+        )}
+        <View style={styles.friendInfo}>
+            <View style={styles.nameAndGender}>
+                <Text style={styles.friendName} numberOfLines={1}>{item.username}</Text>
+                {item.gender === 'male' ? (
+                  <Fontisto name='male' size={10} color='dodgerblue' style={{marginLeft: 5}}/>
+                  ) : (
+                  <Fontisto name='female' size={10} color='pink' style={{marginLeft: 5}}/>
+                  )}
+            </View>
+        </View>
+      </TouchableOpacity>
+      {/* separator */}
+      <View style={styles.separator} />
+    </View>
   );
+
+  const back = () => {
+    setFriendClicked(null);
+  }
 
   return (
     <View style={styles.container}>
@@ -44,12 +97,53 @@ const FriendList = ({navigation}) => {
         <FlatList
           data={friendListData}
           renderItem={renderFriendItem}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item.username}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.flatListContent}
           style={{ flex: 1 }}
         />
       </View>
+
+      <Modal visible={friendClicked !== null} transparent animationType='fade' >
+        {friendClicked && <View style={styles.userClickedContainer}>
+          <View style={styles.userClicked}>
+            <View style={styles.backAndAdd}>
+              <TouchableOpacity
+                style={{marginRight: 190}}
+                onPress={back}>
+                <Text style={styles.back}>{'\u2190'}</Text >  
+              </TouchableOpacity>
+              <Ionicons name="checkbox" size={40} color={'green'}/>
+              </View>
+              <View style={styles.photoContainer}>
+                {friendClicked.photo ? (
+                    <Image
+                    source={{uri: friendClicked.photo}} 
+                    style={styles.photo}/>
+                ) : (
+                    <Image
+                    source={require('../../../../assets/profileholder.png')}
+                    style={styles.photo}/>
+                )}
+              </View>
+              <View style={{backgroundColor: 'white', height: 1, width: 250, bottom: 5}}/>
+              <View style={styles.textContainer}>
+              <View style={styles.nameAndGender}> 
+                  <Text style={styles.text} numberOfLines={1}>{friendClicked.username}</Text>
+                  {friendClicked.gender === 'male' ? (
+                      <Fontisto name='male' size={15} color='dodgerblue' style={{marginLeft: 10}}/>
+                  ) : (
+                      <Fontisto name='female' size={15} color='pink' style={{marginLeft: 10}}/>
+                  )}
+              </View>
+              <View style={styles.interests}>
+                <Text style={styles.text2}>Interests: {friendClicked.interests ? friendClicked.interests.join(', ') : "-"}</Text>
+              </View>
+            </View>
+          </View>
+        </View>
+        }
+      </Modal>
     </View>
   );
 };
@@ -78,7 +172,7 @@ const styles = StyleSheet.create({
   friendItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 10,
+    marginVertical: 10,
   },
   avatar: {
     width: 50,
@@ -103,6 +197,65 @@ const styles = StyleSheet.create({
   },
   flatListContent: {
     paddingBottom: 40,
+  },
+  nameAndGender: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: "90%"
+  },
+  separator: {
+    height: 0.5,
+    backgroundColor: 'gray',
+  },
+  userClickedContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center', 
+    backgroundColor:'rgba(0, 0, 0, 0.5)'
+  },
+  userClicked: {
+    width: 300,
+    backgroundColor: 'thistle',
+    borderRadius: 10,
+    alignItems: 'center',
+    padding:30
+  },  
+  backAndAdd: {
+    flexDirection: "row",
+    alignItems: 'center',
+    bottom: 10
+  },
+  back: {
+    fontSize: 30,
+    color: "white",
+    fontWeight: "bold",
+  },
+  photoContainer: {
+    borderRadius: 50,
+    height: 100,
+    width: 100,
+    overflow: 'hidden',
+    bottom: 20
+  },
+  photo: {
+    height: 100,
+    width: 100,
+  },
+  textContainer: {
+    alignItems: 'center',
+    top: 5
+  },
+  interests: {
+    top: 5,
+  },
+  text: {
+    fontSize: 24,
+    color: 'white',
+    fontWeight: "bold"
+  },
+  text2: {
+    fontSize: 20,
+    color: 'white'
   },
 });
 

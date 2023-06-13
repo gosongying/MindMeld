@@ -1,6 +1,5 @@
-import React from 'react';
-import { View, Text, StyleSheet, FlatList } from 'react-native';
-import { TouchableOpacity } from 'react-native-gesture-handler';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, FlatList, Alert } from 'react-native';
 import Groups from '../../../../components/Home/Community/Groups';
 import FriendList from '../../../../components/Home/Community/FriendList';
 import CommunityHeader from '../../../../components/Home/Community/CommunityHeader';

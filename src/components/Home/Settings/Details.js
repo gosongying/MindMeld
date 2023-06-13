@@ -319,13 +319,14 @@ const styles = StyleSheet.create({
     marginRight: 20,
   },
   name: {
-    fontSize: 30,
+    fontSize: 28,
     fontWeight: 'bold',
   },
   nameWhenEditing: {
     textAlign: 'left',
     borderBottomColor: "gray",
     borderBottomWidth: 2,
+    width: "90%"
   },
   detailsContainer: {
     flex: 1,

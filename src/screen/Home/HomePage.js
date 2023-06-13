@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -6,10 +6,20 @@ import StudyDashboardTab from './Tabs/StudyDashboardTab';
 import StudyCommunityTab from './Tabs/StudyCommunityTab';
 import AchievementTab from './Tabs/AchievementTab';
 import SettingTab from './Tabs/SettingTab';
+import { update, ref, onDisconnect, serverTimestamp, goOnline } from 'firebase/database';
+import { database, auth } from '../../../firebase';
 
 const HomePage = () => {
 
   console.log("Home");
+
+  /*useEffect(() => {
+    const userIdRef = ref(database, 'userId/' + auth.currentUser.uid);
+    onDisconnect(userIdRef).update({status: serverTimestamp()});
+    update(userIdRef, {
+      status: true
+    });
+  }, []);*/
 
   const Tab = createBottomTabNavigator();
 
