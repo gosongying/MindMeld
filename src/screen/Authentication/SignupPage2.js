@@ -8,6 +8,7 @@ import { updateProfile } from 'firebase/auth';
 import * as ImagePicker from 'expo-image-picker';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { getDownloadURL, uploadBytes, ref as storageRef, deleteObject } from 'firebase/storage';
+import { AntDesign } from '@expo/vector-icons'
 
 const SignupPage2 = ({ navigation}) => {
 
@@ -178,6 +179,20 @@ const SignupPage2 = ({ navigation}) => {
     }
   };
 
+  const goToSignUp = () => {
+    navigation.navigate('Signup');
+
+  }
+
+  const reset = () => {
+    setUsername('');
+    setInterests([]);
+    setAgreeTerms(false);
+    setGender('');
+    setConfirmUsername(false);
+    setImage(null);
+  }
+
   const renderInterestItem = ({ item }) => (
     <TouchableOpacity
       style={[styles.toggleButton, interests.includes(item) && styles.toggleButtonSelected]}
@@ -205,13 +220,24 @@ const SignupPage2 = ({ navigation}) => {
   ];
   
   return(
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <TouchableOpacity style={styles.backButton} onPress={goToSignUp}>
+          <Text style={styles.back}>{'\u2190'}</Text>
+        </TouchableOpacity>
+        <Text style={styles.title}>Create your account</Text>
+        <TouchableOpacity style={styles.closeButton} onPress={reset}>
+          <AntDesign name="close" size={24} color="#fff" />
+        </TouchableOpacity>
+      </View>
+
+      <View style={{flex: 1, margin: 15}}>
       <FlatList
         showsVerticalScrollIndicator={false} // Hide the vertical scroll bar
         //data={data}
         ListHeaderComponent={
           <>
-            <Text style={styles.heading}>Create your account</Text>
+ 
 
            <View style={styles.container}>
               <View style={styles.outerPictureContainer}>
@@ -354,19 +380,27 @@ const SignupPage2 = ({ navigation}) => {
           </>
         }
       />
-    </SafeAreaView>
+    </View>
+  </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    margin: 15,
+  },
+  header: {
+    backgroundColor: '#8A2BE2',
+    paddingHorizontal: 20,
+    paddingTop: 50,
+    paddingBottom: 20, 
   },
   heading: {
     fontSize: 30,
     fontWeight: 'bold',
-    marginBottom: 20,
+    marginBottom: 10, 
+    textAlign: 'center',
+    color: '#fff',
   },
   formRow: {
     marginBottom: 20,
@@ -485,8 +519,33 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems:'center',
     justifyContent:'space-between',
-  }
-
+  },
+  backButton: {
+    marginRight: 10,
+  },
+  back: {
+    fontSize: 35,
+    fontWeight: 'bold',
+    color: '#fff',
+  },
+  closeButton: {
+    marginLeft: 10,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+    backgroundColor: '#8A2BE2',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    paddingTop: 50
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#fff'
+  },
 });
 
 export default SignupPage2;

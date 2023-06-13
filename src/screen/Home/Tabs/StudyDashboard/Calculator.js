@@ -8,6 +8,7 @@ import {
   View,
 } from 'react-native';
 import axios from 'axios';
+import { AntDesign } from '@expo/vector-icons';
 
 const Calculator = ({ navigation }) => {
   const goToHome = () => navigation.navigate('StudyDashboard');
@@ -18,7 +19,9 @@ const Calculator = ({ navigation }) => {
   const handleCalculation = async () => {
     try {
       const apiKey = 'Y36GEU-TW4VU6G736';
-      const apiUrl = `http://api.wolframalpha.com/v1/result?appid=${apiKey}&i=${encodeURIComponent(input)}`;
+      const apiUrl = `http://api.wolframalpha.com/v1/result?appid=${apiKey}&i=${encodeURIComponent(
+        input
+      )}`;
 
       const response = await axios.get(apiUrl);
       const result = response.data;
@@ -33,8 +36,22 @@ const Calculator = ({ navigation }) => {
     setInput(input.slice(0, -1));
   };
 
+  const reset = () => {
+    setInput('');
+  };
+
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <TouchableOpacity style={styles.backButton} onPress={goToHome}>
+          <Text style={styles.back}>{'\u2190'}</Text>
+        </TouchableOpacity>
+        <Text style={styles.title}>Calculator</Text>
+        <TouchableOpacity style={styles.closeButton} onPress={reset}>
+          <AntDesign name="close" size={24} color="#fff" />
+        </TouchableOpacity>
+      </View>
+
       <View style={styles.displayContainer}>
         <TextInput
           style={styles.input}
@@ -85,11 +102,7 @@ const Calculator = ({ navigation }) => {
       <View style={styles.attributionContainer}>
         <Text style={styles.attributionText}>Powered by Wolfram Alpha</Text>
       </View>
-
-      <TouchableOpacity style={styles.backButton} onPress={goToHome}>
-        <Text style={styles.back}>{'\u2190'}</Text>
-      </TouchableOpacity>
-    </SafeAreaView>
+    </View>
   );
 };
 
@@ -105,9 +118,33 @@ const CalcButton = ({ onPress, text, color }) => (
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#fff',
+  },
+  backButton: {
+    marginRight: 10,
+  },
+  back: {
+    fontSize: 35,
+    fontWeight: 'bold',
+    color: '#fff',
+  },
+  closeButton: {
+    marginLeft: 10,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+    backgroundColor: '#8A2BE2',
     paddingHorizontal: 20,
-    paddingTop: 20,
-    backgroundColor: 'white',
+    paddingVertical: 10,
+    paddingTop: 50,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#fff',
   },
   displayContainer: {
     flex: 1,
@@ -118,7 +155,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 8,
     borderRadius: 8,
-    fontSize: 35,
+    fontSize: 32,
     marginBottom: 5,
     fontWeight: 'bold',
     textAlign: 'right',
@@ -136,7 +173,7 @@ const styles = StyleSheet.create({
   },
   row: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'space-evenly',
     marginBottom: 10,
   },
   calcButton: {
@@ -144,23 +181,12 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
-    width: 70,
-    height: 70,
-    marginHorizontal: 10,
+    width: 65,
+    height: 65,
+    marginHorizontal: 5,
   },
   calcButtonText: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#333333',
-  },
-  backButton: {
-    position: 'absolute',
-    top: 40,
-    left: 10,
-    zIndex: 1,
-  },
-  back: {
-    fontSize: 35,
+    fontSize: 30,
     fontWeight: 'bold',
     color: '#333333',
   },
@@ -168,7 +194,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 10,
-    marginTop: -20
+    marginTop: -20,
   },
   attributionText: {
     fontSize: 14,

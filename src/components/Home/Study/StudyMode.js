@@ -99,6 +99,7 @@ const StudyMode = () => {
             <TextInput
               style={styles.durationInput}
               placeholder="Enter duration in minutes (up to 120)"
+              placeholderTextColor="#999999"
               keyboardType="number-pad"
               onChangeText={setStudyModeDuration}
             />

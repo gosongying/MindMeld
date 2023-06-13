@@ -157,7 +157,7 @@ const LoginPage = ({navigation}) => {
           <Text style={styles.text7}>{'\u2190'}</Text >  
         </TouchableOpacity>
         <Image source={require("../../../assets/logoOnly.png")} />
-        <Text style={styles.text1}>Log in now!</Text>
+        <Text style={styles.text1}>Log to Your Account</Text>
         <TextInput
           style={styles.text2}
           placeholder="Enter your email address"
@@ -213,9 +213,11 @@ const LoginPage = ({navigation}) => {
         <Modal visible={isModalVisible} transparent animationType="fade">
           <View style={styles.promptContainer} >
             <View style={styles.prompt}>
-              <Text style={{ fontSize: 18, marginBottom: 10 }}>Forgot Password</Text>
+              <Text style={{ fontSize: 20, fontWeight:'bold' }}>Forgot your password?</Text>
+              <Text style ={{ fontSize: 12, marginTop: 10, marginBottom: 20}}>We'll email you a link to reset your password.</Text>
                 <TextInput
-                  placeholder="Email"
+                  placeholder="Enter your email"
+                  placeholderTextColor='#999999'
                   value={emailReset}
                   onChangeText={text => setEmailReset(text)}
                   style={styles.emailResetInput}
@@ -224,27 +226,29 @@ const LoginPage = ({navigation}) => {
                   inputMode="email"
                   clearButtonMode="while-editing"
                 />
+              
+              <View style={styles.buttonContainer}>
+                 <TouchableOpacity style={styles.cancelButton}                 
+                 onPress={() => {
+                  setModalVisible(false);
+                  setEmailReset("");
+                }} 
+                 disabled={secondLoading}>
+                    <Text style={styles.buttonText}>Cancel</Text>
+                </TouchableOpacity>
+
                 {/* If it is loading, show the ActivityIndicator, else show the reset password button */}
+
                 {secondLoading ? (
                   <View style={styles.loading2}>
                     <ActivityIndicator size="small" color="#0000ff" />
                   </View>
                 ) : (
-                <TouchableOpacity onPress={resetPassword} style={styles.pressable2}>
-                  <Text style={{ color: 'white' }}>Reset Password</Text>
+                <TouchableOpacity onPress={resetPassword} style={styles.confirmButton}>
+                  <Text style={styles.buttonText}>Confirm</Text>
                 </TouchableOpacity>
                 )}
-
-                <TouchableOpacity 
-                onPress={() => {
-                  setModalVisible(false);
-                  setEmailReset("");
-                }} 
-                style={{ marginTop: 10, alignItems: "center"}}
-                disabled={secondLoading}
-                >
-                <Text style={{ textDecorationLine: 'underline' }}>Cancel</Text>
-              </TouchableOpacity>
+             </View>
             </View>
           </View>
         </Modal>
@@ -290,12 +294,12 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   text5: {
-    fontSize: 14,
+    fontSize: 12,
     color: "gray",
-    marginRight: 50,
+    marginRight: 5,
   },
   text6: {
-    fontSize: 14,
+    fontSize: 12,
     color: "#710EF1",
     fontWeight: "bold",
     textDecorationLine: "underline",
@@ -338,10 +342,10 @@ const styles = StyleSheet.create({
   },
   prompt: {
     bottom: 30,
-    width: 300, 
+    width: 325, 
     backgroundColor: 'white',
     padding: 20, 
-    borderRadius: 10
+    borderRadius: 25
   },
   pressable2: {
     height:40,
@@ -353,10 +357,35 @@ const styles = StyleSheet.create({
   emailResetInput: {
     height: 40, 
     borderWidth: 1, 
-    marginBottom: 10, 
+    marginBottom: 15, 
     paddingHorizontal: 10,
     borderRadius: 10,
-  }
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    paddingHorizontal: 10,
+  },
+  cancelButton: {
+    backgroundColor: '#999',
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 10,
+    marginRight: 6, 
+  },
+  confirmButton: {
+    backgroundColor: '#007AFF',
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 10,
+    marginLeft: 6, 
+  },
+  buttonText: {
+    color: '#FFF',
+    fontSize: 18,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
 }); 
  
 export default LoginPage;

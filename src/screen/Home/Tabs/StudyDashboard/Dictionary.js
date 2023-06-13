@@ -10,6 +10,7 @@ import {
   Keyboard
 } from 'react-native';
 import axios from 'axios';
+import { AntDesign } from '@expo/vector-icons';
 
 const Dictionary = ({ navigation }) => {
   const goToHome = () => navigation.navigate('StudyDashboard');
@@ -44,14 +45,24 @@ const Dictionary = ({ navigation }) => {
     }
   };
 
+  
+  const reset = () => {
+    Keyboard.dismiss();
+    setWord('');
+    setDefinitions([])
+  };
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={goToHome}>
           <Text style={styles.back}>{'\u2190'}</Text>
         </TouchableOpacity>
-        <Text style={styles.headerText}>Dictionary</Text>
+        <Text style={styles.title}>Dictionary</Text>
+        <TouchableOpacity style={styles.closeButton} onPress={reset}>
+          <AntDesign name="close" size={24} color="#fff" />
+        </TouchableOpacity>
       </View>
+
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}
@@ -80,36 +91,41 @@ const Dictionary = ({ navigation }) => {
           Powered by Merriam-Webster
         </Text>
       </View>
-    </SafeAreaView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 20,
-    paddingTop: 20,
     backgroundColor: '#fff',
   },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
   backButton: {
-    marginRight: 0,
-    marginLeft: 10,
+    marginRight: 10,
   },
   back: {
     fontSize: 35,
     fontWeight: 'bold',
-    color: '#333333',
+    color: '#fff',
+    
   },
-  headerText: {
-    fontSize: 34,
+  closeButton: {
+    marginLeft: 10,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+    backgroundColor: '#8A2BE2',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    paddingTop: 50
+  },
+  title: {
+    fontSize: 24,
     fontWeight: 'bold',
-    marginLeft: 60,
-    marginBottom: -30,
+    color: '#fff'
   },
   inputContainer: {
     alignItems: 'center',
@@ -135,6 +151,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     paddingVertical: 10,
     marginTop: 10,
+    marginBottom: 10,
   },
   searchButtonText: {
     fontSize: 20,

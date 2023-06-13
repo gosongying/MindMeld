@@ -1,26 +1,36 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   TouchableOpacity,
   StyleSheet,
   Text,
-  SafeAreaView,
   TextInput,
   View,
   FlatList,
   KeyboardAvoidingView,
-  Platform,
   Modal,
   Keyboard,
 } from 'react-native';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
+import { AntDesign } from '@expo/vector-icons';
 
 const Tasks = ({ navigation }) => {
   const [tasks, setTasks] = useState([]);
   const [newTask, setNewTask] = useState('');
   const [showModal, setShowModal] = useState(false);
+  const [showModal2, setShowModal2] = useState(false);
   const [taskTime, setTaskTime] = useState('');
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setSelectedDate(new Date());
+    }, 1000);
+
+    return () => {
+      clearInterval(interval); 
+    };
+  }, []);
 
   const showDatepicker = () => {
     setShowDatePicker(true);
@@ -37,7 +47,8 @@ const Tasks = ({ navigation }) => {
   const addTask = () => {
     if (newTask.trim() !== '') {
       setShowModal(true);
-      Keyboard.dismiss(); // Close the keyboard
+      setTaskTime('');
+      Keyboard.dismiss(); 
     }
   };
 
@@ -47,7 +58,7 @@ const Tasks = ({ navigation }) => {
       updatedTasks[index].checked = !updatedTasks[index].checked;
       return updatedTasks;
     });
-  };
+  };  
 
   const removeTask = (index) => {
     setTasks((prevTasks) => {
@@ -56,7 +67,7 @@ const Tasks = ({ navigation }) => {
       return updatedTasks;
     });
   };
-
+  
   const handleConfirm = () => {
     const newTaskTime = taskTime ? taskTime : `${selectedDate.getDate()}/${selectedDate.getMonth() + 1} ${selectedDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
     setTasks((prevTasks) => [...prevTasks, { title: newTask, checked: false, time: newTaskTime }]);
@@ -66,18 +77,40 @@ const Tasks = ({ navigation }) => {
     Keyboard.dismiss();
   };
 
+  const handleCancel = () => {
+    const newTaskTime = taskTime ? taskTime : `${selectedDate.getDate()}/${selectedDate.getMonth() + 1} ${selectedDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+    setNewTask('');
+    setTaskTime('');
+    setShowModal(false);
+    Keyboard.dismiss();
+  }
+
   const minimumDate = new Date(new Date().getTime() + 60000); 
 
+  const goToHome = () => navigation.navigate('StudyDashboard');
+  const confirmReset = () => {
+    setShowModal2(true)
+    
+  }
+  const confirmDelete = () => {
+    setTasks([]);
+    setShowModal2(false)
+  }
+  const cancelDelete = () => {
+    setShowModal2(false)
+  }
+
   return (
-    <SafeAreaView style={styles.container}>
-      <KeyboardAvoidingView
-        style={styles.container}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
-      >
-        <View style={styles.header}>
-          <Text style={styles.headerText}>Tasks To Do</Text>
-        </View>
+    <KeyboardAvoidingView style={styles.container} behavior="padding">
+      <View style={styles.header}>
+        <TouchableOpacity style={styles.backButton} onPress={goToHome}>
+          <Text style={styles.back}>{'\u2190'}</Text>
+        </TouchableOpacity>
+        <Text style={styles.title}>Tasks</Text>
+        <TouchableOpacity style={styles.closeButton} onPress={confirmReset}>
+          <AntDesign name="close" size={24} color="#fff" />
+        </TouchableOpacity>
+      </View>
 
         <View style={styles.taskContainer}>
           <FlatList
@@ -98,7 +131,7 @@ const Tasks = ({ navigation }) => {
                   <Text style={styles.taskTime}>{item.time}</Text>
                 </View>
               </TouchableOpacity>
-            )}
+            )}            
             keyExtractor={(item, index) => index.toString()}
             contentContainerStyle={styles.taskList}
           />
@@ -119,7 +152,7 @@ const Tasks = ({ navigation }) => {
 
         <Modal
           visible={showModal}
-          animationType="slide"
+          animationType="fade"
           transparent={true}
           onRequestClose={() => setShowModal(false)}
         >
@@ -129,7 +162,7 @@ const Tasks = ({ navigation }) => {
               <View style={styles.modalInput}>
                 <TouchableOpacity onPress={showDatepicker}>
                   <Text style={styles.datePickerText}>
-                    {taskTime ? taskTime : `${selectedDate.getDate()}/${selectedDate.getMonth() + 1} ${selectedDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`}
+                     {taskTime ? taskTime : `${selectedDate.getDate()}/${selectedDate.getMonth() + 1} ${selectedDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`} 
                   </Text>
                 </TouchableOpacity>
                 <DateTimePickerModal
@@ -141,36 +174,72 @@ const Tasks = ({ navigation }) => {
                   textColor="#000000"
                 />
               </View>
-              <TouchableOpacity style={styles.modalButton} onPress={handleConfirm}>
-                <Text style={styles.modalButtonText}>Confirm</Text>
-              </TouchableOpacity>
+              <View style={styles.buttonContainer}>
+               <TouchableOpacity style={styles.cancelButton} onPress={handleCancel}>
+                 <Text style={styles.buttonText}>Cancel</Text>
+               </TouchableOpacity>
+               <TouchableOpacity style={styles.confirmButton} onPress={handleConfirm}>
+                  <Text style={styles.buttonText}>Confirm</Text>
+               </TouchableOpacity>
+              </View>
             </View>
           </View>
         </Modal>
-
-        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-          <Text style={styles.back}>{'\u2190'}</Text>
-        </TouchableOpacity>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+        <Modal
+          visible={showModal2}
+          animationType="fade"
+          transparent={true}>
+            <View style={styles.modalContainer}>
+              <View style={styles.modalContent}>
+               <View style={styles.labelContainer}>
+                <AntDesign name="exclamationcircle" style={styles.warningIcon} />
+                <Text style={styles.label}>Confirm to delete all tasks</Text>
+               </View>
+                <View style={styles.buttonContainer}>
+                  <TouchableOpacity style={styles.cancelButton} onPress={cancelDelete}>
+                    <Text style={styles.buttonText}>Cancel</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.confirmButton} onPress={confirmDelete}>
+                   <Text style={styles.buttonText}>Confirm</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+        </Modal>
+    </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#fff',
+  },
+  backButton: {
+    marginRight: 10,
+  },
+  back: {
+    fontSize: 35,
+    fontWeight: 'bold',
+    color: '#fff',
+  },
+  closeButton: {
+    marginLeft: 10,
   },
   header: {
-    marginBottom: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+    backgroundColor: '#8A2BE2',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    paddingTop: 50
   },
-  headerText: {
-    fontSize: 30,
+  title: {
+    fontSize: 24,
     fontWeight: 'bold',
-    textAlign: 'center',
-    color: '#333333',
+    color: '#fff'
   },
   taskContainer: {
     flex: 1,
@@ -211,7 +280,7 @@ const styles = StyleSheet.create({
   },
   taskText: {
     flex: 1,
-    fontSize: 18,
+    fontSize: 16,
     color: '#333333',
   },
   taskTime: {
@@ -225,7 +294,8 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 15,
+    paddingHorizontal: 20,
   },
   input: {
     flex: 1,
@@ -250,16 +320,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     color: '#fff',
-  },
-  backButton: {
-    position: 'absolute',
-    left: 10,
-    zIndex: 1,
-  },
-  back: {
-    fontSize: 35,
-    fontWeight: 'bold',
-    color: '#333333',
   },
   modalContainer: {
     flex: 1,
@@ -291,18 +351,47 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#777777',
   },
-  modalButton: {
-    backgroundColor: '#007bff',
-    borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 10,
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    paddingHorizontal: 10,
   },
-  modalButtonText: {
-    fontSize: 16,
+  cancelButton: {
+    backgroundColor: '#999',
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 10,
+    marginRight: 6, 
+  },
+  confirmButton: {
+    backgroundColor: '#007AFF',
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 10,
+    marginLeft: 6, 
+  },
+  buttonText: {
+    color: '#FFF',
+    fontSize: 18,
     fontWeight: 'bold',
-    color: '#fff',
+    textAlign: 'center',
   },
+  labelContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 20,
+  },
+  warningIcon: {
+    marginRight: 10,
+    fontSize: 24,
+    color: '#FF0000',
+  },
+  label: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333333',
+  },  
   datePickerText: {
     textAlign: 'center'
   }
