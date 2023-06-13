@@ -3,7 +3,8 @@ import { View, Text, FlatList, TouchableOpacity, StyleSheet, SafeAreaView } from
 import Details from '../../../../components/Home/Settings/Details';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
-import { auth } from "../../../../../firebase"
+import { auth, database } from "../../../../../firebase"
+import { goOffline } from 'firebase/database';
 
 const Settings = ({navigation}) => {
   const options = [
@@ -27,6 +28,7 @@ const Settings = ({navigation}) => {
       signOut(auth)
       .then(() => {
         console.log("signed out succesfully");
+        //goOffline(database);
         navigation.replace("Landing");
       })
       .catch((error) => console.log(error));
