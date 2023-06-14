@@ -5,6 +5,7 @@ import { auth, database } from "../../../../firebase"
 import { ref, runTransaction, set, get, onValue, update, child } from 'firebase/database';
 import Fontisto from 'react-native-vector-icons/Fontisto';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import { AntDesign } from '@expo/vector-icons';
 
 const FriendListmore = ({navigation, route}) => {
 
@@ -20,6 +21,11 @@ const FriendListmore = ({navigation, route}) => {
     const [friendOrFriendSearchedId, setFriedOrFriendSearchedId] = useState('');
     const [friendListData, setFriendListData] = useState(route.params.friendListData);
     const [friendListId, setFriendListId] = useState(route.params.friendListId);
+    //friend being deleted
+    const [deletingFriend, setDeletingFriend] = useState(null);
+
+    console.log(deletingFriend)
+
 
     const clickUser = (user) => {
         setIsCheckingFriend(true);
@@ -60,7 +66,7 @@ const FriendListmore = ({navigation, route}) => {
                             name={"delete"}
                             size={25} 
                             style={{right: 35}}
-                            onPress={() => deleteClicked(item)}/>
+                            onPress={() => setDeletingFriend(item)}/>
                         </TouchableOpacity>
                     </TouchableOpacity>
                     {/* separator */}
@@ -68,24 +74,6 @@ const FriendListmore = ({navigation, route}) => {
                 </View>
             );
         } 
-    };
-
-    const deleteClicked = (user) => {
-        Alert.alert(
-            'Confirm Delete',
-            `Are you sure you want to delete ${user.username}?`,
-            [
-                {
-                    text: 'Cancel',
-                    style: 'cancel'
-                },
-                {
-                    text: 'Delete',
-                    style: 'destructive',
-                    onPress: () => deleteFriend(user)
-                }
-            ],
-        )
     };
 
     const deleteFriend = (user) => {
@@ -114,6 +102,8 @@ const FriendListmore = ({navigation, route}) => {
                 } else {
                     return profile;
                 }
+            }).then(() => {
+                setDeletingFriend(null);
             })
         } catch (error) { 
             console.log(error);
@@ -290,7 +280,7 @@ const FriendListmore = ({navigation, route}) => {
                             <View style={{backgroundColor: 'white', height: 1, width: 250, bottom: 10}}/>
                             <View style={styles.textContainer}>
                                 <View style={styles.nameAndGender}> 
-                                    <Text style={styles.text} numberOfLines={1}>{friendOrFriendSearched.username}</Text>
+                                <Text style={styles.text} numberOfLines={1}>{friendOrFriendSearched.username}</Text>
                                     {friendOrFriendSearched.gender === 'male' ? (
                                         <Fontisto name='male' size={15} color='dodgerblue' style={{marginLeft: 10}}/>
                                     ) : (
@@ -333,6 +323,28 @@ const FriendListmore = ({navigation, route}) => {
                     </View>
                 </View>
                 )}
+            </Modal>
+
+            {/* Prompt for deleting friend */}
+            <Modal visible={deletingFriend !== null} transparent animationType='fade'>
+                <View style={styles.modalContainer}>
+                    <View style={styles.modalContent}>
+                        <View style={styles.labelContainer}>
+                            <AntDesign name="exclamationcircle" style={styles.warningIcon} />
+                            {deletingFriend !== null &&
+                            <Text style={styles.label}>Confirm to delete {deletingFriend.username}?</Text>
+                            }   
+                        </View>
+                        <View style={styles.buttonContainer}>
+                        <TouchableOpacity style={styles.cancelButton} onPress={() => setDeletingFriend(null)}>
+                            <Text style={styles.buttonText}>Cancel</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.confirmButton} onPress={() => deleteFriend(deletingFriend)}>
+                            <Text style={styles.buttonText}>Confirm</Text>
+                        </TouchableOpacity>
+                        </View>
+                    </View>
+                </View>
             </Modal>
         </View>
     )
@@ -536,7 +548,61 @@ const styles = StyleSheet.create({
         position: 'absolute',
         left: 75, 
         top: 65
-    }
+    },
+    modalContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    },
+    modalContent: {
+        backgroundColor: '#fff',
+        borderRadius: 8,
+        padding: 20,
+        width: '80%',
+        maxHeight: '50%',
+    },
+    labelContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginBottom: 20,
+    },
+    warningIcon: {
+        marginRight: 10,
+        fontSize: 24,
+        color: '#FF0000',
+    },
+    label: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#333333',
+    },  
+    buttonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        paddingHorizontal: 10,
+    },
+    cancelButton: {
+        backgroundColor: '#999',
+        paddingVertical: 12,
+        paddingHorizontal: 24,
+        borderRadius: 10,
+        marginRight: 6, 
+    },
+    confirmButton: {
+        backgroundColor: '#007AFF',
+        paddingVertical: 12,
+        paddingHorizontal: 24,
+        borderRadius: 10,
+        marginLeft: 6, 
+    },
+    buttonText: {
+        color: '#FFF',
+        fontSize: 18,
+        fontWeight: 'bold',
+        textAlign: 'center',
+    },
 })
 
 
