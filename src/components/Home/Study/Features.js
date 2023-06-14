@@ -48,7 +48,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     overflow: 'hidden',
     width: 335,
-    marginLeft: 20
+    marginLeft: 20,
   },
   title: {
     fontSize: 24,

@@ -241,21 +241,20 @@ const Details = ({ navigation }) => {
             ) : (
               <Image source={require("../../../../assets/profileholder.png")} style={styles.profile}/> 
             )}      
-          </View>
+            <View style={styles.statusIndicator} />
+            </View>
           {/* anonymous user cannot change profile picture */}
           {!isAnonymous && (
             <View style={styles.libraryAndCamera}>
             <TouchableOpacity 
-            style={styles.icon} 
             onPress={selectImageLibrary}
             disabled={isLoading}>
-              <FontAwesome name={'photo'} size={25} />
+              <FontAwesome name={'photo'} size={22} />
             </TouchableOpacity>
             <TouchableOpacity 
-            style={styles.icon} 
             onPress={selectImageCamera}
             disabled={isLoading}>
-              <MaterialCommunityIcons name={'camera-outline'} size={30} />
+              <MaterialCommunityIcons name={'camera-outline'} size={27} />
             </TouchableOpacity>
             </View>
           )}
@@ -285,7 +284,7 @@ const Details = ({ navigation }) => {
               { !isAnonymous && (
                 <TouchableOpacity 
                 onPress={editUsername}
-                style={{left: 30}}
+                style={{left: 20}}
                 disabled={isLoading}>
                   <Ionicons name="create" size={20} />
                 </TouchableOpacity>
@@ -312,14 +311,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: 5,
+    //height: 120
   },
   profile: {
     height: 70,
     width: 70,
     marginRight: 20,
+    left: 5
   },
   name: {
-    fontSize: 28,
+    fontSize: 26,
     fontWeight: 'bold',
   },
   nameWhenEditing: {
@@ -330,7 +331,7 @@ const styles = StyleSheet.create({
   },
   detailsContainer: {
     flex: 1,
-    left: 10,
+    left: 5,
   },
   levelContainer: {
     flexDirection: 'row',
@@ -351,11 +352,12 @@ const styles = StyleSheet.create({
     marginLeft: 5,
   },
   photoContainer: {
-    borderRadius: 35,
-    height: 70,
-    width: 70,
+    borderRadius: 45,
+    height: 85,
+    width: 85,
     overflow: 'hidden',
-    right: 10
+    right: 10,
+    justifyContent: 'center',
   },
   nameAndEdit: {
     flexDirection: 'row',
@@ -365,15 +367,21 @@ const styles = StyleSheet.create({
     width:80,
     flexDirection: 'row',
     alignItems:'center',
-    justifyContent:'space-between',
+    justifyContent:'space-evenly',
     right: 10
-  },
-  icon: {
-    marginTop: 10
   },
   outerPhotoContainer: {
     alignItems: 'center',
   },
+  statusIndicator: {
+    backgroundColor: 'rgb(0, 200, 0)',
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    bottom: 15,
+    left: 63,
+    position: 'absolute',    
+  }
 });
 
 export default Details;

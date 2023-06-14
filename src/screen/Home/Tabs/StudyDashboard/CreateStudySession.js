@@ -8,11 +8,14 @@ import {
   View,
 } from 'react-native';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
+import { auth } from '../../../../../firebase';
 
 const CreateStudySession = ({ navigation }) => {
-  const [sessionType, setSessionType] = useState('group');
+
+  const isAnonymous = auth.currentUser.isAnonymous;
+  const [sessionType, setSessionType] = useState(isAnonymous? 'private': 'group');
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-  const [studyModeEnabled, setStudyModeEnabled] = useState(false);
+  const [studyModeEnabled, setStudyModeEnabled] = useState(isAnonymous);
   const [selectedDate, setSelectedDate] = useState(null);
   const [isStartTimePickerVisible, setStartTimePickerVisibility] = useState(false);
   const [isEndTimePickerVisible, setEndTimePickerVisibility] = useState(false);
@@ -77,6 +80,7 @@ const CreateStudySession = ({ navigation }) => {
           sessionType === 'group' && styles.activeButton,
         ]}
         onPress={() => handleSessionTypeChange('group')}
+        disabled={isAnonymous}
       >
         <Text style={styles.buttonText}>Group</Text>
       </TouchableOpacity>
@@ -101,7 +105,7 @@ const CreateStudySession = ({ navigation }) => {
       </TouchableOpacity>
       <Text style={styles.heading}>Create Study Session</Text>
       <Text style={styles.subheading}>Session Name</Text>
-      <TextInput style={styles.input} placeholder="Enter session name" />
+      <TextInput style={styles.input} placeholder="Enter session name" autoCapitalize='none'/>
       <Text style={styles.subheading}>Session Type</Text>
       {renderSessionTypeButtons()}
 
@@ -115,7 +119,7 @@ const CreateStudySession = ({ navigation }) => {
           {studyModeEnabled && <Text style={styles.checkmark}>&#x2713;</Text>}
         </TouchableOpacity>
         {sessionType === 'private' && (
-          <Text style={styles.checkboxLabel}>      This must be enabled {"\n"}      during private sessions </Text>
+          <Text style={styles.checkboxLabel2}>      This must be enabled {"\n"}      during private sessions </Text>
         )}
       </View>
       <Text style={styles.subheading}>Select Date</Text>
@@ -137,9 +141,6 @@ const CreateStudySession = ({ navigation }) => {
             </Text>
         </TouchableOpacity>
       </View>
-      <Text style={styles.subheading}>Select Buddies</Text>
-      <TextInput style={styles.input} placeholder="Select Buddies" />
-
       <TouchableOpacity style={styles.createButton}>
         <Text style={styles.createButtonText}>Create Session</Text>
       </TouchableOpacity>
@@ -173,14 +174,15 @@ const CreateStudySession = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 20,
-    paddingTop: 20,
+    //paddingHorizontal: 20,
+   // paddingTop: 20,
     marginHorizontal: 10,
     marginVertical: 10,
+    top: 70
   },
   backButton: {
     position: 'absolute',
-    top: 25,
+    top: -35,
     left: 10,
     zIndex: 1,
   },
@@ -193,6 +195,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 20,
     textAlign: 'center',
+    bottom: 5
   },
   subheading: {
     fontSize: 16,
@@ -264,6 +267,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 10,
     alignItems: 'center',
+    top: 20
   },
   createButtonText: {
     fontSize: 14,
@@ -279,6 +283,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: 'bold',
     marginRight: 10,
+  },
+  checkboxLabel2: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    position: 'absolute',
+    left: 160
   },
   checkbox: {
     width: 20,

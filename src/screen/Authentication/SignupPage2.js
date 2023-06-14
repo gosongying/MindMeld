@@ -139,6 +139,7 @@ const SignupPage2 = ({ navigation}) => {
       groupList: [],
       photo: photo,
       uid: userId,
+      status: 0
     });
     updateProfile(currentUser, {
       displayName: username,

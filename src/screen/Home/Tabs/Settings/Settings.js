@@ -4,7 +4,7 @@ import Details from '../../../../components/Home/Settings/Details';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { auth, database } from "../../../../../firebase"
-import { goOffline } from 'firebase/database';
+import { goOffline, update, ref, increment, runTransaction } from 'firebase/database';
 
 const Settings = ({navigation}) => {
   const options = [
@@ -25,10 +25,22 @@ const Settings = ({navigation}) => {
   //only when logout is clicked, the user will be signed out.
   const navigateToScreen = (screen) => {
     if (screen === 'Landing') {  //when Logout is clicked.
+      const currentUser = auth.currentUser;
+      const id = currentUser.uid;
       signOut(auth)
       .then(() => {
         console.log("signed out succesfully");
-        //goOffline(database);
+        //use runTransaction to update the number of online account correctly
+        if (!currentUser.isAnonymous) {
+          runTransaction(ref(database, 'userId/' + id), (profile) => {
+            if (profile) {
+              profile.status--;
+              return profile;
+            } else {
+              return profile;
+            }
+          });
+        }
         navigation.replace("Landing");
       })
       .catch((error) => console.log(error));
@@ -36,17 +48,6 @@ const Settings = ({navigation}) => {
       navigation.replace(screen);
     }
   };
-
-  //useEffect(() => {
-  //  const unsubscribe = onAuthStateChanged(auth, (user) => {
-  //    if (!user) {
-  //      navigation.replace("Landing"); 
-   //   }
-  //  });
-  //  return () => {
-  //    unsubscribe();
-  //  }
-  //});
 
   const icon = (item) => {
     let iconName;

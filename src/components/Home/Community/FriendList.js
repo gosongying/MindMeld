@@ -11,19 +11,20 @@ const FriendList = ({navigation}) => {
   const [friendClicked, setFriendClicked] = useState(null);
   const [friendListData, setFriendListData] = useState([]);
   const [friendListId, setFriendListId] = useState([]);
-
+  
   const currentUser = auth.currentUser;
   useEffect(() => {
     //listen to the change of friend list
     //to get the latest friend list
-    const unsubscribe = onValue(ref(database, 'userId/' + currentUser.uid), (snapshot) => {
+    const unsubscribe = onValue(ref(database, 'userId/' + currentUser.uid), async (snapshot) => {
       let friends = [];
       const friendList = snapshot.val().friendList ? snapshot.val().friendList : [];
       if (friendList) {
         setFriendListId(friendList);
-        friendList.map(async (id) => {
-          //to make sure all datas have been added
-          await get(ref(database, 'userId/' + id))
+        //to make sure friendlist is added before set
+        await Promise.all(friendList.map(async (id) => {
+          const userRef = ref(database, 'userId/' + id);   
+          await get(userRef)
           .then((user) => {
             friends.push(user.val());
           })
@@ -32,8 +33,21 @@ const FriendList = ({navigation}) => {
             Alert.alert("Error");
           });
           return;
-        });
+        }));
         setFriendListData(friends);
+        friendList.map((id) => {
+          //attach listener to each of the friend to get their status update
+          const unsubscribe = onValue(ref(database, 'userId/' + id), (snapshot) => {
+            const user = snapshot.val();
+            const id = user.uid;
+            //update the specific user with status update
+            const newFriendList = friends.map((item) => item.uid === id ? user : item)
+            setFriendListData(newFriendList);
+            return () => {
+              unsubscribe();
+            }
+          })
+        })
         return;
       } 
       setFriendListId([]);
@@ -65,6 +79,8 @@ const FriendList = ({navigation}) => {
           style={styles.avatar}
         />
         )}
+        {/* status indicator */}
+        {item.status > 0 && <View style={styles.statusIndicator}/>}
         <View style={styles.friendInfo}>
             <View style={styles.nameAndGender}>
                 <Text style={styles.friendName} numberOfLines={1}>{item.username}</Text>
@@ -126,7 +142,7 @@ const FriendList = ({navigation}) => {
                     style={styles.photo}/>
                 )}
               </View>
-              <View style={{backgroundColor: 'white', height: 1, width: 250, bottom: 5}}/>
+              <View style={{backgroundColor: 'white', height: 1, width: 250, bottom: 10}}/>
               <View style={styles.textContainer}>
               <View style={styles.nameAndGender}> 
                   <Text style={styles.text} numberOfLines={1}>{friendClicked.username}</Text>
@@ -184,7 +200,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   friendName: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
   },
   friendStatus: {
@@ -223,7 +239,7 @@ const styles = StyleSheet.create({
   backAndAdd: {
     flexDirection: "row",
     alignItems: 'center',
-    bottom: 10
+    bottom: 20
   },
   back: {
     fontSize: 30,
@@ -235,7 +251,7 @@ const styles = StyleSheet.create({
     height: 100,
     width: 100,
     overflow: 'hidden',
-    bottom: 20
+    bottom: 30
   },
   photo: {
     height: 100,
@@ -243,7 +259,6 @@ const styles = StyleSheet.create({
   },
   textContainer: {
     alignItems: 'center',
-    top: 5
   },
   interests: {
     top: 5,
@@ -257,6 +272,15 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: 'white'
   },
+  statusIndicator: {
+    height: 8,
+    width: 8,
+    backgroundColor: 'rgb(0, 200, 0)',
+    borderRadius: 5,
+    position: 'absolute',
+    left: 42,
+    top: 35
+  }
 });
 
 export default FriendList;

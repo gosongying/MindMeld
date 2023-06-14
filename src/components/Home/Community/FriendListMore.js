@@ -8,6 +8,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 const FriendListmore = ({navigation, route}) => {
 
+    console.log('friendlistmore')
     const currentUser = auth.currentUser;
 
     const [username, setUsername] = useState('');
@@ -24,7 +25,7 @@ const FriendListmore = ({navigation, route}) => {
         setIsCheckingFriend(true);
         setFriendOrFriendSearched(user);
         setFriedOrFriendSearchedId(user.uid);
-    }
+    };
 
     const renderFriendItem = ({ item }) => {
         if (item.username.startsWith(username) || !username) {
@@ -42,6 +43,8 @@ const FriendListmore = ({navigation, route}) => {
                             source={require('../../../../assets/profileholder.png')} // Replace with actual image source
                             style={styles.avatar}/>
                         )}
+                        {/* status indicator */}
+                        {item.status > 0 && <View style={styles.statusIndicator}/>}
                         <View style={styles.friendInfo}>
                             <View style={styles.nameAndGender}>
                                 <Text style={styles.friendName} numberOfLines={1}>{item.username}</Text>
@@ -51,7 +54,6 @@ const FriendListmore = ({navigation, route}) => {
                                     <Fontisto name='female' size={15} color='pink' style={{marginLeft: 5}}/>
                                     )}
                             </View>
-                            <Text style={styles.friendStatus}>Online</Text>
                         </View>
                         <TouchableOpacity>
                             <MaterialIcons 
@@ -285,7 +287,7 @@ const FriendListmore = ({navigation, route}) => {
                                 )}
                                 
                             </View>
-                            <View style={{backgroundColor: 'white', height: 1, width: 250, bottom: 5}}/>
+                            <View style={{backgroundColor: 'white', height: 1, width: 250, bottom: 10}}/>
                             <View style={styles.textContainer}>
                                 <View style={styles.nameAndGender}> 
                                     <Text style={styles.text} numberOfLines={1}>{friendOrFriendSearched.username}</Text>
@@ -482,7 +484,7 @@ const styles = StyleSheet.create({
     backAndAdd: {
         flexDirection: "row",
         alignItems: 'center',
-        bottom: 10
+        bottom: 20
     },
     back2: {
         fontSize: 30,
@@ -500,7 +502,7 @@ const styles = StyleSheet.create({
         height: 100,
         width: 100,
         overflow: 'hidden',
-        bottom: 20
+        bottom: 30
     },
     photo: {
         height: 100,
@@ -508,7 +510,6 @@ const styles = StyleSheet.create({
     },
     textContainer: {
         alignItems: 'center',
-        top: 5
     },
     nameAndGender: {
         flexDirection: 'row',
@@ -527,6 +528,15 @@ const styles = StyleSheet.create({
     interests: {
         top: 5,
     },
+    statusIndicator: {
+        height: 12,
+        width: 12,
+        backgroundColor: 'rgb(0, 200, 0)',
+        borderRadius: 6,
+        position: 'absolute',
+        left: 75, 
+        top: 65
+    }
 })
 
 
