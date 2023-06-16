@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   TouchableOpacity,
   StyleSheet,
@@ -8,8 +8,13 @@ import {
   Modal,
   TextInput,
   Keyboard,
+  Switch
 } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+
 
 const Notecards = ({ navigation }) => {
   const [frontText, setFrontText] = useState('');
@@ -18,13 +23,47 @@ const Notecards = ({ navigation }) => {
   const [flashcards, setFlashcards] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [showModal, setshowModal] = useState(false);
+  const [showSettingModal, setShowSettingModal] = useState(false)
+  const [shuffleToggle, setShuffleToggle] = useState(false);
+  const [deleteToggle, setDeleteToggle] = useState(false);
+
+  useEffect(() => {
+    const loadNoteCards = async () => {
+      try {
+        const savedNoteCards = await AsyncStorage.getItem('notecards');
+        if (savedNoteCards) {
+          setFlashcards(JSON.parse(savedNoteCards));
+        }
+      } catch (error) {
+        console.log('Error loading flashcards:', error);
+      }
+    };
+  
+    loadNoteCards();
+  }, []);
+  
+  useEffect(() => {
+    const saveNoteCards = async () => {
+      try {
+        await AsyncStorage.setItem('notecards', JSON.stringify(flashcards));
+      } catch (error) {
+        console.log('Error saving flashcards:', error);
+      }
+    };
+  
+    saveNoteCards();
+  }, [flashcards]);
+  
 
   const goToHome = () => navigation.navigate('StudyDashboard');
 
   const flipCard = () => {
     setIsFrontVisible(!isFrontVisible);
   };
+
+  const flipToFront = () => {
+    setIsFrontVisible(true);
+  }
 
   const createCard = () => {
     if (frontText && backText) {
@@ -33,7 +72,12 @@ const Notecards = ({ navigation }) => {
         front: frontText,
         back: backText,
       };
-      setFlashcards([...flashcards, newCard]);
+      const updatedFlashcards = [...flashcards, newCard];
+      const updatedIndex = updatedFlashcards.length - 1; // Set index to the last card
+  
+      flipToFront()
+      setFlashcards(updatedFlashcards);
+      setCurrentIndex(updatedIndex);
       setFrontText('');
       setBackText('');
       setIsModalVisible(false);
@@ -42,20 +86,22 @@ const Notecards = ({ navigation }) => {
 
   const handleNextCard = () => {
     if (currentIndex < flashcards.length - 1) {
+      flipToFront()
       setCurrentIndex(currentIndex + 1);
     }
   };
 
   const handlePreviousCard = () => {
     if (currentIndex > 0) {
+      flipToFront()
       setCurrentIndex(currentIndex - 1);
     }
   };
 
   const reset = () => {
     setCurrentIndex(0);
+    flipToFront()
     setFlashcards([]);
-    setshowModal(false);
   };
 
   const cancelCreate = () => {
@@ -72,17 +118,80 @@ const Notecards = ({ navigation }) => {
 
   const renderCard = () => {
     const card = flashcards[currentIndex];
+  
+    const handleDelete = () => {
+      const updatedFlashcards = [...flashcards];
+      updatedFlashcards.splice(currentIndex, 1);
+    
+      let updatedIndex = currentIndex;
+    
+      if (updatedIndex === updatedFlashcards.length) {
+        // If the deleted flashcard was the last one
+        updatedIndex--;
+      }
+    
+      if (updatedFlashcards.length === 0) {
+        // If there are no more flashcards
+        updatedIndex = 0;
+      }
+    
+      flipToFront();
+      setFlashcards(updatedFlashcards);
+      setCurrentIndex(updatedIndex);
+    };
+    
+    
+  
     return (
       <TouchableOpacity style={styles.cardContainer} onPress={flipCard}>
         <View style={[styles.card, isFrontVisible ? styles.frontCard : styles.backCard]}>
           <Text style={styles.cardText}>{isFrontVisible ? card.front : card.back}</Text>
+          {isFrontVisible ? null : (
+            <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
+              <Ionicons name="close-outline" size={36} color="#FF0000"/>
+            </TouchableOpacity>
+          ) }
         </View>
       </TouchableOpacity>
     );
   };
+  
 
   const renderEmptyCard = () => {
-    return <Text style={styles.emptyText}>No flashcards yet</Text>;
+    return (
+      <TouchableOpacity style={styles.cardContainer} onPress={flipCard}>
+        <View style={[styles.card, isFrontVisible ? styles.frontCard : styles.backCard]}>
+          <Text style={styles.cardText}>No notecards yet</Text>
+        </View>
+      </TouchableOpacity>
+    );
+  };
+  
+
+  const goToFirst = () => {
+    flipToFront();
+    setCurrentIndex(0);
+  }
+
+  // Randomly jumps to another index
+  const jumpIndex = () => {
+    if (flashcards.length > 0) {
+      const randomIndex = Math.floor(Math.random() * flashcards.length);
+      flipToFront();
+      setCurrentIndex(randomIndex);
+    }
+  };
+
+  // Using Fisher-Yates algorithm to shuffle entire card array
+  const shuffleCards = () => {
+    const shuffledFlashcards = [...flashcards];
+    for (let i = shuffledFlashcards.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffledFlashcards[i], shuffledFlashcards[j]] = [shuffledFlashcards[j], shuffledFlashcards[i]];
+    }
+    setFlashcards(shuffledFlashcards);
+    flipToFront();
+    setCurrentIndex(0); // Reset the current index to the first card
   };
 
   return (
@@ -93,34 +202,49 @@ const Notecards = ({ navigation }) => {
           <Text style={styles.back}>{'\u2190'}</Text>
         </TouchableOpacity>
         <Text style={styles.title}>Notecards</Text>
-        <View style={styles.buttons}>
-          <TouchableOpacity style={styles.closeButton} onPress={() => setshowModal(true)}>
-            <AntDesign name="close" size={24} color="#fff" />
-          </TouchableOpacity>
           <TouchableOpacity style={styles.createCardButton} onPress={() => setIsModalVisible(true)}>
             <AntDesign name="plus" size={24} color="#fff" />
           </TouchableOpacity>
-        </View>
       </View>
+
+      <View style={{marginBottom: 170}}/>
 
       {flashcards.length > 0 ? renderCard() : renderEmptyCard()}
 
       <View style={styles.navigationContainer}>
+        <View style={{flexDirection: 'row'}}>
+          <TouchableOpacity style={styles.navigationButton} onPress={goToFirst} >
+            <Ionicons name="refresh" size={24} color="#333" />
+          </TouchableOpacity>
+          <TouchableOpacity style={{marginTop: 4}}  onPress={jumpIndex}>
+            <Ionicons name="shuffle-outline" size={28} color="#333"/>
+          </TouchableOpacity>
+        </View>
+        <View style={{flexDirection: 'row', marginRight: 30}}>
         <TouchableOpacity
           style={[styles.navigationButton, { opacity: currentIndex === 0 ? 0.5 : 1 }]}
           disabled={currentIndex === 0}
           onPress={handlePreviousCard}
         >
-          <AntDesign name="caretleft" size={24} color={currentIndex === 0 ? '#ccc' : '#333'} />
+          <Ionicons name="arrow-back" size={24} color={currentIndex === 0 ? '#ccc' : '#333'} />
         </TouchableOpacity>
+
+        <Text style={styles.indexText}>{flashcards.length === 0 ? '0 / 0' : `${currentIndex + 1} / ${flashcards.length}`}</Text>
+
         <TouchableOpacity
-          style={[styles.navigationButton, { opacity: currentIndex === flashcards.length - 1 ? 0.5 : 1 }]}
+          style={[styles.navigationButton, { opacity: currentIndex === Math.max(flashcards.length - 1, 0) ? 0.5 : 1 }]}
           disabled={currentIndex === flashcards.length - 1}
           onPress={handleNextCard}
         >
-          <AntDesign name="caretright" size={24} color={currentIndex === flashcards.length - 1 ? '#ccc' : '#333'} />
+          <Ionicons name="arrow-forward" size={24} color={currentIndex === Math.max(flashcards.length - 1, 0) ? '#ccc' : '#333'} />
+        </TouchableOpacity>
+        </View>
+
+        <TouchableOpacity style={styles.navigationButton} onPress={() => setShowSettingModal(true)}>
+          <Ionicons name="settings-outline" size={24} color="#333"/>
         </TouchableOpacity>
       </View>
+
       <Modal visible={isModalVisible} animationType="fade" transparent={true}>
         <View style={styles.modalContainerCard}>
           <View style={styles.modalContent}>
@@ -132,6 +256,7 @@ const Notecards = ({ navigation }) => {
                   value={frontText}
                   onChangeText={setFrontText}
                   multiline={true}
+                  maxHeight={140}
                 />
                 <TextInput
                   style={styles.modalInput}
@@ -140,6 +265,7 @@ const Notecards = ({ navigation }) => {
                   value={backText}
                   onChangeText={setBackText}
                   multiline={true}
+                  maxHeight={140}
                 />
             <View style={styles.buttonContainer}>
               <TouchableOpacity style={styles.cancelButton} onPress={cancelCreate}>
@@ -152,21 +278,57 @@ const Notecards = ({ navigation }) => {
           </View>
         </View>
       </Modal>
+
       <Modal
-        visible={showModal}
+        visible={showSettingModal}
         animationType="fade"
         transparent={true}>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            <View style={styles.labelContainer}>
-              <AntDesign name="exclamationcircle" style={styles.warningIcon} />
-              <Text style={styles.label}>Confirm to delete all notecards</Text>
+            <View style={styles.toggleContainer}>
+               <Text style={styles.modalTitle2}>Options</Text>
             </View>
+            <View style={styles.toggleContainer}>
+              <Text style={styles.label1}>Shuffle your notecards</Text>
+              <Switch
+                value={shuffleToggle}
+                onValueChange={(value) => setShuffleToggle(value)}
+                style={styles.toggleSwitch}
+              />
+            </View>
+
+            <View style={styles.toggleContainer}>
+              <Text style={styles.label2}>Delete all notecards</Text>
+              <Switch
+                value={deleteToggle}
+                onValueChange={(value) => setDeleteToggle(value)}
+                style={styles.toggleSwitch}
+              />
+            </View>
+                        
             <View style={styles.buttonContainer}>
-              <TouchableOpacity style={styles.cancelButton} onPress={() => setshowModal(false)}>
+              <TouchableOpacity
+                style={styles.cancelButton}
+                onPress={() => {
+                  setShuffleToggle(false)
+                  setDeleteToggle(false)
+                  setShowSettingModal(false)}}>
                 <Text style={styles.buttonText}>Cancel</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.confirmButton} onPress={reset}>
+
+              <TouchableOpacity
+                style={styles.confirmButton}
+                onPress={() => {
+                  if (shuffleToggle) {
+                    shuffleCards();
+                  }
+                  if (deleteToggle) {
+                    reset();
+                  }
+                  setShuffleToggle(false)
+                  setDeleteToggle(false)
+                  setShowSettingModal(false);
+                }}>
                 <Text style={styles.buttonText}>Confirm</Text>
               </TouchableOpacity>
             </View>
@@ -196,13 +358,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   card: {
-    width: 300,
+    width: 340,
     height: 200,
     borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#8A2BE2',
   },
+  
   frontCard: {
     backgroundColor: '#8A2BE2',
   },
@@ -248,7 +411,10 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     color: '#fff',
-    marginLeft: 20,
+  },
+  indexText: {
+    fontSize: 18,
+    marginTop: 5,
   },
   modalContainer: {
     flex: 1,
@@ -260,7 +426,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: -300, // Adjust the value as needed
+    marginTop: -300, 
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   
@@ -292,6 +458,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     paddingHorizontal: 10,
+    marginTop: 10,
   },
   cancelButton: {
     backgroundColor: '#999',
@@ -330,16 +497,34 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: 20,
   },
-  warningIcon: {
-    marginRight: 10,
-    fontSize: 24,
-    color: '#FF0000',
-  },
-  label: {
+  label1: {
     fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333333',
+    color: '#000000',
+    marginRight: 38,
+  },
+  label2: {
+    fontSize: 16,
+    color: '#FF0000',
+    marginRight: 58,
   },  
+  modalTitle2: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    marginBottom: 5,
+  },
+  toggleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  toggleSwitch: {
+    marginRight: 10,
+  },
+  deleteButton: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+  },
 });
 
 export default Notecards;
