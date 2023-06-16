@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 
+
 const Stopwatch = () => {
   const [time, setTime] = useState('0s 00');
   const [isRunning, setIsRunning] = useState(false);
@@ -57,11 +58,13 @@ const Stopwatch = () => {
     }
   };
 
+
   const handleReset = () => {
     setIsRunning(false);
     setElapsedTime(0);
     setTime('0s 00');
   };
+
 
   useEffect(() => {
     setTime(calculateTime());

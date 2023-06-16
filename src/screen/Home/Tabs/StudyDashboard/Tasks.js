@@ -11,6 +11,7 @@ import {
   Keyboard,
 } from 'react-native';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AntDesign } from '@expo/vector-icons';
 
 const Tasks = ({ navigation }) => {
@@ -31,6 +32,34 @@ const Tasks = ({ navigation }) => {
       clearInterval(interval); 
     };
   }, []);
+
+  useEffect(() => {
+    const loadTasks = async () => {
+      try {
+        const savedTasks = await AsyncStorage.getItem('tasks');
+        if (savedTasks) {
+          setTasks(JSON.parse(savedTasks));
+        }
+      } catch (error) {
+        console.log('Error loading tasks:', error);
+      }
+    };
+  
+    loadTasks();
+  }, []);
+  
+  useEffect(() => {
+    const saveTasks = async () => {
+      try {
+        await AsyncStorage.setItem('tasks', JSON.stringify(tasks));
+      } catch (error) {
+        console.log('Error saving tasks:', error);
+      }
+    };
+  
+    saveTasks();
+  }, [tasks]);
+  
 
   const showDatepicker = () => {
     setShowDatePicker(true);
