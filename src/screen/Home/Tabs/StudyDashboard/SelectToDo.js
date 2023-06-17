@@ -274,11 +274,12 @@ const SelectToDo = ({ navigation, route }) => {
             </View>
         </Modal>
 
+        {/* for loading */}
         <Modal 
         visible={showText} 
         transparent 
         animationType='fade'>
-            <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.5)'}}>
+            <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.4)'}}>
                 <Animated.Text style={{
                     opacity,
                     transform: [{ translateY }],
@@ -300,6 +301,7 @@ const styles = StyleSheet.create({
   },
   backButton: {
     marginRight: 10,
+    bottom: 10
   },
   back: {
     fontSize: 35,
@@ -497,29 +499,30 @@ const styles = StyleSheet.create({
   finish: {
     fontSize: 20,
     color: "white",
-    fontWeight: 'bold'
+    fontWeight: 'bold',
+    bottom: 10
   },
   dots: {
     position: "absolute",
     flexDirection: "row",
     alignItems: 'center',
-    top: 60,
-    left: 190
-},
-dot1: {
+    top: 55,
+    left: 175
+  },
+  dot1: {
     width: 10,
     height: 10,
     borderRadius: 5,
     backgroundColor: 'gray',
     right: 5
-},
-dot2: {
+  },
+  dot2: {
     width: 10,
     height: 10,
     borderRadius: 5,
     backgroundColor: 'orange',
     left: 5
-},
+  },
 });
 
 

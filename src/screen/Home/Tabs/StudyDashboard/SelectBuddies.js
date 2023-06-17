@@ -377,7 +377,6 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: '#FFF',
         right: 30,
-        bottom: 0
     },
     flatListContainer: {
         height: "100%",
@@ -422,11 +421,11 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
     },
     backButton: {
-       bottom: 25,
+       bottom: 28,
        right: 55
     },
     nextButton: {
-        bottom: 25,
+        bottom: 28,
         left: 220
      },
     search: {
@@ -670,7 +669,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
     },
     interestsModal: {
-        top: 190,
+        top: 200,
         left: 50,
         position: 'absolute'
     },
@@ -679,7 +678,7 @@ const styles = StyleSheet.create({
         height: 300
     },
     genderModal: {
-        top: 190,
+        top: 200,
         left: 210,
         position: 'absolute'
     },
@@ -704,7 +703,7 @@ const styles = StyleSheet.create({
         position: "absolute",
         flexDirection: "row",
         alignItems: 'center',
-        top: 60,
+        top: 55,
     },
     dot1: {
         width: 10,
