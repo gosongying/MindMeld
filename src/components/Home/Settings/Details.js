@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { TouchableOpacity, StyleSheet, View, Text, Image, Alert, TextInput } from 'react-native';
+import { TouchableOpacity, StyleSheet, View, Text, Image, Alert, TextInput, TouchableWithoutFeedback } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { auth, database, storage } from '../../../../firebase';
 import { onValue, ref as databaseRef, get, remove, runTransaction, update } from 'firebase/database';
@@ -233,6 +233,11 @@ const Details = ({ navigation }) => {
   };
 
   return (
+    //for cancel changing username
+    <TouchableWithoutFeedback  onPress={() => {
+      setIsEditingUsername(false);
+      setNewUsername(oldUsername);
+    }}>
       <View style={styles.container}>
         <View style={styles.outerPhotoContainer}>
           <View style={styles.photoContainer}>
@@ -302,6 +307,7 @@ const Details = ({ navigation }) => {
           )}
         </View>
       </View>
+    </TouchableWithoutFeedback>
   );
 };
 

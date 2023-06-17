@@ -6,6 +6,8 @@ import {
   SafeAreaView,
   TextInput,
   View,
+  Keyboard,
+  Alert
 } from 'react-native';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { auth } from '../../../../../firebase';
@@ -21,6 +23,8 @@ const CreateStudySession = ({ navigation }) => {
   const [isEndTimePickerVisible, setEndTimePickerVisibility] = useState(false);
   const [startTime, setStartTime] = useState(null);
   const [endTime, setEndTime] = useState(null);
+  const [sessionName, setSessionName] = useState('');
+  const [sessionDescription, setSessionDescription] = useState('');
 
   const goToHome = () => navigation.navigate('StudyDashboard');
 
@@ -98,6 +102,44 @@ const CreateStudySession = ({ navigation }) => {
 
   const minimumDate = new Date(new Date().getTime() + 60000); 
 
+  const createStudySession = () => {
+    if (!sessionName) {
+      Alert.alert('Session Name cannot be empty');
+      return;
+    } else if (!selectedDate) {
+      Alert.alert("Please select date");
+      return;
+    } else if (!startTime) {
+      Alert.alert("Please select start time");
+      return;
+    } else if (!endTime) {
+      Alert.alert("Please select end time");
+    } else {
+      if (isAnonymous) {
+        //anonymous user does not have study buddy feature
+        navigation.navigate('SelectToDo', {
+          sessionName, 
+          sessionType, 
+          sessionDescription,
+          studyModeEnabled,
+          selectedDate: selectedDate.toDateString(),
+          startTime: startTime.toLocaleTimeString(),
+          endTime: endTime.toLocaleTimeString()
+        })
+      } else {
+        navigation.navigate('SelectBuddies', {
+          sessionName, 
+          sessionType, 
+          sessionDescription,
+          studyModeEnabled,
+          selectedDate: selectedDate.toDateString(),
+          startTime: startTime.toLocaleTimeString(),
+          endTime: endTime.toLocaleTimeString()
+        });
+      }
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <TouchableOpacity style={styles.backButton} onPress={goToHome}>
@@ -105,9 +147,31 @@ const CreateStudySession = ({ navigation }) => {
       </TouchableOpacity>
       <Text style={styles.heading}>Create Study Session</Text>
       <Text style={styles.subheading}>Session Name</Text>
-      <TextInput style={styles.input} placeholder="Enter session name" autoCapitalize='none'/>
+      <TextInput 
+      style={styles.input1} 
+      placeholder="Enter session name"
+      autoCapitalize='none'
+      autoCorrect={false}
+      clearButtonMode='while-editing'
+      value={sessionName}
+      onChangeText={(text) => setSessionName(text)}/>
       <Text style={styles.subheading}>Session Type</Text>
       {renderSessionTypeButtons()}
+
+      <View>
+        <Text style={styles.subheading}>Session Description</Text>
+        <TextInput 
+        value={sessionDescription}
+        onChangeText={(text) => setSessionDescription(text)}
+        style={styles.input2} 
+        multiline
+        placeholder='Description'
+        autoCapitalize='none'
+        autoCorrect={false}
+        blurOnSubmit
+        clearButtonMode='while-editing'
+        />
+      </View>
 
       <View style={styles.checkboxContainer}>
         <Text style={styles.checkboxLabel}>Enable Study Mode</Text>
@@ -141,8 +205,8 @@ const CreateStudySession = ({ navigation }) => {
             </Text>
         </TouchableOpacity>
       </View>
-      <TouchableOpacity style={styles.createButton}>
-        <Text style={styles.createButtonText}>Create Session</Text>
+      <TouchableOpacity style={styles.createButton} onPress={createStudySession}>
+        <Text style={styles.createButtonText}>Create Study Session</Text>
       </TouchableOpacity>
       <DateTimePickerModal
         isVisible={isDatePickerVisible}
@@ -178,11 +242,11 @@ const styles = StyleSheet.create({
    // paddingTop: 20,
     marginHorizontal: 10,
     marginVertical: 10,
-    top: 70
+    top: 40
   },
   backButton: {
     position: 'absolute',
-    top: -35,
+    top: -15,
     left: 10,
     zIndex: 1,
   },
@@ -220,12 +284,23 @@ const styles = StyleSheet.create({
   activeButton: {
     backgroundColor: '#DC582A',
   },
-  input: {
+  input1: {
     borderWidth: 1,
     borderColor: '#CCCCCC',
     borderRadius: 10,
     padding: 10,
     marginBottom: 20,
+  },
+  input2: {
+    fontSize: 15,
+    borderWidth: 1,
+    borderColor: '#CCCCCC',
+    borderRadius: 10,
+    marginBottom: 30,
+    height: 130,
+    width: "100%",
+    textAlign: 'left',
+    paddingHorizontal: 10,
   },
   calendarButton: {
     backgroundColor: '#DCDCDC',
@@ -267,10 +342,11 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 10,
     alignItems: 'center',
-    top: 20
+    width: "90%",
+    alignSelf: 'center'
   },
   createButtonText: {
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: 'bold',
     color: 'white',
   },
@@ -280,7 +356,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   checkboxLabel: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: 'bold',
     marginRight: 10,
   },
@@ -288,7 +364,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: 'bold',
     position: 'absolute',
-    left: 160
+    left: 170
   },
   checkbox: {
     width: 20,
