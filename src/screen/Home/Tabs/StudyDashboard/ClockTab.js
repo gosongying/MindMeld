@@ -29,8 +29,8 @@ const Tabs = () => {
         },
       })}
     >
-      <Tab.Screen name="Timer" component={Timer} />
-      <Tab.Screen name="Stopwatch" component={Stopwatch} />
+      <Tab.Screen name="Timer" component={Timer} key={1}/>
+      <Tab.Screen name="Stopwatch" component={Stopwatch} key={2}/>
     </Tab.Navigator>
   );
 };

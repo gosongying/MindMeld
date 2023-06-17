@@ -11,6 +11,8 @@ import Clock from './StudyDashboard/Clock';
 import Notecards from './StudyDashboard/Notecards';
 import Notes from './StudyDashboard/Notes';
 import Dictionary from './StudyDashboard/Dictionary';
+import SelectBuddies from './StudyDashboard/SelectBuddies';
+import SelectToDo from './StudyDashboard/SelectToDo';
 
 
 const StudyDashboardTab = () => {
@@ -28,6 +30,8 @@ const StudyDashboardTab = () => {
         <Stack.Screen name="Dictionary" component={Dictionary} />
         <Stack.Screen name="Clock" component={Clock} />
         <Stack.Screen name="Notes" component={Notes} />
+        <Stack.Screen name="SelectBuddies" component={SelectBuddies} />
+        <Stack.Screen name="SelectToDo" component={SelectToDo} />
       </Stack.Navigator>
     </NavigationContainer>
    );

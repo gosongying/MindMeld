@@ -29,6 +29,8 @@
     "react-native-clock-analog": "^0.0.3",
     "react-native-date-picker": "^4.2.13",
     "react-native-dotenv": "^3.4.8",
+    "react-native-dropdown-picker": "^5.4.6",
+    "react-native-dropdown-select-list": "^2.0.4",
     "react-native-image-crop-picker": "^0.40.0",
     "react-native-image-picker": "^5.4.0",
     "react-native-leaderboard": "^1.0.6",
@@ -43,6 +45,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
+    "nodemon": "^2.0.22",
     "prettier": "2.8.8"
   },
   "private": true

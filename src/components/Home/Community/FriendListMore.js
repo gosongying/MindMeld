@@ -8,8 +8,6 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { AntDesign } from '@expo/vector-icons';
 
 const FriendListmore = ({navigation, route}) => {
-
-    console.log('friendlistmore')
     const currentUser = auth.currentUser;
 
     const [username, setUsername] = useState('');
