@@ -6,6 +6,7 @@ import StudyDashboardTab from './Tabs/StudyDashboardTab';
 import StudyCommunityTab from './Tabs/StudyCommunityTab';
 import AchievementTab from './Tabs/AchievementTab';
 import SettingTab from './Tabs/SettingTab';
+import StudySessionTab from './Tabs/StudySessionTab';
 import { update, ref, onDisconnect, serverTimestamp, goOnline, onValue, increment, runTransaction } from 'firebase/database';
 import { database, auth } from '../../../firebase';
 
@@ -47,6 +48,8 @@ const HomePage = () => {
               iconName = focused ? 'trophy' : 'trophy-outline';
             } else if (route.name === 'SettingTab') {
               iconName = focused ? 'menu' : 'menu-outline';
+            } else if (route.name === 'StudySessionTab') {
+              iconName = focused ? 'easel' : 'easel-outline'
             }
   
             return <Ionicons name={iconName} size={size} color={color} />;
@@ -64,6 +67,7 @@ const HomePage = () => {
           },
         })}>
         <Tab.Screen name={'StudyDashboardTab'} component={StudyDashboardTab} options={{ tabBarLabel: 'Study', headerShown: false }} />
+        <Tab.Screen name={'StudySessionTab'} component={StudySessionTab} options={{ tabBarLabel: 'Session', headerShown: false }} />
         {!isAnonymous && <Tab.Screen name={'StudyCommunityTab'} component={StudyCommunityTab} options={{ tabBarLabel: 'Community', headerShown: false }} />}
         {!isAnonymous && <Tab.Screen name={'AchievementsTab'} component={AchievementTab} options={{ tabBarLabel: 'Achievement', headerShown: false }} />}
         <Tab.Screen name={'SettingTab'} component={SettingTab} options={{ tabBarLabel: 'Setting' ,headerShown: false }} />

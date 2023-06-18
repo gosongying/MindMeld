@@ -16,11 +16,6 @@ const StudyCommunity = ({navigation}) => {
     },
     {
       id: '2',
-      title: 'Groups',
-      component: Groups,
-    },
-    {
-      id: '3',
       title: 'FriendList',
       component: FriendList,
     },

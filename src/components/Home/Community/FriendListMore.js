@@ -359,6 +359,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'thistle',
         alignItems: 'center',
         justifyContent: 'center',
+        borderRadius: 20
     },
     headerText: {
         fontSize: 24,

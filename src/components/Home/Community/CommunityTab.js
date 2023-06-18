@@ -36,7 +36,6 @@ const CommunityTabs = () => {
         tabBarInactiveTintColor: '#000000',
       }}
     >
-      <Tab.Screen name="Feed" component={CommunityFeed} />
       <Tab.Screen name="Sessions" component={Sessions} />
       <Tab.Screen name="Forums" component={Forums} />
     </Tab.Navigator>

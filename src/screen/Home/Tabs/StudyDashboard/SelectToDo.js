@@ -14,7 +14,7 @@ import {
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { AntDesign } from '@expo/vector-icons';
 import { auth, database } from '../../../../../firebase';
-import { ref, set, push, child } from 'firebase/database';
+import { ref, set, push, child, runTransaction } from 'firebase/database';
 
 const SelectToDo = ({ navigation, route }) => {
   const [tasks, setTasks] = useState([]);
@@ -123,12 +123,35 @@ const SelectToDo = ({ navigation, route }) => {
   };
 
   const createSession = () => {
+    const currentUser = auth.currentUser;
     const sessionRef = ref(database, 'sessions/');
     const newSessionKey = push(sessionRef).key;
     console.log(newSessionKey);
+    const invitationList = route.params.buddiesInvited
+    console.log(invitationList)
+    invitationList.forEach(id => {
+      const userRef = ref(database, 'userId/' + id);
+      runTransaction(userRef, (profile) => {
+        if (profile) {
+          if (profile.invitationList) {
+            profile.invitationList.push(newSessionKey);
+            return profile;
+          } else {
+            profile.invitationList = [newSessionKey];
+            return profile;
+          }
+        } else {
+          return profile;
+        }
+      });
+    });
+    delete route.params.buddiesInvited;
     set(child(sessionRef, newSessionKey), {
         ...route.params,
         tasks,
+        participants: [{username: currentUser.displayName, uid: currentUser.uid}],
+        host: {username: currentUser.displayName, uid: currentUser.uid},
+        id: newSessionKey
     })
     .then(() => {
         goToHome();
