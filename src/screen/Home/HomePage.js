@@ -64,7 +64,7 @@ const HomePage = () => {
           },
         })}>
         <Tab.Screen name={'StudyDashboardTab'} component={StudyDashboardTab} options={{ tabBarLabel: 'Study', headerShown: false }} />
-        {!isAnonymous && <Tab.Screen name={'StudyCommunityTab'} component={StudyCommunityTab} options={{ tabBarLabel: 'Community', headerShown: false }} />}
+        {!isAnonymous && <Tab.Screen name={'StudyCommunityTab'} component={StudyCommunityTab} options={{ tabBarLabel: 'Feeds', headerShown: false }} />}
         {!isAnonymous && <Tab.Screen name={'AchievementsTab'} component={AchievementTab} options={{ tabBarLabel: 'Achievement', headerShown: false }} />}
         <Tab.Screen name={'SettingTab'} component={SettingTab} options={{ tabBarLabel: 'Setting' ,headerShown: false }} />
       </Tab.Navigator>
