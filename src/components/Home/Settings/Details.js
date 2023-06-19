@@ -320,10 +320,9 @@ const styles = StyleSheet.create({
     //height: 120
   },
   profile: {
-    height: 70,
-    width: 70,
+    height: 85,
+    width: 85,
     marginRight: 20,
-    left: 5
   },
   name: {
     fontSize: 26,
@@ -358,12 +357,13 @@ const styles = StyleSheet.create({
     marginLeft: 5,
   },
   photoContainer: {
-    borderRadius: 45,
+    borderRadius: 42.5,
     height: 85,
     width: 85,
     overflow: 'hidden',
     right: 10,
     justifyContent: 'center',
+    bottom: 5
   },
   nameAndEdit: {
     flexDirection: 'row',

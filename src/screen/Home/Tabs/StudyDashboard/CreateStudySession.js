@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   TouchableOpacity,
   StyleSheet,
@@ -25,6 +25,9 @@ const CreateStudySession = ({ navigation }) => {
   const [endTime, setEndTime] = useState(null);
   const [sessionName, setSessionName] = useState('');
   const [sessionDescription, setSessionDescription] = useState('');
+
+  const minimumDate = new Date(new Date().getTime() + 60000);
+  const minimumEnd = startTime? new Date(startTime.getTime() + 60000): new Date(minimumDate.getTime() + 60000);
 
   const goToHome = () => navigation.navigate('StudyDashboard');
 
@@ -59,6 +62,15 @@ const CreateStudySession = ({ navigation }) => {
   };
 
   const handleStartTimeConfirm = (time) => {
+    if (endTime) {
+      //if end time set already
+      if (time.getTime() >= endTime.getTime()) {
+        //if end time earlier than start time
+        Alert.alert("End time cannot be earlier than start time");
+        hideStartTimePicker();
+        return;
+      }
+    }
     setStartTime(time);
     hideStartTimePicker();
   };
@@ -100,8 +112,6 @@ const CreateStudySession = ({ navigation }) => {
     </View>
   );
 
-  const minimumDate = new Date(new Date().getTime() + 60000); 
-
   const createStudySession = () => {
     if (!sessionName) {
       Alert.alert('Session Name cannot be empty');
@@ -123,18 +133,30 @@ const CreateStudySession = ({ navigation }) => {
           sessionDescription,
           studyModeEnabled,
           selectedDate: selectedDate.toDateString(),
-          startTime: startTime.toLocaleTimeString(),
-          endTime: endTime.toLocaleTimeString()
-        })
-      } else {
+          startTime: {
+            string: startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), 
+            timestamp: selectedDate.setHours(startTime.getHours()).setMinutes(startTime.getMinutes()).setSeconds(startTime.getSeconds()).setMilliseconds(startTime.getMilliseconds())
+          },
+          endTime:  {
+            string: endTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            timestamp: selectedDate.setHours(endTime.getHours(), endTime.getMinutes(), endTime.getSeconds(), endTime.getMilliseconds())
+          }
+        });
+      } else { 
         navigation.navigate('SelectBuddies', {
           sessionName, 
           sessionType, 
           sessionDescription,
           studyModeEnabled,
           selectedDate: selectedDate.toDateString(),
-          startTime: startTime.toLocaleTimeString(),
-          endTime: endTime.toLocaleTimeString()
+          startTime: {
+            string: startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), 
+            timestamp: selectedDate.setHours(startTime.getHours(), startTime.getMinutes(), startTime.getSeconds(), startTime.getMilliseconds())
+          },
+          endTime:  {
+            string: endTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            timestamp: selectedDate.setHours(endTime.getHours(), endTime.getMinutes(), endTime.getSeconds(), endTime.getMilliseconds())
+          }
         });
       }
     }
@@ -218,7 +240,7 @@ const CreateStudySession = ({ navigation }) => {
       />
       <DateTimePickerModal
         isVisible={isStartTimePickerVisible}
-        mode="time"
+        mode='time'
         onConfirm={handleStartTimeConfirm}
         onCancel={hideStartTimePicker}
         textColor="#000000"
@@ -230,6 +252,7 @@ const CreateStudySession = ({ navigation }) => {
         onConfirm={handleEndTimeConfirm}
         onCancel={hideEndTimePicker}
         textColor="#000000"
+        minimumDate={minimumEnd}
       />
     </SafeAreaView>
   );

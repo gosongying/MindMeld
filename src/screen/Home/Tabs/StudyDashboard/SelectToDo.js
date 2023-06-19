@@ -126,9 +126,22 @@ const SelectToDo = ({ navigation, route }) => {
     const currentUser = auth.currentUser;
     const sessionRef = ref(database, 'sessions/');
     const newSessionKey = push(sessionRef).key;
-    console.log(newSessionKey);
     const invitationList = route.params.buddiesInvited
-    console.log(invitationList)
+    runTransaction(ref(database, 'userId/' + currentUser.uid), (profile) => {
+      if (profile) {
+        if (profile.upcomingSessions) {
+          //if the user has other upcoming sessions
+          profile.upcomingSessions.push(newSessionKey);
+          return profile;
+        } else {
+          //if the user does have any upcoming sessions so far
+          profile.upcomingSessions = [newSessionKey];
+          return profile;
+        }
+      } else {
+        return profile;
+      }
+    })
     invitationList.forEach(id => {
       const userRef = ref(database, 'userId/' + id);
       runTransaction(userRef, (profile) => {
