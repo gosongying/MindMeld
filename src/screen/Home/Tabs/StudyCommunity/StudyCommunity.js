@@ -3,27 +3,27 @@ import { View, Text, StyleSheet, FlatList, Alert } from 'react-native';
 import Groups from '../../../../components/Home/Community/Groups';
 import FriendList from '../../../../components/Home/Community/FriendList';
 import CommunityHeader from '../../../../components/Home/Community/CommunityHeader';
-import CommunityTab from '../../../../components/Home/Community/CommunityTab';
+import Feeds from '../../../../components/Home/Community/Feeds';
 
 const StudyCommunity = ({navigation}) => {
 
   //item to be shown
   const DATA = [
-    {
-      id: '1',
-      title: 'Tab',
-      component: CommunityTab,
-    },
-    {
-      id: '2',
-      title: 'Groups',
-      component: Groups,
-    },
-    {
-      id: '3',
-      title: 'FriendList',
-      component: FriendList,
-    },
+    // {
+    //   id: '1',
+    //   title: 'Tab',
+    //   component: Feeds,
+    // },
+    // {
+    //   id: '2',
+    //   title: 'Groups',
+    //   component: Groups,
+    // },
+    // {
+    //   id: '3',
+    //   title: 'FriendList',
+    //   component: FriendList,
+    // },
   ];
 
   const renderOption = ({ item }) => (
@@ -35,11 +35,12 @@ const StudyCommunity = ({navigation}) => {
   return (
     <View style={styles.container}>
       <CommunityHeader/>
-      <FlatList
+      {/* <FlatList
         data={DATA}
         renderItem={renderOption}
         keyExtractor={(item) => item.id}
-      />
+      /> */}
+      <Feeds navigation={navigation}/>
     </View>
   );
 };

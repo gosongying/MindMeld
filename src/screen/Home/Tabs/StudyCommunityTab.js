@@ -6,6 +6,9 @@ import { createStackNavigator } from '@react-navigation/stack';
 import StudyCommunity from './StudyCommunity/StudyCommunity';
 import FriendListMore from '../../../components/Home/Community/FriendListMore';
 import FriendList from '../../../components/Home/Community/FriendList';
+import ChatRoom from '../../../components/Home/Community/ChatRoom';
+import PostScreen from '../../../components/Home/Community/PostScreen';
+import Feeds from '../../../components/Home/Community/Feeds';
 
 
 const StudyCommunityTab = () => {
@@ -18,6 +21,8 @@ const StudyCommunityTab = () => {
         <Stack.Screen name="StudyCommunity" component={StudyCommunity} />
         <Stack.Screen name="FriendListMore" component={FriendListMore} />
         <Stack.Screen name="FriendList" component={FriendList}/>
+        <Stack.Screen name="ChatRoom" component={ChatRoom}/>
+        <Stack.Screen name="PostScreen" component={PostScreen}/>
       </Stack.Navigator>
     //</NavigationContainer>
    );

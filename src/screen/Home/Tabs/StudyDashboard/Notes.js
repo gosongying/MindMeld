@@ -106,7 +106,7 @@ const Notes = ({ navigation }) => {
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
               <View style={styles.labelContainer}>
-                <Text style={styles.label2}>To prevent the keyboard from appearing, swipe along the right side of the screen.</Text>
+                <Text style={styles.label2}>To prevent the keyboard from appearing, scroll along the right side of the screen.</Text>
               </View>
               <TouchableOpacity style={styles.confirmButton2} onPress={() => {setShowInfoPopup(false)}}>
                 <Text style={styles.buttonText}>I understand</Text>
