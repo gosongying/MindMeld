@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
-const CommunityHeader = () => {
+const FeedHeader = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Study Feeds</Text>
@@ -26,4 +26,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CommunityHeader;
+export default FeedHeader;
