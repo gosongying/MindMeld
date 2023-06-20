@@ -12,7 +12,7 @@ import {
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { auth } from '../../../../../firebase';
 
-const CreateStudySession = ({ navigation }) => {
+const CreateStudySession2 = ({ navigation }) => {
 
   const isAnonymous = auth.currentUser.isAnonymous;
   const [sessionType, setSessionType] = useState(isAnonymous? 'private': 'group');
@@ -29,7 +29,7 @@ const CreateStudySession = ({ navigation }) => {
   const minimumDate = new Date(new Date().getTime() + 60000);
   const minimumEnd = startTime? new Date(startTime.getTime() + 60000): new Date(minimumDate.getTime() + 60000);
 
-  const goToHome = () => navigation.navigate('StudyDashboard');
+  const goToHome = () => navigation.navigate('StudySession');
 
   const handleSessionTypeChange = (type) => {
     setSessionType(type);
@@ -403,4 +403,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CreateStudySession;
+export default CreateStudySession2;
