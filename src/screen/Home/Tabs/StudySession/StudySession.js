@@ -23,7 +23,8 @@ const StudySession = ({navigation}) => {
     const [sessionName, setSessionName] = useState('');
 
     const currentUser = auth.currentUser;
-    console.log(currentTimestamp)
+    const isAnonymous = currentUser.isAnonymous;
+    console.log(currentUser.uid);
 
     /*const checkExpired = () => {
         const currentTimestamp = new Date().getTime();
@@ -51,7 +52,7 @@ const StudySession = ({navigation}) => {
         const unsubscribe = onValue(ref(database, 'userId/' + currentUser.uid), async (snapshot) => {
             let sessions = [];
             let ended = [];
-            const sessionList = snapshot.val().upcomingSessions? snapshot.val().upcomingSessions: [];
+            const sessionList = snapshot.val()? (snapshot.val().upcomingSessions? snapshot.val().upcomingSessions: []): [];
             if (sessionList) {
                 await Promise.all(sessionList.map(async (id) => {
                     console.log(currentUser.displayName)
@@ -94,48 +95,51 @@ const StudySession = ({navigation}) => {
         }
     }, [currentTimestamp]);
 
-    useEffect(() => {
-        //to check if any invitation expired
-        //listen to the change of invitation list
-        //to get the latest invitation list
-        const unsubscribe = onValue(ref(database, 'userId/' + currentUser.uid), async (snapshot) => {
-            let invitation = [];
-            let expired = [];
-            const invitationList = snapshot.val().invitationList ? snapshot.val().invitationList : [];
-            if (invitationList) {
-                await Promise.all(invitationList.map(async (id) => {
-                    const sessionRef = ref(database, 'sessions/' + id);   
-                    await get(sessionRef)
-                    .then((session) => {
-                        if (session.val().endTime.timestamp - currentTimestamp < 300000) {
-                            expired.push(session.val().id);
-                        } else {
-                            invitation.push(session.val());
-                        }
+    if (!isAnonymous) {
+    
+        useEffect(() => {
+            //to check if any invitation expired
+            //listen to the change of invitation list
+            //to get the latest invitation list
+            const unsubscribe = onValue(ref(database, 'userId/' + currentUser.uid), async (snapshot) => {
+                let invitation = [];
+                let expired = [];
+                const invitationList = snapshot.val().invitationList ? snapshot.val().invitationList : [];
+                if (invitationList) {
+                    await Promise.all(invitationList.map(async (id) => {
+                        const sessionRef = ref(database, 'sessions/' + id);   
+                        await get(sessionRef)
+                        .then((session) => {
+                            if (session.val().endTime.timestamp - currentTimestamp < 300000) {
+                                expired.push(session.val().id);
+                            } else {
+                                invitation.push(session.val());
+                            }
+                        })
+                        .catch((error) => {
+                            console.log(error);
+                            Alert.alert("Error");
+                        });
+                        return;
+                    }));
+                    const newInvitationList = invitationList.filter((id) => !expired.includes(id));
+                    update(ref(database, 'userId/' + currentUser.uid), {
+                        invitationList: newInvitationList
                     })
-                    .catch((error) => {
-                        console.log(error);
-                        Alert.alert("Error");
+                    .then(() => {
+                        setInvitationIds(newInvitationList);
+                        setInvitationData(invitation);
                     });
-                    return;
-                }));
-                const newInvitationList = invitationList.filter((id) => !expired.includes(id));
-                update(ref(database, 'userId/' + currentUser.uid), {
-                    invitationList: newInvitationList
-                })
-                .then(() => {
-                    setInvitationIds(newInvitationList);
-                    setInvitationData(invitation);
-                });
-            } else {
-                setInvitationIds([]);
-                setInvitationData([]);
+                } else {
+                    setInvitationIds([]);
+                    setInvitationData([]);
+                }
+            });
+            return () => {
+                unsubscribe();
             }
-        });
-        return () => {
-            unsubscribe();
-        }
-    }, [currentTimestamp]);
+        }, [currentTimestamp]);
+    }
 
     const showJoin = () => {
         setJoin(true);
@@ -444,7 +448,8 @@ const SessionHeader = ({setIsCheckingInvitation, setSessionName}) => {
                 </TextInput>
                 <TouchableOpacity
                 style={styles.news}
-                onPress={() => setIsCheckingInvitation(true)}>
+                onPress={() => setIsCheckingInvitation(true)}
+                disabled={auth.currentUser.isAnonymous}>
                     <MaterialCommunityIcons 
                     name='bell-outline'
                     size={30}

@@ -239,6 +239,7 @@ const Details = ({ navigation }) => {
       setNewUsername(oldUsername);
     }}>
       <View style={styles.container}>
+        <View style={[styles.statusIndicator, isAnonymous && styles.anonymous]} />
         <View style={styles.outerPhotoContainer}>
           <View style={styles.photoContainer}>
             {image ? (
@@ -246,7 +247,6 @@ const Details = ({ navigation }) => {
             ) : (
               <Image source={require("../../../../assets/profileholder.png")} style={styles.profile}/> 
             )}      
-            <View style={styles.statusIndicator} />
             </View>
           {/* anonymous user cannot change profile picture */}
           {!isAnonymous && (
@@ -380,13 +380,24 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   statusIndicator: {
+    position: 'absolute',    
     backgroundColor: 'rgb(0, 200, 0)',
     width: 12,
     height: 12,
     borderRadius: 6,
-    bottom: 15,
+    bottom: 45,
     left: 63,
+    zIndex: 1
+  },
+  anonymous: {
     position: 'absolute',    
+    backgroundColor: 'rgb(0, 200, 0)',
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    bottom: 25,
+    left: 67,
+    zIndex: 1
   }
 });
 

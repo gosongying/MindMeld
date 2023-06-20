@@ -126,7 +126,7 @@ const SelectToDo = ({ navigation, route }) => {
     const currentUser = auth.currentUser;
     const sessionRef = ref(database, 'sessions/');
     const newSessionKey = push(sessionRef).key;
-    const invitationList = route.params.buddiesInvited
+    const invitationList = currentUser.isAnonymous? []: route.params.buddiesInvited
     runTransaction(ref(database, 'userId/' + currentUser.uid), (profile) => {
       if (profile) {
         if (profile.upcomingSessions) {

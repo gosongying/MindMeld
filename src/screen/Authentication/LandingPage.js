@@ -9,7 +9,8 @@ import {
 } from "react-native";
 import CarouselCard from "../../components/Authentication/CarouselCard";
 import { signInAnonymously, onAuthStateChanged, updateProfile } from "firebase/auth";
-import { auth } from "../../../firebase"
+import { auth, database } from "../../../firebase"
+import { set, ref } from "firebase/database";
 
 
 const LandingPage = ({navigation}) => {
@@ -35,6 +36,9 @@ const LandingPage = ({navigation}) => {
     signInAnonymously(auth)
     .then(() => {
       console.log("Anon");
+      set(ref(database, 'userId/' + auth.currentUser.uid), {
+        uid: auth.currentUser.uid
+      });
       updateProfile(auth.currentUser, {
         displayName: "Guest"
       }).then(() => navigation.replace("Home"))

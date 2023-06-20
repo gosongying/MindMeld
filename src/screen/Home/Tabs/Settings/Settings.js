@@ -4,7 +4,7 @@ import Details from '../../../../components/Home/Settings/Details';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { auth, database } from "../../../../../firebase"
-import { goOffline, update, ref, increment, runTransaction } from 'firebase/database';
+import { goOffline, update, ref, increment, runTransaction, remove } from 'firebase/database';
 
 const Settings = ({navigation}) => {
   const options = [
@@ -40,6 +40,8 @@ const Settings = ({navigation}) => {
               return profile;
             }
           });
+        } else {
+          remove(ref(database, 'userId/' + id));
         }
         navigation.replace("Landing");
       })
