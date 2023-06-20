@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { TouchableOpacity, StyleSheet, Text, SafeAreaView, View, KeyboardAvoidingView } from 'react-native';
-import AnalogClock from 'react-native-clock-analog';
+
 import TimeFeature from './ClockTab';
+import AnalogClock from '../../../../components/Home/Study/AnalogClock';
 
 const Clock = ({ navigation }) => {
   const [currentTime, setCurrentTime] = useState('');
@@ -45,6 +46,7 @@ const Clock = ({ navigation }) => {
 
       <View style={styles.clockContainer}> 
       <AnalogClock
+        key="analog-clock" // To remove console warning
         size={160}
         colorClock="#333333"
         colorCenter="#333333"

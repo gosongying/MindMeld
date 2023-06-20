@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, ScrollView, Keyboard, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, ScrollView, Keyboard, Dimensions, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
+
 
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/database';
@@ -61,7 +63,7 @@ const DynamicTimeText = ({ timestamp }) => {
 
     calculateTimeSinceCreation();
 
-    const interval = setInterval(calculateTimeSinceCreation, 60000); // Update every minute
+    const interval = setInterval(calculateTimeSinceCreation, 1000); // Update every second
 
     return () => clearInterval(interval);
   }, [timestamp]);
@@ -75,8 +77,20 @@ const Feeds = ( {navigation}) => {
   const [newPostContent, setNewPostContent] = useState('');
   const [posts, setPosts] = useState([]);
   const [searchText, setSearchText] = useState('');
-  const [searchTitle, setSearchTitle] = useState('');
   const [sortOrder, setSortOrder] = useState('newest'); 
+  const [selectedPost, setSelectedPost] = useState(null);
+  const [currentPostId, setCurrentPostId] = useState(null);
+  const [userAuthenticated, setUserAuthenticated] = useState(false);
+  const [editModalVisible, setEditModalVisible] = useState(false);
+  const [editedPostTitle, setEditedPostTitle] = useState('');
+  const [editedPostContent, setEditedPostContent] = useState('');
+
+  // Have not implemented Images
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [editedImage, setEditedImage] = useState(null);
+
+  
+
 
   // Function to toggle the sorting order
   const toggleSortOrder = () => {
@@ -117,10 +131,9 @@ const Feeds = ( {navigation}) => {
     navigation.navigate('PostScreen', { post });
   };
   
-  const createNewPost = () => {
+  const createNewPost = async => {
     const user = firebase.auth().currentUser;
-    const username = user ? user.displayName : 'Unknown User';
-
+    const username = user ? user.displayName : 'Anonymous User';
     // Create the post data object
     const postData = {
       title: newPostTitle,
@@ -136,15 +149,23 @@ const Feeds = ( {navigation}) => {
     const newPostRef = database.ref(`posts`).push(postData);
     const postId = newPostRef.key;
     newPostRef.set(postData)
-  
-      // Close the modal and reset the input values
-      setShowModal(false);
-      setNewPostTitle('');
-      setNewPostContent('');
+
+    // Close the modal and reset the input values
+    setShowModal(false);
+    setNewPostTitle('');
+    setNewPostContent('');
   };
 
   
   useEffect(() => {
+    // Check the user authentication status
+    firebase.auth().onAuthStateChanged((user) => {
+        if (user) {
+        setUserAuthenticated(true);
+        } else {
+        setUserAuthenticated(false);
+        }
+    });
     // Fetch the posts from the database on component mount
     database.ref('posts').on('value', (snapshot) => {
       const data = snapshot.val();
@@ -172,59 +193,143 @@ const Feeds = ( {navigation}) => {
     }
   }, [showModal]);
 
-  const limitTextToFourLines = (text) => {
-    const lines = text.split('\n');
-    return lines.slice(0, 4).join('\n');
-  };
-
-  const likePost = (postId) => {
-    const postRef = database.ref(`posts/${postId}`);
+//   const likePost = (postId) => {
+//     const postRef = database.ref(`posts/${postId}`);
 
 
-    postRef.transaction((post) => {
-      if (post) {
-        if (post.isLiked) {
-          post.likes -= 1;
-          post.isLiked = false;
-        }
-        else if (!post.likes) {
-          post.likes = 1;
-          post.isLiked = true;
-        } else {
-          post.likes += 1;
-          post.isLiked = true;
-        }
-        post.aggregateScore = (post.likes || 0) - (post.dislikes || 0);
-      }
+//     postRef.transaction((post) => {
+//       if (post) {
+//         if (post.isLiked) {
+//           post.likes -= 1;
+//           post.isLiked = false;
+//         }
+//         else if (!post.likes) {
+//           post.likes = 1;
+//           post.isLiked = true;
+//         } else {
+//           post.likes += 1;
+//           post.isLiked = true;
+//         }
+//         post.aggregateScore = (post.likes || 0) - (post.dislikes || 0);
+//       }
       
-      return post;
-    });
+//       return post;
+//     });
+//   };
+  
+//   const dislikePost = (postId) => {
+//     const postRef = database.ref(`posts/${postId}`);
+  
+//     postRef.transaction((post) => {
+//       if (post) {
+//         if (post.isDisliked) {
+//           post.dislikes -= 1
+//           post.isDisliked = false;
+//         }
+//         else if (!post.dislikes) {
+//           post.dislikes = 1;
+//           post.isDisliked = true;
+//         } else {
+//           post.dislikes += 1;
+//           post.isDisliked = true;
+//         }
+//         post.aggregateScore = (post.likes || 0) - (post.dislikes || 0);
+//       }
+      
+//       return post;
+//     });
+//   };
+
+const closePost = (postId) => {
+    Alert.alert(
+      'Confirmation',
+      'The post cannot be opened again after closed.',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Confirm',
+          style: 'destructive',
+          onPress: () => {
+            const postRef = database.ref(`posts/${postId}`);
+            postRef.update({
+              isClosed: true,
+            });
+          },
+        },
+      ],
+      { cancelable: false }
+    );
   };
   
-  const dislikePost = (postId) => {
-    const postRef = database.ref(`posts/${postId}`);
-  
-    postRef.transaction((post) => {
-      if (post) {
-        if (post.isDisliked) {
-          post.dislikes -= 1
-          post.isDisliked = false;
-        }
-        else if (!post.dislikes) {
-          post.dislikes = 1;
-          post.isDisliked = true;
-        } else {
-          post.dislikes += 1;
-          post.isDisliked = true;
-        }
-        post.aggregateScore = (post.likes || 0) - (post.dislikes || 0);
-      }
-      
-      return post;
-    });
+    
+  const openPost = () => {
+    Alert.alert(
+      'Error',
+      'Closed post cannot be opened.',
+    );
   };
+  
+  
   
   const screenWidth = Dimensions.get('window').width;
+
+  const deletePost = (postId) => {
+    Alert.alert(
+      'Confirmation',
+      'Are you sure you want to delete this post?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: () => {
+            database.ref(`posts/${postId}`).remove();
+          },
+        },
+      ]
+    );
+  };
+
+  const editPost = () => {
+    const postRef = database.ref(`posts/${currentPostId}`);
+    postRef.update({
+      title: editedPostTitle,
+      content: editedPostContent,
+    });
+  
+    setEditModalVisible(false);
+    setEditedPostTitle('');
+    setEditedPostContent('');
+    setCurrentPostId(null);
+  };
+  
+
+  const openEditModal = (post) => {
+    setCurrentPostId(post.id);
+    setEditedPostTitle(post.title);
+    setEditedPostContent(post.content);
+    setEditModalVisible(true);
+  };
+
+  const closeEditModal = () => {
+    setEditModalVisible(false);
+    setEditedPostTitle('');
+    setEditedPostContent('');
+  };
+
+  const handleCancelCreate = () => {
+    setShowModal(false)
+    setNewPostTitle('')
+    setNewPostContent('')
+    }
+
+
 
   return (
     <View style={styles.container}>
@@ -253,19 +358,75 @@ const Feeds = ( {navigation}) => {
           >
 
             <View style={{ flexDirection: 'row' }}>
-              <View style={{ maxWidth: screenWidth * 0.7 }}>
-                <Text style={styles.forumTitle}>{post.title}</Text>
+              <View style={{ maxWidth: screenWidth * 0.65 }}>
+                <Text numberOfLines={2} style={styles.forumTitle}>{post.title}</Text>
               </View>
-              <View style={{ flex: 1, alignItems: 'flex-end', marginBottom: 10, }}>
-                <Text>{post.author}</Text>
+
+              <View style={{ 
+                 flex: 1,
+                 alignItems: 'flex-end',
+                 marginTop: -8,
+                 marginBottom: 10}}>
+                
+                <View>
+                {/* Lock, Edit and Delete Pressables */}
+
+                {userAuthenticated && post.author === firebase.auth().currentUser?.displayName && (
+                <View style={styles.postButtons}>
+                    {post.isClosed ? (
+                    <TouchableOpacity
+                        style={styles.openButton}
+                        onPress={() => openPost(post.id)}
+                    >
+                        <Ionicons name="lock-closed-outline" size={22} color="red" />
+                    </TouchableOpacity>
+                    ) : (
+                    <TouchableOpacity
+                        style={styles.closeButton}
+                        onPress={() => closePost(post.id)}
+                    >
+                        <Ionicons name="lock-open-outline" size={22} color="green" />
+                    </TouchableOpacity>
+                    )}
+
+                    <TouchableOpacity
+                    style={styles.editButton}
+                    onPress={() => {
+                        if (post.isClosed) {
+                        Alert.alert("Error", "You cannot edit a closed post.");
+                        } else {
+                        openEditModal(post);
+                        }
+                    }}
+                    >
+                    <Ionicons name="pencil" size={22} color="#8A2BE2" />
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                    style={styles.deleteButton}
+                    onPress={() => deletePost(post.id)}
+                    >
+                    <Ionicons name="trash" size={22} color="red" />
+                    </TouchableOpacity>
+                </View>
+                )}
+
+
+                {/* <Text style={{marginLeft: 10, marginTop: 5}}>{post.author}</Text> */}
+                </View>
               </View>
             </View>
 
-            <Text numberOfLines={4} style={styles.forumContent}>{limitTextToFourLines(post.content)}</Text>
+ 
+            <Text numberOfLines={4} style={styles.forumContent}>{post.content}</Text>
 
             <View style={styles.postFooter}>
               <View style={styles.postMetrics}>
-                <View style={styles.itemContainer}>   
+
+                <Text>{post.isClosed ? 'Closed' : 'Open'}</Text>
+
+
+                {/* <View style={styles.itemContainer}>   
                   <TouchableOpacity
                     onPress={() => likePost(post.id)}
                     style={styles.likeButton}
@@ -281,7 +442,7 @@ const Feeds = ( {navigation}) => {
                   >
                     <Ionicons name="arrow-down" size={24} color={post.isDisliked ? 'red' : "#888"} />
                   </TouchableOpacity>
-                </View>
+                </View> */}
               
               <View style={{marginLeft: 85}}> 
                 <View style={styles.commentsCount}>
@@ -300,18 +461,16 @@ const Feeds = ( {navigation}) => {
         ))}
       </ScrollView>
 
-      <Modal visible={showModal} animationType="fade">
+      <Modal visible={showModal} animationType="fade" transparent={true}>
         <View style={styles.modalContainer}>
           <View style={{flexDirection:'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 15}}>
-            <TouchableOpacity onPress={() => setShowModal(false)}>
+            <TouchableOpacity onPress={() => handleCancelCreate()}>
               <Ionicons name='close-outline' size={32} color ='#000000'/>
             </TouchableOpacity>
             <TouchableOpacity onPress={createNewPost}  disabled={newPostTitle.trim().length === 0}>
               <Text style={[styles.createButtonText, { opacity: newPostTitle.trim().length === 0 ? 0.3 : 1 }]}>Create Feed</Text>
             </TouchableOpacity>
           </View>
-
-
           <TextInput
             ref={titleInputRef}
             value={newPostTitle}
@@ -323,6 +482,36 @@ const Feeds = ( {navigation}) => {
           <TextInput
             value={newPostContent}
             onChangeText={setNewPostContent}
+            placeholder="body text (optional)"
+            placeholderTextColor="#888888"
+            style={[styles.input2, styles.contentInput]}
+            multiline
+            textAlignVertical="top"
+          />
+        </View>
+      </Modal>
+
+      <Modal visible={editModalVisible && currentPostId !== null} animationType="fade">
+        <View style={styles.modalContainer}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 15 }}>
+            <TouchableOpacity onPress={closeEditModal}>
+              <Ionicons name='close-outline' size={32} color='#000000' />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={editPost} disabled={editedPostTitle.trim().length === 0}>
+              <Text style={[styles.createButtonText, { opacity: editedPostTitle.trim().length === 0 ? 0.3 : 1 }]}>Edit Post</Text>
+            </TouchableOpacity>
+          </View>
+
+          <TextInput
+            value={editedPostTitle}
+            onChangeText={setEditedPostTitle}
+            placeholder="Title"
+            placeholderTextColor="#888888"
+            style={[styles.input1, {maxWidth: '100%'}]}
+          />
+          <TextInput
+            value={editedPostContent}
+            onChangeText={setEditedPostContent}
             placeholder="body text (optional)"
             placeholderTextColor="#888888"
             style={[styles.input2, styles.contentInput]}
@@ -375,9 +564,8 @@ const styles = StyleSheet.create({
   modalContainer: {
     backgroundColor: '#fff',
     padding: 20,
-    marginTop: 20,
+    paddingVertical: 40,
     borderRadius: 8,
-
   },
   modalTitle: {
     fontSize: 24,
@@ -442,19 +630,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginRight: 20,
   },
-  likeButton: {
-    marginRight: 5,
-  },
-  dislikeButton: {
-    marginRight: 10,
-    marginLeft: -5,
-  },
-  aggregateScore: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginRight: 10,
-    marginTop: 3,
-  },
   commentsCount: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -475,6 +650,14 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     marginBottom: 10,
     width: 260
+  },
+  postButtons: {
+    flexDirection: 'row',
+    marginTop: 3,
+  },
+  editButton: {
+    marginRight: 5,
+    marginLeft: 8,
   },
 });
 
