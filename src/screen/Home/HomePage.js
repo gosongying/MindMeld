@@ -3,7 +3,7 @@ import { Pressable, Text } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import StudyDashboardTab from './Tabs/StudyDashboardTab';
-import StudyCommunityTab from './Tabs/StudyCommunityTab';
+import StudyFeedsTab from './Tabs/StudyFeedsTab';
 import AchievementTab from './Tabs/AchievementTab';
 import SettingTab from './Tabs/SettingTab';
 import StudySessionTab from './Tabs/StudySessionTab';
@@ -42,7 +42,7 @@ const HomePage = () => {
   
             if (route.name === 'StudyDashboardTab') {
               iconName = focused ? 'book' : 'book-outline';
-            } else if (route.name === 'StudyCommunityTab') {
+            } else if (route.name === 'StudyFeedsTab') {
               iconName = focused ? 'people' : 'people-outline';
             } else if (route.name === 'AchievementsTab') {
               iconName = focused ? 'trophy' : 'trophy-outline';
@@ -68,7 +68,7 @@ const HomePage = () => {
         })}>
         <Tab.Screen name={'StudyDashboardTab'} component={StudyDashboardTab} options={{ tabBarLabel: 'Study', headerShown: false }} />
         <Tab.Screen name={'StudySessionTab'} component={StudySessionTab} options={{ tabBarLabel: 'Session', headerShown: false }} />
-        {!isAnonymous && <Tab.Screen name={'StudyCommunityTab'} component={StudyCommunityTab} options={{ tabBarLabel: 'Community', headerShown: false }} />}
+        {!isAnonymous && <Tab.Screen name={'StudyFeedsTab'} component={StudyFeedsTab} options={{ tabBarLabel: 'Feeds', headerShown: false }} />}
         {!isAnonymous && <Tab.Screen name={'AchievementsTab'} component={AchievementTab} options={{ tabBarLabel: 'Achievement', headerShown: false }} />}
         <Tab.Screen name={'SettingTab'} component={SettingTab} options={{ tabBarLabel: 'Setting' ,headerShown: false }} />
       </Tab.Navigator>

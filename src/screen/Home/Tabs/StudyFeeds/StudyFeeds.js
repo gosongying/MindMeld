@@ -1,25 +1,23 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, Alert } from 'react-native';
-import Groups from '../../../../components/Home/Community/Groups';
-import FriendList from '../../../../components/Home/Community/FriendList';
-import CommunityHeader from '../../../../components/Home/Community/CommunityHeader';
-import CommunityTab from '../../../../components/Home/Community/CommunityTab';
+import { View, Text, StyleSheet, FlatList, Alert } from 'react-native';;
+import Feeds from '../../../../components/Home/Feed/Feeds';
+import FeedHeader from '../../../../components/Home/Feed/FeedHeader';
 
-const StudyCommunity = ({navigation}) => {
+const StudyFeeds = ({navigation}) => {
 
-  //item to be shown
-  const DATA = [
-    {
-      id: '1',
-      title: 'Tab',
-      component: CommunityTab,
-    },
-    {
-      id: '2',
-      title: 'FriendList',
-      component: FriendList,
-    },
-  ];
+  // //item to be shown
+  // const DATA = [
+  //   {
+  //     id: '1',
+  //     title: 'Tab',
+  //     component: CommunityTab,
+  //   },
+  //   {
+  //     id: '2',
+  //     title: 'FriendList',
+  //     component: FriendList,
+  //   },
+  // ];
 
   const renderOption = ({ item }) => (
     <View style={styles.optionContainer}>
@@ -29,12 +27,13 @@ const StudyCommunity = ({navigation}) => {
 
   return (
     <View style={styles.container}>
-      <CommunityHeader/>
-      <FlatList
+      <FeedHeader/>
+      {/* <FlatList
         data={DATA}
         renderItem={renderOption}
         keyExtractor={(item) => item.id}
-      />
+      /> */}
+      <Feeds navigation={navigation}/>
     </View>
   );
 };
@@ -73,4 +72,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default StudyCommunity;
+export default StudyFeeds;
