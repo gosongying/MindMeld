@@ -126,7 +126,7 @@ const SelectToDo2 = ({ navigation, route }) => {
     const currentUser = auth.currentUser;
     const sessionRef = ref(database, 'sessions/');
     const newSessionKey = push(sessionRef).key;
-    const invitationList = currentUser.isAnonymous? []: route.params.buddiesInvited;
+    const invitationList = route.params.buddiesInvited
     runTransaction(ref(database, 'userId/' + currentUser.uid), (profile) => {
       if (profile) {
         if (profile.upcomingSessions) {
@@ -184,6 +184,10 @@ const SelectToDo2 = ({ navigation, route }) => {
           useNativeDriver: true,
         }),
         Animated.spring(translateY, {
+          toValue: 100,
+          useNativeDriver: true,
+        }),
+        Animated.spring(translateY, {
           toValue: 0,
           useNativeDriver: true,
         }),
@@ -191,7 +195,7 @@ const SelectToDo2 = ({ navigation, route }) => {
     setTimeout(() => {
         setShowText(false);
         createSession();
-    }, 2000);
+    }, 3500);
 };
 
   return (

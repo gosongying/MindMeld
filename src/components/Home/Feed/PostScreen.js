@@ -489,7 +489,7 @@ const scrollViewRef = useRef(null);
 
         
         <View style={styles.postFooter}>
-          <Text>{post.isClosed ? 'Closed' : 'Open'}</Text>
+          <Text style={{ color: post.isClosed ? 'red' : 'green' }}>{post.isClosed ? 'Closed' : 'Open'}</Text>
 
           <View style={styles.commentsCount}>
             <Ionicons name="chatbubble-outline" size={20} color="#888" />

@@ -430,7 +430,7 @@ const StudySession = ({navigation}) => {
 const SessionHeader = ({setIsCheckingInvitation, setSessionName}) => {
     return (
         <View style={styles.headerContainer}>
-            <View style={styles.backgroundPattern} />
+            <View/>
             <Text style={styles.title}>Study Session</Text>
             <View style={styles.searchContainer}>
                 <Ionicons 
@@ -446,6 +446,7 @@ const SessionHeader = ({setIsCheckingInvitation, setSessionName}) => {
                 autoCorrect={false}
                 onChangeText={(text) => setSessionName(text)}>
                 </TextInput>
+
                 <TouchableOpacity
                 style={styles.news}
                 onPress={() => setIsCheckingInvitation(true)}
@@ -505,7 +506,7 @@ const styles = StyleSheet.create({
         bottom: 10
     },
     news: {
-        left: 45
+        left: 45,
     },
     invitationBackground: {
         flex: 1,
@@ -536,7 +537,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         borderRadius: 20,
-        backgroundColor: 'mediumpurple',
+        backgroundColor: '#8A2BE2',
         height: '20%'
     },
     flatListItem: {
@@ -666,7 +667,7 @@ const styles = StyleSheet.create({
         width: 50,
         height: 50,
         position: 'absolute',
-        bottom: 8,
+        bottom: 15,
         left: 170,
         backgroundColor: 'lavender',
         borderRadius: 25,
