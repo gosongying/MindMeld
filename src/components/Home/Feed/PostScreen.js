@@ -170,17 +170,6 @@ const PostScreen = ({ route, navigation }) => {
       // ]);
     };
 
-
-
-    const editComment = (newText) => {
-      const commentRef = database.ref(`posts/${post.id}/comments/${selectedItem.id}`);
-      console.log(commentRef);
-      commentRef.update({ comment: newText });
-    
-      setEditedComment('');
-      setEditCommentModal(false);
-    };
-  
     return (
       <View
         style={[
@@ -191,45 +180,6 @@ const PostScreen = ({ route, navigation }) => {
         <View style={{    
           flexDirection: 'row',
           justifyContent: 'space-between',}}>
-
-        <Modal visible={editCommentModal} animationType="slide" transparent={true}>
-          <View style={styles.modalContainer}>
-            <Text style={{ marginTop: 50 }}>
-              <Text style={{ color: '#888888' }}>Editing your comment to </Text>
-              <Text style={{ fontWeight: 'bold' }}>{post.title}</Text>
-            </Text>
-            <TextInput
-              style={[styles.modalInput, { borderWidth: 0, borderColor: 'transparent' }]}
-              multiline
-              placeholder="Edit your comment"
-              onChangeText={setEditedComment}
-              autoFocus={true}
-            />
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-              <TouchableOpacity
-                onPress={() => {
-                  Keyboard.dismiss(); // Dismiss the keyboard
-                  setEditedComment('')
-                  setEditCommentModal(false);
-                }}
-                style={[styles.modalButton]} 
-              >
-                <Text style={styles.modalButtonText}>Cancel</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => {
-                  Keyboard.dismiss(); // Dismiss the keyboard
-                  editComment(editedComment);
-                }}
-                style={[styles.modalButton, { backgroundColor: editedComment === '' ? '#CCCCCC' : '#8A2BE2' }]} // Update the background color when disabled
-                disabled={editedComment === ''}
-              >
-                <Text style={[styles.modalButtonText, { color: editedComment === '' ? '#888888' : 'white' }]}>Save</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </Modal>
-
           <View style={{flexDirection: 'row'}}>
             <Text style={styles.username}>{item.author}</Text>
               {isCurrentUser && (
@@ -408,6 +358,15 @@ const scrollToBottom = () => {
 
 const scrollViewRef = useRef(null);
 
+const editComment = (newText) => {
+  const commentRef = database.ref(`posts/${post.id}/comments/${selectedItem.id}`);
+  console.log(commentRef);
+  commentRef.update({ comment: newText });
+
+  setEditedComment('');
+  setEditCommentModal(false);
+};
+
   return (
     <KeyboardAvoidingView style={styles.container} behavior='padding'>
       <View style={styles.header}>
@@ -577,6 +536,45 @@ const scrollViewRef = useRef(null);
           />
         </View>
       </Modal>
+      <Modal visible={editCommentModal} animationType="slide" transparent={true}>
+          <View style={styles.modalContainer}>
+            <Text style={{ marginTop: 50 }}>
+              <Text style={{ color: '#888888' }}>Editing your comment to </Text>
+              <Text style={{ fontWeight: 'bold' }}>{post.title}</Text>
+            </Text>
+            <TextInput
+              style={[styles.modalInput, { borderWidth: 0, borderColor: 'transparent' }]}
+              multiline
+              placeholder="Edit your comment"
+              // Use optional chaining and nullish coalescing operator for null check
+              defaultValue={selectedItem?.comment ?? ''} 
+              onChangeText={setEditedComment}
+              autoFocus={true}
+            />
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 30 }}>
+              <TouchableOpacity
+                onPress={() => {
+                  Keyboard.dismiss(); // Dismiss the keyboard
+                  setEditedComment('')
+                  setEditCommentModal(false);
+                }}
+                style={[styles.cancelButton]} 
+              >
+                <Text style={styles.modalButtonText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  Keyboard.dismiss(); // Dismiss the keyboard
+                  editComment(editedComment);
+                }}
+                style={[styles.modalButton, { backgroundColor: editedComment === '' ? '#CCCCCC' : '#8A2BE2' }]} // Update the background color when disabled
+                disabled={editedComment === ''}
+              >
+                <Text style={[styles.modalButtonText, { color: editedComment === '' ? '#888888' : 'white' }]}>Save</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
     </KeyboardAvoidingView>
   );
 };
@@ -749,11 +747,18 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   modalButton: {
-    paddingVertical: 10,
-    paddingHorizontal: 20,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
     backgroundColor: '#8A2BE2',
     borderRadius: 10,
-    marginBottom: 10,
+    marginRight: 8,
+  },
+  cancelButton: {
+    backgroundColor: '#999',
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 10,
+    marginRight: 8,
   },
   modalButtonText: {
     color: 'white',
@@ -789,6 +794,13 @@ const styles = StyleSheet.create({
   },
   footerContainer: {
     paddingHorizontal: 10,
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginTop: 20,
+    marginBottom: 10,
+    marginHorizontal: 20,
   },
 });
 

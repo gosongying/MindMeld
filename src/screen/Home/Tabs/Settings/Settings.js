@@ -9,12 +9,12 @@ import { goOffline, update, ref, increment, runTransaction, remove } from 'fireb
 const Settings = ({navigation}) => {
   const options = [
     { id: '1', title: 'Privacy Settings', screen: 'Privacy' },
-    { id: '2', title: 'Study Buddy List', screen: 'FriendListSetting' },
+    { id: '2', title: 'Study Buddy Settings', screen: 'FriendListSetting' },
     // { id: '3', title: 'Group List', screen: 'GroupList' },
-    { id: '4', title: 'Sessions Setting', screen: 'SessionsSetting' },
+    { id: '4', title: 'Sessions Settings', screen: 'SessionsSetting' },
     { id: '5', title: 'Achievement Settings', screen: 'AchievementSettings' },
     { id: '6', title: 'Feedback', screen: 'Feedback' },
-    { id: '7', title: 'Terms and Conditions', screen: 'TermsAndConditions' },
+    { id: '7', title: 'Terms and Conditions', screen: 'TermsAndCondition' },
     { id: '8', title: 'Help & Support', screen: 'HelpAndSupport' },
     { id: '9', title: 'About', screen: 'About' },
     { id: '10', title: 'Logout', screen: 'Landing' },

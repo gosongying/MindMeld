@@ -28,14 +28,18 @@ const Dictionary = ({ navigation }) => {
       Keyboard.dismiss(); 
 
       if (Array.isArray(data) && data.length > 0) {
-        const wordDefinitions = data.map(entry => {
+        const wordDefinitions = data.flatMap(entry => {
           if (entry.hasOwnProperty('shortdef')) {
-            return entry.shortdef[0];
+            return entry.shortdef;
           } else {
-            return 'No definition found.';
+            return [];
           }
         });
-        setDefinitions(wordDefinitions);
+        if (wordDefinitions.length > 0) {
+          setDefinitions(wordDefinitions);
+        } else {
+          setDefinitions(['No definition found.']);
+        }
       } else {
         setDefinitions(['No definition found.']);
       }
@@ -45,12 +49,12 @@ const Dictionary = ({ navigation }) => {
     }
   };
 
-  
   const reset = () => {
     Keyboard.dismiss();
     setWord('');
-    setDefinitions([])
+    setDefinitions([]);
   };
+  
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -107,7 +111,6 @@ const styles = StyleSheet.create({
     fontSize: 35,
     fontWeight: 'bold',
     color: '#fff',
-    
   },
   closeButton: {
     marginLeft: 10,
@@ -169,11 +172,10 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 10,
     width: '80%',
-    marginBottom: 20,
+    marginBottom: 10,
   },
   definition: {
-    fontSize: 18,
-    fontWeight: 'bold',
+    fontSize: 14,
     textAlign: 'center',
     color: '#333333',
   },

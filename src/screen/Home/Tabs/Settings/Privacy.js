@@ -7,7 +7,7 @@ import {
   } from "react-native";
 
   const Privacy = ({navigation}) => {
-    const goToHome = () => navigation.navigate("Settings") 
+    const goToHome = () => navigation.navigate('Settings');
 
     return (
         <SafeAreaView>

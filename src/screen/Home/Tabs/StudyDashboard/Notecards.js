@@ -75,7 +75,7 @@ const Notecards = ({ navigation }) => {
       const updatedFlashcards = [...flashcards, newCard];
       const updatedIndex = updatedFlashcards.length - 1; // Set index to the last card
   
-      flipToFront()
+      flipToFront();
       setFlashcards(updatedFlashcards);
       setCurrentIndex(updatedIndex);
       setFrontText('');
@@ -86,21 +86,21 @@ const Notecards = ({ navigation }) => {
 
   const handleNextCard = () => {
     if (currentIndex < flashcards.length - 1) {
-      flipToFront()
+      flipToFront();
       setCurrentIndex(currentIndex + 1);
     }
   };
 
   const handlePreviousCard = () => {
     if (currentIndex > 0) {
-      flipToFront()
+      flipToFront();
       setCurrentIndex(currentIndex - 1);
     }
   };
 
   const reset = () => {
     setCurrentIndex(0);
-    flipToFront()
+    flipToFront();
     setFlashcards([]);
   };
 
@@ -421,6 +421,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    marginBottom: 40,
+    
   },
   modalContainerCard: {
     flex: 1,
