@@ -150,7 +150,8 @@ const Feeds = ( {navigation}) => {
     const postId = newPostRef.key;
     newPostRef.set(postData)
 
-    // Close the modal and reset the input values
+    // Close the modal and reset the input values and scroll to top.
+    scrollViewRef.current.scrollTo({ y: 0, animated: true });
     setShowModal(false);
     setNewPostTitle('');
     setNewPostContent('');
@@ -329,6 +330,8 @@ const closePost = (postId) => {
     setNewPostContent('')
     }
 
+  const scrollViewRef = useRef(null);
+
 
 
   return (
@@ -349,7 +352,7 @@ const closePost = (postId) => {
         </TouchableOpacity>
       </View>
 
-      <ScrollView>
+      <ScrollView ref={scrollViewRef}>
         {sortPosts(filterPosts()).map((post) => (
           <TouchableOpacity
             key={post.id}
@@ -423,8 +426,7 @@ const closePost = (postId) => {
             <View style={styles.postFooter}>
               <View style={styles.postMetrics}>
 
-                <Text>{post.isClosed ? 'Closed' : 'Open'}</Text>
-
+              <Text style={{ color: post.isClosed ? 'red' : 'green' }}>{post.isClosed ? 'Closed' : 'Open'}</Text>
 
                 {/* <View style={styles.itemContainer}>   
                   <TouchableOpacity

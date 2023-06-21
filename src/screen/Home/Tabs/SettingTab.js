@@ -7,12 +7,13 @@ import Settings from './Settings/Settings';
 import About from './Settings/About';
 import AchievementSettings from './Settings/AchievementSettings';
 import Feedback from './Settings/Feedback';
-import FriendList from './Settings/FriendList';
+import FriendListSetting from './Settings/FriendListSetting';
 import GroupList from './Settings/GroupList';
 import HelpAndSupport from './Settings/HelpandSupport';
 import Privacy from './Settings/Privacy';
 import SessionsSetting from './Settings/SessionsSetting';
 import TermsAndCondition from './Settings/TermsAndCondition';
+import FriendListMore from '../../../components/Home/Session/FriendListMore';
 
 const SettingTab = () => {
 
@@ -24,12 +25,13 @@ const SettingTab = () => {
         <Stack.Screen name="About" component={About} />
         <Stack.Screen name="AchievementSettings" component={AchievementSettings} />
         <Stack.Screen name="Feedback" component={Feedback} />
-        <Stack.Screen name="FriendList" component={FriendList} />
+        <Stack.Screen name="FriendListSetting" component={FriendListSetting} />
         <Stack.Screen name="GroupList" component={GroupList} />
         <Stack.Screen name="HelpAndSupport" component={HelpAndSupport} />
         <Stack.Screen name="Privacy" component={Privacy} />
         <Stack.Screen name="SessionsSetting" component={SessionsSetting} />
         <Stack.Screen name="TermsAndCondition" component={TermsAndCondition} />
+        <Stack.Screen name="FriendListMore" component={FriendListMore} />
       </Stack.Navigator>
    );
 }

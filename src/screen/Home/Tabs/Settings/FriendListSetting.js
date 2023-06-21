@@ -5,15 +5,17 @@ import {
     Text,
     SafeAreaView
   } from "react-native";
+  import FriendList from '../../../../components/Home/Session/FriendList';
 
-  const FriendList = ({navigation}) => {
+  const FriendListSetting = ({navigation}) => {
     const goToHome = () => navigation.navigate("Settings") 
 
     return (
-        <SafeAreaView>
+        <SafeAreaView style={{flex: 1}}>
             <TouchableOpacity style={styles.button} onPress={goToHome}>
                  <Text style={styles.back} >{'\u2190'}</Text >
             </TouchableOpacity>
+            <FriendList navigation={navigation}/>
         </SafeAreaView>
     )
   }
@@ -30,4 +32,4 @@ import {
       }
   })
 
-  export default FriendList
+  export default FriendListSetting

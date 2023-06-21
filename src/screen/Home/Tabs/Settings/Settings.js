@@ -9,8 +9,8 @@ import { goOffline, update, ref, increment, runTransaction, remove } from 'fireb
 const Settings = ({navigation}) => {
   const options = [
     { id: '1', title: 'Privacy Settings', screen: 'Privacy' },
-    { id: '2', title: 'Study Buddy List', screen: 'FriendList' },
-    { id: '3', title: 'Group List', screen: 'GroupList' },
+    { id: '2', title: 'Study Buddy List', screen: 'FriendListSetting' },
+    // { id: '3', title: 'Group List', screen: 'GroupList' },
     { id: '4', title: 'Sessions Setting', screen: 'SessionsSetting' },
     { id: '5', title: 'Achievement Settings', screen: 'AchievementSettings' },
     { id: '6', title: 'Feedback', screen: 'Feedback' },
@@ -98,7 +98,7 @@ const Settings = ({navigation}) => {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <View style={styles.detailsContainer}>
         <Details navigation={navigation} /> 
         {/* Pass the navigation prop */}
@@ -111,14 +111,13 @@ const Settings = ({navigation}) => {
           keyExtractor={(item) => item.id}
         />
       </View>
-    </SafeAreaView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop:30,
   },
   sectionTitle: {
     fontSize: 20,
@@ -149,9 +148,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   detailsContainer: {
-    marginBottom: 10,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
   },
   separator: {
     borderBottomColor: 'black',

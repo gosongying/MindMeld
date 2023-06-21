@@ -179,6 +179,7 @@ const styles = StyleSheet.create({
   moreText: {
     fontSize: 16,
     color: '#888',
+    marginBottom: 7,
   },
   sectionTitle: {
     fontSize: 20,

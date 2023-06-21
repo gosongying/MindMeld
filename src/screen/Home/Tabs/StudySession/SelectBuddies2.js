@@ -261,7 +261,6 @@ const SelectBuddies2 = ({navigation, route}) => {
                         )}
                     </TouchableOpacity>
                 </View>
-            <View style={styles.separator2} />
             </View>
             <View style={styles.flatListContainer}>
                 <FlatList

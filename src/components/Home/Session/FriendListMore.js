@@ -7,7 +7,7 @@ import Fontisto from 'react-native-vector-icons/Fontisto';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { AntDesign } from '@expo/vector-icons';
 
-const FriendListmore = ({navigation, route}) => {
+const FriendListMore = ({navigation, route}) => {
     const currentUser = auth.currentUser;
 
     const [username, setUsername] = useState('');
@@ -210,6 +210,7 @@ const FriendListmore = ({navigation, route}) => {
                     <Text style={styles.headerText}>Study Buddies</Text>
                 </View>
                 <View style={styles.searchContainer}>
+                
                     <Ionicons 
                     style={styles.searchIcon}
                     name='search' 
@@ -299,6 +300,7 @@ const FriendListmore = ({navigation, route}) => {
                             <TextInput
                             style={styles.addFriend}
                             placeholder='Username'
+                            placeholderTextColor={'gray'}
                             value={usernameAdded}
                             onChangeText={(text) => setUsernameAdded(text)}
                             autoCapitalize='none'
@@ -356,7 +358,7 @@ const styles = StyleSheet.create({
     header: {
         width: "100%",
         height: 140,
-        backgroundColor: 'thistle',
+        backgroundColor: '#8A2BE2',
         alignItems: 'center',
         justifyContent: 'center',
         borderRadius: 20
@@ -429,13 +431,15 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         right: 35,
         top: 20,
-        alignItems: 'center'
+        alignItems: 'center',
+        marginLeft: 30,
     },
     searchIcon: {
         right: 5
     },
     addIcon: {
         left: 80,
+        marginLeft: -20,
     },
     promptContainer: {
         flex:1, 
@@ -446,7 +450,7 @@ const styles = StyleSheet.create({
     prompt: {
         bottom: 30,
         width: 300, 
-        backgroundColor: 'thistle',
+        backgroundColor: '#BAA8BA',
         padding: 30, 
         borderRadius: 10,
         alignItems: 'center',
@@ -605,4 +609,4 @@ const styles = StyleSheet.create({
 })
 
 
-export default FriendListmore;
+export default FriendListMore;

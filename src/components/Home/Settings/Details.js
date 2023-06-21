@@ -238,6 +238,7 @@ const Details = ({ navigation }) => {
       setIsEditingUsername(false);
       setNewUsername(oldUsername);
     }}>
+      <View>
       <View style={styles.container}>
         <View style={[styles.statusIndicator, isAnonymous && styles.anonymous]} />
         <View style={styles.outerPhotoContainer}>
@@ -254,12 +255,12 @@ const Details = ({ navigation }) => {
             <TouchableOpacity 
             onPress={selectImageLibrary}
             disabled={isLoading}>
-              <FontAwesome name={'photo'} size={22} />
+              <FontAwesome name={'photo'} size={15} />
             </TouchableOpacity>
             <TouchableOpacity 
             onPress={selectImageCamera}
             disabled={isLoading}>
-              <MaterialCommunityIcons name={'camera-outline'} size={27} />
+              <MaterialCommunityIcons name={'camera-outline'} size={19} />
             </TouchableOpacity>
             </View>
           )}
@@ -289,9 +290,9 @@ const Details = ({ navigation }) => {
               { !isAnonymous && (
                 <TouchableOpacity 
                 onPress={editUsername}
-                style={{left: 20}}
+                style={{left: 20, marginBottom: 0,}}
                 disabled={isLoading}>
-                  <Ionicons name="create" size={20} />
+                  <Ionicons name="create" size={22} />
                 </TouchableOpacity>
               )}
             </View>
@@ -307,6 +308,7 @@ const Details = ({ navigation }) => {
           )}
         </View>
       </View>
+      </View>
     </TouchableWithoutFeedback>
   );
 };
@@ -317,15 +319,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: 5,
+    marginTop: 35,
+    marginBottom: 10,
     //height: 120
   },
   profile: {
-    height: 85,
-    width: 85,
-    marginRight: 20,
+    height: 55,
+    width: 55,
+    marginTop: 10,
+    marginLeft: 20,
   },
   name: {
-    fontSize: 26,
+    fontSize: 28,
     fontWeight: 'bold',
   },
   nameWhenEditing: {
@@ -345,6 +350,7 @@ const styles = StyleSheet.create({
   },
   levelText: {
     marginRight: 10,
+    fontSize: 16,
   },
   trophyContainer: {
     flexDirection: 'row',
@@ -352,6 +358,7 @@ const styles = StyleSheet.create({
   },
   trophyText: {
     marginRight: 5,
+    fontSize: 16,
   },
   trophyIcon: {
     marginLeft: 5,
@@ -374,7 +381,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems:'center',
     justifyContent:'space-evenly',
-    right: 10
+    marginRight: 5,
+    marginTop: -10,
   },
   outerPhotoContainer: {
     alignItems: 'center',
@@ -385,7 +393,7 @@ const styles = StyleSheet.create({
     width: 12,
     height: 12,
     borderRadius: 6,
-    bottom: 45,
+    bottom: 33,
     left: 63,
     zIndex: 1
   },
