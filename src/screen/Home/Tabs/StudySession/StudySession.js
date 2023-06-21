@@ -24,7 +24,6 @@ const StudySession = ({navigation}) => {
 
     const currentUser = auth.currentUser;
     const isAnonymous = currentUser.isAnonymous;
-    console.log(currentUser.uid);
 
     /*const checkExpired = () => {
         const currentTimestamp = new Date().getTime();
@@ -48,11 +47,11 @@ const StudySession = ({navigation}) => {
     useEffect(() => {
         const interval = setInterval(() => {
             setCurrentTimestamp(new Date().getTime());
-        }, 60000);
+        }, 30000);
         const unsubscribe = onValue(ref(database, 'userId/' + currentUser.uid), async (snapshot) => {
             let sessions = [];
             let ended = [];
-            const sessionList = snapshot.val()? (snapshot.val().upcomingSessions? snapshot.val().upcomingSessions: []): [];
+            const sessionList = snapshot.val().upcomingSessions? snapshot.val().upcomingSessions: [];
             if (sessionList) {
                 await Promise.all(sessionList.map(async (id) => {
                     console.log(currentUser.displayName)
@@ -155,11 +154,11 @@ const StudySession = ({navigation}) => {
         }, 2000);
     };
 
-    const acceptInvitation = (sessionId) => {
+    const acceptInvitation = (session) => {
         const db = ref(database);
         //add the user into participants list of the session
         try {
-            runTransaction(child(db, 'sessions/' + sessionId), (session) => {
+            runTransaction(child(db, 'sessions/' + session.id), (session) => {
                 if (session) {
                     session.participants.push({
                         uid: currentUser.uid, 
@@ -174,11 +173,11 @@ const StudySession = ({navigation}) => {
             //remove the invitation from the user
             runTransaction(child(db, 'userId/' + currentUser.uid), (user) => {
                 if (user) {
-                    user.invitationList = user.invitationList.filter((id) => id !== sessionId);
+                    user.invitationList = user.invitationList.filter((id) => id !== session.id);
                     if (user.upcomingSessions) {
-                        user.upcomingSessions.push(sessionId);
+                        user.upcomingSessions.push(session.id);
                     } else {
-                        user.upcomingSessions = [sessionId];
+                        user.upcomingSessions = [session.id];
                     }
                     return user;
                 } else {
@@ -187,6 +186,7 @@ const StudySession = ({navigation}) => {
             }).then(() => {
                 showJoin();
                 setInDetail(inDetail.filter((id) => id !== sessionId));
+                setSessionData([...sessionData, session])
             });
         } catch (error) {
             console.log(error);
@@ -246,6 +246,46 @@ const StudySession = ({navigation}) => {
         }
     };
 
+    const joinSession = (session) => {
+       try {
+            const db = ref(database);
+            Promise.all([
+                //add user into online list of the session
+                runTransaction(child(db, 'sessions/' + session.id), (session) => {
+                    if (session) {
+                        if (session.onlineParticipants) {
+                            session.onlineParticipants.push(currentUser.uid);
+                            return session;
+                        } else {
+                            session.onlineParticipants = [currentUser.uid];
+                            return session;
+                        }
+                    } else {
+                        return session;
+                    }
+                }), 
+                //add the session into user's ongoing sessions
+                runTransaction(child(db, 'userId/' + currentUser.uid), (user) => {
+                    if (user) {
+                        if (user.ongoingSessions) {
+                            user.ongoingSessions.push(session.id);
+                            return user;
+                        } else {
+                            user.ongoingSessions = [session.id];
+                            return user;
+                        }
+                    } else {
+                        return user;
+                    }
+                })
+            ])
+            .then(() => navigation.navigate("SessionRoom", {session}));
+        } catch (error) {
+            console.log(error);
+            Alert.alert("An error occurs during joining session");
+        }
+    };
+
     const renderSession = ({item}) => {
         const inProgress = item.startTime.timestamp < currentTimestamp
         if (item.sessionName.startsWith(sessionName) || item.sessionName === sessionName || !sessionName) {
@@ -275,7 +315,9 @@ const StudySession = ({navigation}) => {
                             </View>
                         )}
                         <TouchableOpacity  
-                        style={{right: 4, bottom: 5}}>
+                        style={{right: 4, bottom: 5}}
+                        disabled={!inProgress}
+                        onPress={() => joinSession(item)}>
                             <Ionicons name="enter-outline" color={'black'} size={35}/>
                         </TouchableOpacity>
                         <TouchableOpacity  
@@ -313,7 +355,7 @@ const StudySession = ({navigation}) => {
                         <Text style={[styles.text, !item.studyModeEnabled && {textDecorationLine: 'line-through'}]}>Study Mode</Text>
                     </View>
                     <View style={styles.acceptOrDecline}>
-                        <TouchableOpacity onPress={() => acceptInvitation(item.id)}>
+                        <TouchableOpacity onPress={() => acceptInvitation(item)}>
                             <Ionicons name="checkmark" color={'green'} size={35}/>
                         </TouchableOpacity>
                         <TouchableOpacity onPress={() => declineInvitation(item.id)}>
@@ -652,7 +694,7 @@ const styles = StyleSheet.create({
     inProgress: {
         position: 'absolute',
         width: 100,
-        bottom: 90,
+        bottom: 100,
         right: 10,
         borderRadius: 10,
         backgroundColor: '#8A2BE2',

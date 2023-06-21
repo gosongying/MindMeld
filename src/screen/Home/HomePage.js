@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Pressable, Text } from 'react-native';
+import { Alert, Pressable, Text } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import StudyDashboardTab from './Tabs/StudyDashboardTab';
@@ -7,30 +7,42 @@ import StudyFeedsTab from './Tabs/StudyFeedsTab';
 import AchievementTab from './Tabs/AchievementTab';
 import SettingTab from './Tabs/SettingTab';
 import StudySessionTab from './Tabs/StudySessionTab';
-import { update, ref, onDisconnect, serverTimestamp, goOnline, onValue, increment, runTransaction } from 'firebase/database';
+import { update, ref, onDisconnect, serverTimestamp, goOnline, onValue, increment, runTransaction, remove } from 'firebase/database';
 import { database, auth } from '../../../firebase';
 
 const HomePage = () => {
 
-  const isAnonymous = auth.currentUser.isAnonymous;
+  const currentUser = auth.currentUser;
 
   console.log("Home");
 
   useEffect(() => {
-    if (!auth.currentUser.isAnonymous) {
-      const userIdRef = ref(database, 'userId/' + auth.currentUser.uid);
-      onDisconnect(userIdRef).update({status: increment(-1)});
-      //use runTransaction to update the number of online account correctly
-      runTransaction(userIdRef, (profile) => {
-        if (profile) {
-          profile.status++;
-          return profile;
+    const userIdRef = ref(database, 'userId/' + currentUser.uid);
+    try {
+      if (!currentUser.isAnonymous) {
+         //to handle user online status when user close the app suddenly
+        onDisconnect(userIdRef).update({status: increment(-1)});
+        //to handle user ongoing sessions when user close the app suddenly
+        onDisconnect(userIdRef).update({
+          ongoingSessions: null
+        });
+        //use runTransaction to update the number of online account correctly
+        runTransaction(userIdRef, (profile) => {
+          if (profile) {
+            profile.status++;
+            return profile;
+          } else {
+            return profile;
+          }
+        });
         } else {
-          return profile;
+          //if anonymous user, then delete the account
+          onDisconnect(userIdRef).remove();
         }
-      });
-      }
-    }, []);
+    } catch(error) {
+      console.log(error);
+    }
+  }, []);
 
   const Tab = createBottomTabNavigator();
 
@@ -68,8 +80,8 @@ const HomePage = () => {
         })}>
         <Tab.Screen name={'StudyDashboardTab'} component={StudyDashboardTab} options={{ tabBarLabel: 'Study', headerShown: false }} />
         <Tab.Screen name={'StudySessionTab'} component={StudySessionTab} options={{ tabBarLabel: 'Session', headerShown: false }} />
-        {!isAnonymous && <Tab.Screen name={'StudyFeedsTab'} component={StudyFeedsTab} options={{ tabBarLabel: 'Feeds', headerShown: false }} />}
-        {!isAnonymous && <Tab.Screen name={'AchievementsTab'} component={AchievementTab} options={{ tabBarLabel: 'Achievement', headerShown: false }} />}
+        {!currentUser.isAnonymous && <Tab.Screen name={'StudyFeedsTab'} component={StudyFeedsTab} options={{ tabBarLabel: 'Feeds', headerShown: false }} />}
+        {!currentUser.isAnonymous && <Tab.Screen name={'AchievementsTab'} component={AchievementTab} options={{ tabBarLabel: 'Achievement', headerShown: false }} />}
         <Tab.Screen name={'SettingTab'} component={SettingTab} options={{ tabBarLabel: 'Setting' ,headerShown: false }} />
       </Tab.Navigator>
     );

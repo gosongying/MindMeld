@@ -98,7 +98,7 @@ const Settings = ({navigation}) => {
   );
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.detailsContainer}>
         <Details navigation={navigation} /> 
         {/* Pass the navigation prop */}
@@ -111,7 +111,7 @@ const Settings = ({navigation}) => {
           keyExtractor={(item) => item.id}
         />
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 
