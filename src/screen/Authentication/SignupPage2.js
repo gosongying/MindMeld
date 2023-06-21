@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Image, StyleSheet, TouchableOpacity, FlatList, SafeAreaView, Alert } from 'react-native';
+import { View, Text, TextInput, Image, StyleSheet, TouchableOpacity, FlatList, SafeAreaView, Alert, Modal, ScrollView } from 'react-native';
 import { auth, database, storage } from "../../../firebase";
 import { ref as databaseRef, runTransaction, set, get, onValue } from 'firebase/database';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -21,6 +21,7 @@ const SignupPage2 = ({ navigation}) => {
   const [confirmUsername, setConfirmUsername] = useState(false);
   const [isLoading, setLoading] = useState(false);
   const [image, setImage] = useState(null);
+  const [termsModal, setTermsModal] = useState(false)
 
   const currentUser = auth.currentUser;
 
@@ -163,6 +164,10 @@ const SignupPage2 = ({ navigation}) => {
   };
 
   const handleToggleConfirmUsername = () => {
+    if (username === '') {
+      Alert.alert('Error', 'Username cannot be empty');
+      return
+    }
     setConfirmUsername(!confirmUsername);
   };
 
@@ -210,6 +215,22 @@ const SignupPage2 = ({ navigation}) => {
     </TouchableOpacity>
   );
 
+  const usageAgreement = `By using this app, you agree to abide by these terms and conditions. If you do not agree, please refrain from using the app.`;
+
+  const appPurpose = `This app is provided for educational purposes only. It is not intended for commercial use.`;
+
+  const userResponsibilities = `- Users must use the app in compliance with all applicable laws and regulations.
+- Users are responsible for maintaining the confidentiality of their account information.
+- Users must not engage in any unauthorized activities or misuse the app.`;
+
+  const limitationOfLiability = `- The app and its developers shall not be held liable for any damages or losses incurred while using the app.
+- The app is provided "as is" without any warranties or guarantees.`;
+
+  const intellectualProperty = `- All intellectual property rights related to the app belong to the developers.
+- Users are prohibited from copying, modifying, or distributing the app without prior consent.`;
+
+  const termination = `- The developers reserve the right to terminate or suspend access to the app at any time.`;
+
   const data = [
     { id: '1', label: 'Sciences' },
     { id: '2', label: 'Business and Management' },
@@ -228,10 +249,8 @@ const SignupPage2 = ({ navigation}) => {
   
   return(
     <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={goToSignUp}>
-          <Text style={styles.back}>{'\u2190'}</Text>
-        </TouchableOpacity>
+      <View style={styles.header2}>
+          <Text style={styles.back}>{'    '}</Text>
         <Text style={styles.title}>Create your account</Text>
         <TouchableOpacity style={styles.closeButton} onPress={reset}>
           <AntDesign name="close" size={24} color="#fff" />
@@ -372,9 +391,11 @@ const SignupPage2 = ({ navigation}) => {
                   <View style={styles.checkbox} />
                     )}
                 </TouchableOpacity>
-                <Text style={styles.checkboxText}>Agree to Terms and Conditions</Text>
+                <Text style={styles.checkboxText}>Agree to</Text>
+                <TouchableOpacity onPress={() => setTermsModal(true)}>
+                  <Text style={[styles.checkboxText, {textDecorationLine: 'underline', marginLeft: 5, fontWeight: 'bold'}]}>Terms and Conditions</Text>
+                </TouchableOpacity>
               </View>
-
             </View>
 
             <TouchableOpacity
@@ -388,6 +409,43 @@ const SignupPage2 = ({ navigation}) => {
         }
       />
     </View>
+    <Modal visible={termsModal} animationType="slide" transparent={true}>
+      <View style={styles.modalContainer}>
+
+        <View style={styles.header3}>
+          <Text style={styles.title2}>Terms and Conditions</Text>
+        </View>
+
+        <ScrollView>
+          <Text style={styles.updated}>Updated June 2023</Text>
+          <Text style={styles.acknowledgement}>
+            Please read these terms and conditions carefully. By using the app, you acknowledge and agree to these terms.
+          </Text>
+          <Text style={styles.sectionTitle}>1. Usage Agreement</Text>
+          <Text style={styles.terms}>{usageAgreement}</Text>
+          <Text style={styles.sectionTitle}>2. App Purpose</Text>
+          <Text style={styles.terms}>{appPurpose}</Text>
+          <Text style={styles.sectionTitle}>3. User Responsibilities</Text>
+          <Text style={styles.terms}>{userResponsibilities}</Text>
+          <Text style={styles.sectionTitle}>4. Limitation of Liability</Text>
+          <Text style={styles.terms}>{limitationOfLiability}</Text>
+          <Text style={styles.sectionTitle}>5. Intellectual Property</Text>
+          <Text style={styles.terms}>{intellectualProperty}</Text>
+          <Text style={styles.sectionTitle}>6. Termination</Text>
+
+          <Text style={styles.terms}>{termination}{'\n'}</Text>
+        </ScrollView>
+              <TouchableOpacity
+                onPress={() => {
+                  setTermsModal(false);
+                }}
+                style={[styles.modalButton]} 
+              >
+              <Text style={styles.modalButtonText}>I Agree to the Terms and Conditions</Text>
+              </TouchableOpacity>
+          </View>
+      </Modal>
+
   </View>
   );
 };
@@ -538,7 +596,7 @@ const styles = StyleSheet.create({
   closeButton: {
     marginLeft: 10,
   },
-  header: {
+  header2: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -552,6 +610,64 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     color: '#fff'
+  },
+  modalContainer: {
+    flex: 1,
+    backgroundColor: 'white',
+    paddingHorizontal: 10,
+    paddingVertical: 40,
+  },
+  modalButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    backgroundColor: '#8A2BE2',
+    borderRadius: 10,
+    marginBottom: 10,
+  },
+  modalButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  title2: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: 'white',
+    marginTop: 45,
+    marginLeft: 20,
+  },
+  updated: {
+    color: '#88888888',
+    margin: 20,
+    marginTop: 15,
+    marginBottom: 5,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginHorizontal: 20,
+    marginTop: 20,
+  },
+  terms: {
+    fontSize: 14,
+    lineHeight: 24,
+    marginHorizontal: 20,
+  },
+  acknowledgement: {
+    fontSize: 14,
+    lineHeight: 24,
+    marginHorizontal: 20,
+    marginVertical: 15
+  },
+  header3: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#8A2BE2',
+    padding: 25,
+    marginTop: -60,
+    marginHorizontal: -10,
   },
 });
 
