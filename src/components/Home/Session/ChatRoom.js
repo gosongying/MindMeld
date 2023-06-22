@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard, Modal } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard, Modal, Alert } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 import { auth, database } from "../../../../firebase";
 import { runTransaction, ref, onValue } from 'firebase/database';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 //import firebase from 'firebase/compat/app';
 //import 'firebase/compat/database';
@@ -29,7 +30,6 @@ const ChatRoom = ({ navigation, session }) => {
   const [messages, setMessages] = useState([]);
   const [showModal, setShowModal] = useState(false);
 
-  console.log(session)
 
   const chatId = session.chatId;
   
@@ -112,7 +112,7 @@ const ChatRoom = ({ navigation, session }) => {
 
       return (
         <View
-          key={item.id}
+          key={item.timestamp}
           style={[
             styles.messageContainer,
             isCurrentUser ? styles.currentUserMessageContainer : styles.otherUserMessageContainer,
@@ -128,21 +128,51 @@ const ChatRoom = ({ navigation, session }) => {
     });
   };
 
-  const goToHome = () => navigation.goBack();
+  const goToHome = () => {
+    //remove session from user ongoing session first
+    try {
+      runTransaction(ref(database, 'userId/' + currentUser.uid), (user) => {
+        if (user) {
+          user.ongoingSessions = user.ongoingSessions.filter((id) => id !== session.id);
+          return user;
+        } else {
+          return user;
+        }
+      })
+      .then(() => {
+        navigation.goBack();
+      })
+    } catch (error) {
+      console.log(error);
+      Alert.alert("An error occurs during quiting session");
+    }
+  };
 
   return (
     <KeyboardAvoidingView
         style={styles.container}
         behavior={Platform.OS === 'ios' ? 'padding' : null}
       >
-        <View style={styles.header}>
-          <TouchableOpacity style={styles.backButton} onPress={goToHome}>
-            <Text style={styles.back}>{'\u2190'}</Text>
+        <View style={styles.headerContainer}>
+          <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', top: 15}}>
+            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+              <MaterialIcons name='arrow-left' size={30}/>
+              <Text>Participants</Text>
+            </View>
+            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+              <Text>To Do List</Text>
+              <MaterialIcons name="arrow-right" size={30} />
+            </View>
+          </View>
+          <View style={styles.header}>
+          <TouchableOpacity style={styles.quitButton} onPress={goToHome}>
+            <Text style={styles.quit}>quit</Text>
           </TouchableOpacity>
           <Text style={styles.title}>Chat</Text>
           <TouchableOpacity style={styles.closeButton}>
             <AntDesign name="infocirlceo" size={24} color="#fff" onPress={() => setShowModal(true)} />
           </TouchableOpacity>
+          </View>
         </View>
 
         <ScrollView
@@ -178,10 +208,10 @@ const ChatRoom = ({ navigation, session }) => {
                 Date: {session.selectedDate}
               </Text>
               <Text style={styles.label2}>
-                Start Time: 'a'
+                Start Time: {session.startTime.string}
               </Text>
               <Text style={styles.label2}>
-                End Time: 'b'
+                End Time: {session.endTime.string}
               </Text>
               <TouchableOpacity style={styles.returnButton} onPress={() => setShowModal(false)}>
                 <Text style={styles.buttonText}>Return</Text>
@@ -198,16 +228,24 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#ffffff',
   },
-  backButton: {
-    marginRight: 10,
+  closeButton: {
+    right: 20,
+    top: 10
   },
-  back: {
-    fontSize: 35,
+  quit: {
+    fontSize: 20,
     fontWeight: 'bold',
     color: '#fff',
-  },
-  closeButton: {
-    marginLeft: 10,
+},
+  quitButton: {
+    backgroundColor: "rgba(255,0,0,0.5)",
+    borderRadius: 15,
+    width: 70,
+    alignItems: 'center',
+    justifyContent: 'center',
+    left: 20,
+    top: 10,
+    paddingVertical: 5
   },
   header: {
     flexDirection: 'row',
@@ -215,14 +253,13 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: 10,
     backgroundColor: '#8A2BE2',
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    paddingTop: 50,
+    top: 15
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
     color: '#fff',
+    right:25
   },
   messagesContainer: {
     flexGrow: 1,
@@ -323,6 +360,11 @@ const styles = StyleSheet.create({
   messageContent: {
     fontSize: 16,
   },
+  headerContainer: {
+    height: 120,
+    backgroundColor: '#8A2BE2',
+    justifyContent: 'center'
+  }
 });
 
 export default ChatRoom;

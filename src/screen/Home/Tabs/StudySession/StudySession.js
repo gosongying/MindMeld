@@ -59,7 +59,6 @@ const StudySession = ({navigation}) => {
                     .then((session) => {
                         if (session.val()) {
                             if (session.val().endTime.timestamp <= currentTimestamp) {
-                                console.log('123')
                                 ended.push(session.val().id);
                             } else {
                                 sessions.push(session.val());
@@ -92,8 +91,6 @@ const StudySession = ({navigation}) => {
             unsubscribe();
         }
     }, [currentTimestamp]);
-
-
     
         useEffect(() => {
             //to check if any invitation expired
@@ -157,15 +154,15 @@ const StudySession = ({navigation}) => {
         const db = ref(database);
         //add the user into participants list of the session
         try {
-            runTransaction(child(db, 'sessions/' + session.id), (session) => {
-                if (session) {
-                    session.participants.push({
+            runTransaction(child(db, 'sessions/' + session.id), (session2) => {
+                if (session2) {
+                    session2.participants.push({
                         uid: currentUser.uid, 
                         username: currentUser.displayName
                     });
-                    return session;
+                    return session2;
                 } else {
-                    return session;
+                    return session2;
                 }
             });
 
@@ -176,7 +173,9 @@ const StudySession = ({navigation}) => {
                     if (user.upcomingSessions) {
                         user.upcomingSessions.push(session.id);
                     } else {
+                        console.log('sss')
                         user.upcomingSessions = [session.id];
+                        console.log('ssaaaa')
                     }
                     return user;
                 } else {
@@ -184,7 +183,7 @@ const StudySession = ({navigation}) => {
                 }
             }).then(() => {
                 showJoin();
-                setInDetail(inDetail.filter((id) => id !== sessionId));
+                setInDetail(inDetail.filter((id) => id !== session.id));
                 setSessionData([...sessionData, session])
             });
         } catch (error) {
@@ -248,9 +247,9 @@ const StudySession = ({navigation}) => {
     const joinSession = (session) => {
        try {
             const db = ref(database);
-            Promise.all([
+            //Promise.all([
                 //add user into online list of the session
-                runTransaction(child(db, 'sessions/' + session.id), (session) => {
+                /*runTransaction(child(db, 'sessions/' + session.id), (session) => {
                     if (session) {
                         if (session.onlineParticipants) {
                             session.onlineParticipants.push(currentUser.uid);
@@ -262,7 +261,7 @@ const StudySession = ({navigation}) => {
                     } else {
                         return session;
                     }
-                }), 
+                }), */
                 //add the session into user's ongoing sessions
                 runTransaction(child(db, 'userId/' + currentUser.uid), (user) => {
                     if (user) {
@@ -277,7 +276,7 @@ const StudySession = ({navigation}) => {
                         return user;
                     }
                 })
-            ])
+           // ])
             .then(() => navigation.navigate("SessionRoom", {session}));
         } catch (error) {
             console.log(error);
@@ -374,7 +373,7 @@ const StudySession = ({navigation}) => {
                     </View>
                     
                     <View style={styles.acceptOrDecline}>
-                        <TouchableOpacity onPress={() => acceptInvitation(item.id)}>
+                        <TouchableOpacity onPress={() => acceptInvitation(item)}>
                             <Ionicons name="checkmark" color={'green'} size={35}/>
                         </TouchableOpacity>
                         <TouchableOpacity onPress={() => declineInvitation(item.id)}>
@@ -661,13 +660,13 @@ const styles = StyleSheet.create({
     },
     joinContainer: {
         position: 'absolute',
-        backgroundColor: 'rgba(100, 100, 250, 0.5)',
+        backgroundColor: 'rgba(100, 100, 250, 0.8)',
         justifyContent: 'center',
         alignItems: 'center',
         width: 150,
         height: 40,
         top: 160,
-        left: 130,
+        left: 110,
         borderRadius: 20,
     },
     joinText: {
@@ -682,7 +681,7 @@ const styles = StyleSheet.create({
         width: 120,
         height: 40,
         top: 160,
-        left: 135,
+        left: 125,
         borderRadius: 20,
     },
     declineText: {
