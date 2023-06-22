@@ -21,7 +21,8 @@ const HelloName = () => {
   //  }
   //});
   const currentUser = auth.currentUser;
-  const username = currentUser.displayName;
+  const username = currentUser ? currentUser.displayName : null;
+
 
   /*useEffect(() => {
     if (currentUser.isAnonymous) {

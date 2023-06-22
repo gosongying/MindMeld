@@ -146,28 +146,6 @@ const PostScreen = ({ route, navigation }) => {
         }
         return post;
       });
-
-      // Alert is too slow
-
-      // if (post.isClosed) {
-      //   Alert.alert('Error', 'You cannot delete comments on a closed post.');
-      //   return;
-      // }
-  
-      // Alert.alert('Confirmation', 'Are you sure you want to delete this comment?', [
-      //   { text: 'Cancel', style: 'cancel' },
-      //   {
-      //     text: 'Delete',
-      //     style: 'destructive',
-      //     onPress: () => {
-      //       // Delete the comment from the database
-
-  
-      //       // Decrement the comments count for the post
-
-      //     },
-      //   },
-      // ]);
     };
 
     return (
@@ -385,7 +363,7 @@ const editComment = (newText) => {
           marginBottom: -10 }}>
 
             <View style={{ flexDirection: 'row' }}>
-              <View style={{ maxWidth: screenWidth * 0.65 }}>
+              <View>
                 <Text style={styles.title}>{post.title}</Text>
               </View>
 
@@ -399,46 +377,8 @@ const editComment = (newText) => {
                 {/* Lock, Edit and Delete Pressables */}
                 {userAuthenticated && post.author === firebase.auth().currentUser?.displayName && (
                 <View style={styles.postButtons}>
-
-                  {/* Keep in view */}
-                    {/* {post.isClosed ? (
-                    <TouchableOpacity
-                        style={styles.openButton}
-                        onPress={() => openPost(post.id)}
-                    >
-                        <Ionicons name="lock-closed-outline" size={24} color="red" />
-                    </TouchableOpacity>
-                    ) : (
-                    <TouchableOpacity
-                        style={styles.closeButton}
-                        onPress={() => closePost(post.id)}
-                    >
-                        <Ionicons name="lock-open-outline" size={24} color="green" />
-                    </TouchableOpacity>
-                    )}
-
-                  <TouchableOpacity
-                    style={styles.editButton}
-                    onPress={() => {
-                        if (post.isClosed) {
-                        Alert.alert("Error", "You cannot edit a closed post.");
-                        } else {
-                        openEditModal(post);
-                        }
-                    }}
-                    >
-                    <Ionicons name="pencil" size={24} color="#8A2BE2" />
-                    </TouchableOpacity> */}
-
-                    {/* <TouchableOpacity
-                    style={styles.deleteButton}
-                    onPress={() => deletePost(post.id)}
-                    >
-                    <Ionicons name="trash" size={24} color="red" />
-                    </TouchableOpacity> */}
                 </View>
                 )}
-                <Text style={{marginRight: -10, marginTop: 8}}>Posted by: {post.author}</Text>
                 </View>
               </View>
             </View>
@@ -459,6 +399,7 @@ const editComment = (newText) => {
             <DynamicTimeText timestamp={post.timestamp} />
           </View>
         </View>
+        <Text style={{marginTop: 25}}>Posted by: {post.author}</Text>
       </View>
         
       <View style={{ 
@@ -473,39 +414,50 @@ const editComment = (newText) => {
           scrollEnabled={false} // Disable scrolling of the FlatList
         />
       </View>
-    </ScrollView>
-
+    </ScrollView>   
         
-        
-       <View style={styles.footerContainer}>
-       {post.isClosed ? (
-          <View style={styles.commentInputContainer}>
-            <TextInput
-              style={[styles.commentInput, { backgroundColor: '#E0E0E0' }]}
-              placeholder="Post is closed"
-              placeholderTextColor="#888"
-              editable={false}
-            />
-          </View>
-        ) : (
-          <View style={styles.commentInputContainer}>
-            <TextInput
-              style={styles.commentInput}
-              placeholder="Add a comment..."
-              value={commentText}
-              onChangeText={setCommentText}
+    <View style={styles.footerContainer}>
+      {post.isClosed ? (
+        <View style={styles.commentInputContainer}>
+          <TextInput
+            style={[styles.commentInput, { backgroundColor: '#E0E0E0', textAlign: 'center' }]}
+            placeholder="Post is closed"
+            placeholderTextColor="#888"
+            editable={false}
+          />
+        </View>
+      ) : (
+        <View style={styles.commentInputContainer}>
+          {firebase.auth().currentUser && firebase.auth().currentUser.isAnonymous ? (
+            <View style={styles.commentInputContainer}>
+              <TextInput
+                style={[styles.commentInput, { backgroundColor: '#E0E0E0',  textAlign: 'center' }]}
+                placeholder="Guests cannot comment"
+                placeholderTextColor="#888"
+                editable={false}
+              />
+            </View>
+          ) : (
+            <View style={styles.commentInputContainer}>
+              <TextInput
+                style={styles.commentInput}
+                placeholder="Add a comment..."
+                value={commentText}
+                onChangeText={setCommentText}
+              />
+              <TouchableOpacity
+                style={styles.commentButton}
+                onPress={() => addComment(post.id, commentText)}
+                disabled={!commentText}
+              >
+                <Text style={styles.postButton}>Comment</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        </View>
+      )}
+    </View>
 
-            />
-            <TouchableOpacity
-              style={styles.commentButton}
-              onPress={() => addComment(post.id, commentText)}
-              disabled={!commentText}
-            >
-              <Text style={styles.postButton}>Comment</Text>
-            </TouchableOpacity>
-          </View>
-        )}
-      </View>
 
       <Modal visible={editModalVisible && currentPostId !== null} animationType="fade">
         <View style={styles.modalContainer2}>

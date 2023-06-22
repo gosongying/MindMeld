@@ -1,13 +1,14 @@
-// Not Used Yet
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard, Modal } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
+import { auth, database } from "../../../../firebase";
+import { runTransaction, ref, onValue } from 'firebase/database';
 
-import firebase from 'firebase/compat/app';
-import 'firebase/compat/database';
-import 'firebase/compat/auth';
+//import firebase from 'firebase/compat/app';
+//import 'firebase/compat/database';
+//import 'firebase/compat/auth';
 
-const firebaseConfig = {
+/*const firebaseConfig = {
   apiKey: "AIzaSyBW9gyTZcDHmnAIzCXQKfKmrz1yCrot2ZQ",
   authDomain: "orbital-265b4.firebaseapp.com",
   databaseURL: "https://orbital-265b4-default-rtdb.asia-southeast1.firebasedatabase.app",
@@ -21,21 +22,26 @@ if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
 }
 
-const database = firebase.database();
+const database = firebase.database();*/
 
-const ChatRoom = ({ navigation }) => {
+const ChatRoom = ({ navigation, session }) => {
   const [inputMessage, setInputMessage] = useState('');
   const [messages, setMessages] = useState([]);
   const [showModal, setShowModal] = useState(false);
+
+  console.log(session)
+
+  const chatId = session.chatId;
   
   // To scroll to bottom of scrollList 
   const scrollViewRef = useRef(null);
 
+  const currentUser = auth.currentUser;
+
   const sendMessage = () => {
     if (inputMessage.trim() === '') return;
   
-    const user = firebase.auth().currentUser;
-    const sender = user ? user.displayName : 'Unknown User';
+    const sender = currentUser ? currentUser.displayName : 'Unknown User';
   
     const newMessage = {
       sender,
@@ -43,26 +49,51 @@ const ChatRoom = ({ navigation }) => {
       timestamp: new Date().getTime(), // Add the timestamp property
     };
   
-    database.ref('messages').push(newMessage);
+    runTransaction(ref(database, 'chat/' + chatId), (chat) => {
+      if (chat) {
+        if (chat.messages) {
+          //if there is messages in the chat room alr
+          chat.messages.push(newMessage);
+          return chat;
+        } else {
+          //if there is no messages there before
+          console.log(newMessage)
+          chat.messages = [newMessage];
+          return chat;
+        }
+      } else {
+        return chat;
+      }
+    })
+
+    //database.ref('messages').push(newMessage);
     setInputMessage('');
   };
   
   // To listen for new messages and update the messages state
   useEffect(() => {
-    const messagesRef = database.ref('messages');
+    const messagesRef = ref(database, 'chat/' + chatId);
   
-    const handleSnapshot = (snapshot) => {
+    /*const handleSnapshot = (snapshot) => {
       const data = snapshot.val();
       if (data) {
         const messageList = Object.values(data);
         setMessages(messageList);
       }
-    };
+    };*/
+
+    const unsubscribe = onValue(messagesRef, (snapshot) => {
+      if (snapshot.val()) {
+        const messageList = snapshot.val().messages? snapshot.val().messages: [];
+        setMessages(messageList);
+      }
+    })
   
-    messagesRef.on('value', handleSnapshot);
+    //messagesRef.on('value', handleSnapshot);
   
     return () => {
-      messagesRef.off('value', handleSnapshot);
+      //messagesRef.off('value', handleSnapshot);
+      unsubscribe();
     };
   }, []);
   
@@ -75,7 +106,7 @@ const ChatRoom = ({ navigation }) => {
   
   const renderMessageItems = () => {
     return messages.map((item) => {
-      const isCurrentUser = item.sender === firebase.auth().currentUser?.displayName;
+      const isCurrentUser = item.sender === currentUser?.displayName;
       const messageDate = new Date(item.timestamp);
       const messageTime = messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
@@ -130,6 +161,7 @@ const ChatRoom = ({ navigation }) => {
             style={styles.input}
             multiline
             textAlignVertical="top" 
+            autoCapitalize='none'
           />
           <TouchableOpacity style={styles.sendButton} onPress={sendMessage}>
             <Text style={styles.sendButtonText}>Send</Text>
@@ -143,13 +175,13 @@ const ChatRoom = ({ navigation }) => {
               <Text style={styles.label}>Session Information:</Text>
             </View>
               <Text style={styles.label2}>
-                Date: 17 June 2023
+                Date: {session.selectedDate}
               </Text>
               <Text style={styles.label2}>
-                Start Time: 15 : 00
+                Start Time: 'a'
               </Text>
               <Text style={styles.label2}>
-                End Time: 18 : 00
+                End Time: 'b'
               </Text>
               <TouchableOpacity style={styles.returnButton} onPress={() => setShowModal(false)}>
                 <Text style={styles.buttonText}>Return</Text>

@@ -299,10 +299,10 @@ const FriendListMore = ({navigation, route}) => {
                         <View style={styles.addFriendSearchContainer}>
                             <TextInput
                             style={styles.addFriend}
-                            placeholder='Username'
+                            placeholder='Enter Username'
                             placeholderTextColor={'gray'}
                             value={usernameAdded}
-                            onChangeText={(text) => setUsernameAdded(text)}
+                            onChangeText={(text) => setUsernameAdded(text.trim())}
                             autoCapitalize='none'
                             clearButtonMode='while-editing'
                             autoCorrect={false}
