@@ -421,7 +421,7 @@ const SignupPage2 = ({ navigation}) => {
                 </TouchableOpacity>
                 <Text style={styles.checkboxText}>Agree to</Text>
                 <TouchableOpacity onPress={() => setTermsModal(true)}>
-                  <Text style={[styles.checkboxText, {textDecorationLine: 'underline', marginLeft: 5, fontWeight: 'bold'}]}>Terms and Conditions</Text>
+                  <Text style={[styles.checkboxText, {textDecorationLine: 'underline', marginLeft: 5, fontWeight: 'bold', color: '#8A2BE2'}]}>Terms and Conditions</Text>
                 </TouchableOpacity>
               </View>
             </View>

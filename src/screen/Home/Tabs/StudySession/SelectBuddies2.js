@@ -62,7 +62,10 @@ const SelectBuddies2 = ({navigation, route}) => {
               //attach listener to each of the friend to get their status update
               const unsubscribe = onValue(ref(database, 'userId/' + id), (snapshot) => {
                 const user = snapshot.val();
-                const id = user.uid;
+
+                //const id = user.uid;
+                const id = user?.uid; // include null check
+
                 //update the specific user with status update
                 const newFriendList = friends.map((item) => item.uid === id ? user : item)
                 setFriendListData(newFriendList);
