@@ -15,7 +15,6 @@ import { auth } from '../../../../../firebase';
 const CreateStudySession = ({ navigation }) => {
 
   const isAnonymous = auth.currentUser.isAnonymous;
-  const [sessionType, setSessionType] = useState(isAnonymous? 'private': 'group');
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [studyModeEnabled, setStudyModeEnabled] = useState(isAnonymous);
   const [selectedDate, setSelectedDate] = useState(null);
@@ -31,14 +30,6 @@ const CreateStudySession = ({ navigation }) => {
 
   const goToHome = () => navigation.navigate('StudyDashboard');
 
-  const handleSessionTypeChange = (type) => {
-    setSessionType(type);
-    if (type === 'private') {
-      setStudyModeEnabled(true);
-    } else {
-      setStudyModeEnabled(false);
-    }
-  };
 
   const showDatePicker = () => {
     setDatePickerVisibility(true);
@@ -88,29 +79,6 @@ const CreateStudySession = ({ navigation }) => {
     hideEndTimePicker();
   };
 
-  const renderSessionTypeButtons = () => (
-    <View style={styles.buttonGroup}>
-      <TouchableOpacity
-        style={[
-          styles.sessionTypeButton,
-          sessionType === 'group' && styles.activeButton,
-        ]}
-        onPress={() => handleSessionTypeChange('group')}
-        disabled={isAnonymous}
-      >
-        <Text style={styles.buttonText}>Group</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={[
-          styles.sessionTypeButton,
-          sessionType === 'private' && styles.activeButton,
-        ]}
-        onPress={() => handleSessionTypeChange('private')}
-      >
-        <Text style={styles.buttonText}>Private</Text>
-      </TouchableOpacity>
-    </View>
-  );
 
   const createStudySession = () => {
     if (!sessionName) {
@@ -129,7 +97,6 @@ const CreateStudySession = ({ navigation }) => {
         //anonymous user does not have study buddy feature
         navigation.navigate('SelectToDo', {
           sessionName, 
-          sessionType, 
           sessionDescription,
           studyModeEnabled,
           selectedDate: selectedDate.toDateString(),
@@ -145,7 +112,6 @@ const CreateStudySession = ({ navigation }) => {
       } else { 
         navigation.navigate('SelectBuddies', {
           sessionName, 
-          sessionType, 
           sessionDescription,
           studyModeEnabled,
           selectedDate: selectedDate.toDateString(),
@@ -177,8 +143,6 @@ const CreateStudySession = ({ navigation }) => {
       clearButtonMode='while-editing'
       value={sessionName}
       onChangeText={(text) => setSessionName(text)}/>
-      <Text style={styles.subheading}>Session Type</Text>
-      {renderSessionTypeButtons()}
 
       <View>
         <Text style={styles.subheading}>Session Description</Text>
@@ -200,13 +164,9 @@ const CreateStudySession = ({ navigation }) => {
         <TouchableOpacity
           style={[styles.checkbox, studyModeEnabled && styles.checkboxActive]}
           onPress={() => setStudyModeEnabled(!studyModeEnabled)}
-          disabled={sessionType === 'private'}
         >
           {studyModeEnabled && <Text style={styles.checkmark}>&#x2713;</Text>}
         </TouchableOpacity>
-        {sessionType === 'private' && (
-          <Text style={styles.checkboxLabel2}>      This must be enabled {"\n"}      during private sessions </Text>
-        )}
       </View>
       <Text style={styles.subheading}>Select Date</Text>
       <TouchableOpacity style={styles.calendarButton} onPress={showDatePicker}>
