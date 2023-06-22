@@ -56,6 +56,14 @@ const Details = ({ navigation }) => {
 
   const handleChangedUsername = () => {
     setLoading(true);
+
+    if (!/^[a-zA-Z0-9]+$/.test(newUsername)) {
+      Alert.alert('Username cannot contain special characters');
+      setLoading(false);
+      return
+    }
+
+
     if (!(newUsername.trim())) {
       //if the new username is empty
       Alert.alert("Username cannot be empty");
@@ -370,7 +378,7 @@ const styles = StyleSheet.create({
     textAlign: 'left',
     borderBottomColor: "gray",
     borderBottomWidth: 2,
-    width: "90%"
+    width: "60%"
   },
   detailsContainer: {
     flex: 1,
