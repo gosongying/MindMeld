@@ -111,13 +111,6 @@ const Participants = ({session, navigation}) => {
                                     )}
                             </View>
                         </View>
-                        <TouchableOpacity>
-                            <MaterialIcons 
-                            name={"delete"}
-                            size={25} 
-                            style={{right: 35}}
-                            onPress={() => setDeletingFriend(item)}/>
-                        </TouchableOpacity>
                     </TouchableOpacity>
                     {/* separator */}
                     <View style={styles.separator} />

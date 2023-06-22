@@ -161,6 +161,7 @@ const ChatRoom = ({ navigation, session }) => {
             style={styles.input}
             multiline
             textAlignVertical="top" 
+            autoCapitalize='none'
           />
           <TouchableOpacity style={styles.sendButton} onPress={sendMessage}>
             <Text style={styles.sendButtonText}>Send</Text>
