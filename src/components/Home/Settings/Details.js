@@ -11,6 +11,9 @@ import * as ImagePicker from 'expo-image-picker';
 import { ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage"
 import Fontisto from 'react-native-vector-icons/Fontisto';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Dimensions } from 'react-native';
+
+const screenWidth = Dimensions.get('window').width;
 
 const Details = ({ navigation }) => {
   //since the the profile settings page hasn't been done,
@@ -255,8 +258,9 @@ const Details = ({ navigation }) => {
       setIsEditingUsername(false);
       setNewUsername(oldUsername);
     }}>
+      <View>
       <View style={styles.container}>
-        <View style={[styles.statusIndicator, isAnonymous && styles.anonymous]} />
+        <View style={[styles.statusIndicator]} />
         <View style={styles.outerPhotoContainer}>
           <View style={styles.photoContainer}>
             {image ? (
@@ -265,21 +269,6 @@ const Details = ({ navigation }) => {
               <Image source={require("../../../../assets/profileholder.png")} style={styles.profile}/> 
             )}      
             </View>
-          {/* anonymous user cannot change profile picture */}
-          {!isAnonymous && (
-            <View style={styles.libraryAndCamera}>
-            <TouchableOpacity 
-            onPress={selectImageLibrary}
-            disabled={isLoading}>
-              <FontAwesome name={'photo'} size={22} />
-            </TouchableOpacity>
-            <TouchableOpacity 
-            onPress={selectImageCamera}
-            disabled={isLoading}>
-              <MaterialCommunityIcons name={'camera-outline'} size={27} />
-            </TouchableOpacity>
-            </View>
-          )}
         </View>
         <View style={styles.detailsContainer}>
           {isEditingUsername ? (
@@ -293,8 +282,10 @@ const Details = ({ navigation }) => {
             onBlur={() => setNewUsername(newUsername.trim())}/>
           ) : (
             <View style={styles.nameAndEdit}>
-              <View style={{flexDirection: 'row', alignItems:'center', width: 200}}>
-                <Text style={styles.name} numberOfLines={1}>{oldUsername}</Text>
+              <View style={{flexDirection: 'row', alignItems:'center'}}>
+                <View>
+                  <Text style={[styles.name, {maxWidth: screenWidth * 0.5}]} numberOfLines={1}>{oldUsername}</Text>
+                </View>
                 {gender === 'male' ? (
                   <Fontisto name='male' size={15} color='dodgerblue' style={{marginLeft:5}}/>
                 ) : gender === 'female' ? (
@@ -303,14 +294,30 @@ const Details = ({ navigation }) => {
                   <View />
                 )}
               </View>
-              {/* anonymous user cannot change username */}
-              { !isAnonymous && (
+              {/* anonymous user cannot change profile picture */}
+              {/* edit pictures and username */}
+              {!isAnonymous && (
+                <View style={styles.icons}>
                 <TouchableOpacity 
                 onPress={editUsername}
-                style={{left: 15}}
                 disabled={isLoading}>
                   <Ionicons name="create" size={20} />
                 </TouchableOpacity>
+
+                <TouchableOpacity 
+                onPress={selectImageLibrary}
+                disabled={isLoading}>
+                  <FontAwesome name={'photo'} size={15} />
+                </TouchableOpacity>
+
+                <TouchableOpacity 
+                onPress={selectImageCamera}
+                disabled={isLoading}>
+                  <MaterialCommunityIcons name={'camera-outline'} size={19} />
+                </TouchableOpacity>
+
+
+                </View>
               )}
 
               {/* Display MindMeld logo for anonymous users */}
@@ -319,7 +326,7 @@ const Details = ({ navigation }) => {
                 style={{
                   width: 188 / 2,
                   height: 120 / 2,
-                  marginLeft: -83,
+                  marginLeft: 75,
                 }} />
               )}
             </View>
@@ -335,6 +342,7 @@ const Details = ({ navigation }) => {
           )}
         </View>
       </View>
+      </View>
     </TouchableWithoutFeedback>
   );
 };
@@ -344,17 +352,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: 10,
-    left: 25
+    padding: 5,
+    marginTop: 35,
+    marginBottom: 10,
     //height: 120
   },
   profile: {
-    height: 85,
-    width: 85,
+    height: 70,
+    width: 70,
     marginRight: 20,
   },
   name: {
-    fontSize: 26,
+    fontSize: 22,
     fontWeight: 'bold',
   },
   nameWhenEditing: {
@@ -365,7 +374,8 @@ const styles = StyleSheet.create({
   },
   detailsContainer: {
     flex: 1,
-    left: 5,
+    left: 30,
+    bottom: 11,
   },
   levelContainer: {
     flexDirection: 'row',
@@ -374,6 +384,7 @@ const styles = StyleSheet.create({
   },
   levelText: {
     marginRight: 10,
+    fontSize: 14,
   },
   trophyContainer: {
     flexDirection: 'row',
@@ -381,29 +392,30 @@ const styles = StyleSheet.create({
   },
   trophyText: {
     marginRight: 5,
+    fontSize: 14,
   },
   trophyIcon: {
     marginLeft: 5,
   },
   photoContainer: {
     borderRadius: 42.5,
-    height: 85,
-    width: 85,
+    height: 70,
+    width: 70,
     overflow: 'hidden',
-    right: 10,
+    left: 10,
     justifyContent: 'center',
-    bottom: 5
+    bottom: 10
   },
   nameAndEdit: {
     flexDirection: 'row',
     alignItems: 'center',
   },
-  libraryAndCamera: {
-    width:80,
+  icons: {
+    width: 70,
     flexDirection: 'row',
     alignItems:'center',
-    justifyContent:'space-evenly',
-    right: 10
+    justifyContent: 'space-between',
+    marginLeft: 10,
   },
   outerPhotoContainer: {
     alignItems: 'center',
@@ -411,11 +423,11 @@ const styles = StyleSheet.create({
   statusIndicator: {
     position: 'absolute',    
     backgroundColor: 'rgb(0, 200, 0)',
-    width: 12,
-    height: 12,
+    width: 14,
+    height: 14,
     borderRadius: 6,
-    bottom: 45,
-    left: 63,
+    bottom: 21,
+    left: 69,
     zIndex: 1
   },
   anonymous: {
