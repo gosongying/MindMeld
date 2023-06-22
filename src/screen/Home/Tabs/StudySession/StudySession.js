@@ -23,7 +23,8 @@ const StudySession = ({navigation}) => {
     const [sessionName, setSessionName] = useState('');
 
     const currentUser = auth.currentUser;
-    const isAnonymous = currentUser.isAnonymous;
+    const isAnonymous = currentUser ? currentUser.isAnonymous : null;
+
 
     /*const checkExpired = () => {
         const currentTimestamp = new Date().getTime();

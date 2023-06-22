@@ -120,7 +120,7 @@ const SignupPage2 = ({ navigation}) => {
   runTransaction(usernameRef, (user) => {
     if (user) {
       setLoading(false);
-      Alert.alert("Username already existed");
+      Alert.alert("Username already exists");
       return;
     } else {
       const data = {
@@ -164,11 +164,32 @@ const SignupPage2 = ({ navigation}) => {
   };
 
   const handleToggleConfirmUsername = () => {
-    if (username === '') {
-      Alert.alert('Error', 'Username cannot be empty');
-      return
+    // username cannot be guest (case-insensitive)
+    if (username.trim().toLowerCase() === 'guest') {
+      Alert.alert('Username cannot be "Guest"');
+      return;
     }
-    setConfirmUsername(!confirmUsername);
+    if (username.trim() === '') {
+      Alert.alert('Username cannot be empty');
+      setConfirmUsername(false);
+    } else {
+      setConfirmUsername((prevState) => !prevState);
+    }
+
+    if (username.includes(' ')) {
+      Alert.alert('No whitespace allowed in the username');
+      setUsername('');
+      setConfirmUsername(false);
+    }
+  };
+
+  const handleUsernameBlur = () => {
+    setUsername(username.trim())
+  };
+
+  const handleChangeUsername = (text) => {
+    setUsername(text);
+    setConfirmUsername(false);
   };
 
   const handleToggleAgreeTerms = () => {
@@ -296,9 +317,10 @@ const SignupPage2 = ({ navigation}) => {
               <TextInput
                 style={styles.input}
                 value={username}
-                onChangeText={setUsername}
+                onChangeText={handleChangeUsername}
+                onBlur={handleUsernameBlur}
                 placeholder="Enter your username"
-                autoCapitalize='none'
+                autoCapitalize="none"
                 editable={!isLoading}
                 clearButtonMode="while-editing"
               />
@@ -325,7 +347,7 @@ const SignupPage2 = ({ navigation}) => {
             </View>
 
             <View style={styles.formRow}>
-              <Text style={styles.label}>Study of Interest:</Text>
+              <Text style={styles.label}>Study of Interest {'('}Optional{')'}: </Text>
               <View style={styles.toggleButtonContainer}>
                 <FlatList
                   data={[
@@ -366,7 +388,7 @@ const SignupPage2 = ({ navigation}) => {
                   onPress={handleToggleConfirmUsername}
                   disabled={isLoading}
                 >
-                {confirmUsername ? (
+                {confirmUsername ? ( 
                   <View style={styles.checkbox}>
                     <Ionicons name={"checkmark"} size={15} />
                   </View>
@@ -399,9 +421,9 @@ const SignupPage2 = ({ navigation}) => {
             </View>
 
             <TouchableOpacity
-              style={[styles.nextButton, (!confirmUsername || !agreeTerms) && styles.nextButtonDisabled]}
+              style={[styles.nextButton, (!confirmUsername || !agreeTerms || !gender || !username) && styles.nextButtonDisabled]}
               onPress={handleConfirmDetails}
-              disabled={!agreeTerms || !confirmUsername || isLoading}
+              disabled={!agreeTerms || !confirmUsername || isLoading || !gender || !username}
             >
               <Text style={styles.nextButtonText}>Next</Text>
             </TouchableOpacity>
