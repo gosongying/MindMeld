@@ -23,8 +23,6 @@ const StudySession = ({navigation}) => {
     const [sessionName, setSessionName] = useState('');
 
     const currentUser = auth.currentUser;
-    const isAnonymous = currentUser ? currentUser.isAnonymous : null;
-
 
     /*const checkExpired = () => {
         const currentTimestamp = new Date().getTime();
@@ -95,7 +93,7 @@ const StudySession = ({navigation}) => {
         }
     }, [currentTimestamp]);
 
-    if (!isAnonymous) {
+
     
         useEffect(() => {
             //to check if any invitation expired
@@ -139,7 +137,7 @@ const StudySession = ({navigation}) => {
                 unsubscribe();
             }
         }, [currentTimestamp]);
-    }
+    
 
     const showJoin = () => {
         setJoin(true);
@@ -492,8 +490,7 @@ const SessionHeader = ({setIsCheckingInvitation, setSessionName}) => {
 
                 <TouchableOpacity
                 style={styles.news}
-                onPress={() => setIsCheckingInvitation(true)}
-                disabled={auth.currentUser.isAnonymous}>
+                onPress={() => setIsCheckingInvitation(true)}>
                     <MaterialCommunityIcons 
                     name='bell-outline'
                     size={30}

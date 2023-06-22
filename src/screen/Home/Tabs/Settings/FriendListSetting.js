@@ -20,7 +20,7 @@ import {
               <Text style={styles.title}>Study Buddy Settings</Text>
               <Ionicons name='person' size={30} style={styles.icon} color={'white'}/>
             </View>
-            <FriendList navigation={navigation}/>
+              <FriendList navigation={navigation}/>
         </View>
     )
   }
