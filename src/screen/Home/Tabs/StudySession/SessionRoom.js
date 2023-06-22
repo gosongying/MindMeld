@@ -26,7 +26,9 @@ const SessionRoom = ({route}) => {
 
   const renderScreen = ({item}) => {
     return (
-      <item.component session/>
+      <View style={styles.pageContainer}>
+          <item.component session={session}/>
+      </View>
     )
   };
 
@@ -34,13 +36,13 @@ const SessionRoom = ({route}) => {
 
 
   const data = [
-      {id: 1, component: ChatRoom},
-       {id: 2, component: ToDoList},
-       {id: 3, component: Participants}
+       {id: 1, component: Participants},
+       {id: 2, component: ChatRoom},
+       {id: 3, component: ToDoList}
   ];
 
 
-    const isCarousel = React.useRef(null);
+    /*const isCarousel = React.useRef(null);
 
     const [index, setIndex] = React.useState(0); //to keep track of currently active dot
 
@@ -50,47 +52,28 @@ const SessionRoom = ({route}) => {
         dotStyle.push(styles.activeDot);
       }
       return <View/>;
-    };
+    };*/
+
+    const getItemLayout = (_, index) => ({
+      length: 200, // Set the height of each item
+      offset: 200 * index, // Calculate the offset based on item height and index
+      index,
+    });
+  
 
 
  return (
-  <SafeAreaView >
-    <Carousel
-      layout="tinder"
-      layoutCardOffset={9}
-      ref={isCarousel}
-      data={data}
-      renderItem={renderScreen}
-      sliderWidth={Dimensions.get('window').width + 80}
-      itemWidth={Math.round(Dimensions.get('window').width + 80 * 0.7)}
-      inactiveSlideShift={0}
-      onSnapToItem={(index) => setIndex(index)}
-      useScrollView={true}
-      scrollEnabled={true}
-      autoplay={true}
-      keyExtractor={(item) => item.id}
-/>
-{/* for creating pagination */}
-    <Pagination
-  dotsLength={data.length}
-  activeDotIndex={index}
-  carouselRef={isCarousel}
-  dotStyle={{
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    marginHorizontal: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.92)',
-    bottom:40
-  }}
-  inactiveDotOpacity={0.4}
-  inactiveDotScale={0.7}
-  tappableDots={true}
-  renderDot={renderDot}
-/>
-  </SafeAreaView>
+  <FlatList 
+  pagingEnabled
+  data={data}
+  renderItem={renderScreen}
+  keyExtractor={(item) => item.id}
+  horizontal
+  contentContainerStyle={{flexGrow: 1}}
+  initialScrollIndex={2}
+  getItemLayout={getItemLayout}
+  />
  )
-
 };
 
 const styles = StyleSheet.create({
@@ -125,7 +108,12 @@ const styles = StyleSheet.create({
   },
   des:{
     fontSize:15,
-  }
+  },
+  pageContainer: {
+    width: Dimensions.get('screen').width,
+    //justifyContent: 'center',
+    //alignItems: 'center',
+  },
 
 });
 
