@@ -16,8 +16,6 @@ const Participants = ({session, navigation}) => {
     const [username, setUsername] = useState('');
 
     const sessionId = session.id;
-
-    console.log(participantsData)
     
     useEffect(() => {
     //listen to the change of participant list
@@ -25,11 +23,12 @@ const Participants = ({session, navigation}) => {
     const unsubscribe = onValue(ref(database, 'sessions/' + sessionId), async (snapshot) => {
         let participantsData2 = [];
         if (snapshot.val()) {
-            const participantsId2 = snapshot.val().onlineParticipants ? snapshot.val().onlineParticipants: [];
+            const participantsId2 = snapshot.val().participants? snapshot.val().participants: [];
             if (participantsId2) {
+                setParticipantsId(participantsId2);
             //to make sure participants is added before set
-            await Promise.all(participantsId2.map(async (id) => {
-                const userRef = ref(database, 'userId/' + id);  
+            await Promise.all(participantsId2.map(async (user) => {
+                const userRef = ref(database, 'userId/' + user.uid);  
                 await get(userRef)
                 .then((user) => {
                     participantsData2.push(user.val());
@@ -42,10 +41,9 @@ const Participants = ({session, navigation}) => {
             }));
             console.log(participantsData2)
             setParticipantsData(participantsData2);
-            setParticipantsId(participantsId2);
-            /*participantsId2.map((id) => {
-                //attach listener to each of the friend to get their status update
-                const unsubscribe = onValue(ref(database, 'userId/' + id), (snapshot) => {
+            participantsId2.map((user) => {
+                //attach listener to each of the participants to get their status update
+                const unsubscribe = onValue(ref(database, 'userId/' + user.uid), (snapshot) => {
                     const user = snapshot.val();
                     const id = user.uid;
                     //update the specific user with status update
@@ -55,11 +53,11 @@ const Participants = ({session, navigation}) => {
                         unsubscribe();
                     }
                 })
-            })*/
+            })
             return;
         }
         setParticipantsId([]);
-        setParticipantsData(participantsData2);
+        setParticipantsData([]);
     }
     });
     return () => {
@@ -84,6 +82,7 @@ const Participants = ({session, navigation}) => {
     };
 
     const renderFriendItem = ({ item }) => {
+        const isPresent = item.ongoingSessions? item.ongoingSessions.includes(sessionId): false;
         if (item.username.startsWith(username) || !username) {
             return (
                 <View>
@@ -111,44 +110,17 @@ const Participants = ({session, navigation}) => {
                                     )}
                             </View>
                         </View>
+                        {isPresent && (
+                            <View style={styles.presentContainer}>
+                                <Text style={styles.presentText}>Present</Text>
+                            </View>
+                        )}
                     </TouchableOpacity>
                     {/* separator */}
                     <View style={styles.separator} />
                 </View>
             );
         } 
-    };
-
-    const quitSession = () => {
-        try {
-            const db = ref(database);
-            Promise.all([
-                //to remove the user from session online participants
-                runTransaction(child(db, 'sessions/' + sessionId), (session) => {
-                    if (session) {
-                        session.onlineParticipants = session.onlineParticipants.filter((id) => id !== currentUser.uid);
-                        return session;
-                    } else {
-                        return;
-                    }
-                }),
-                //to remove the session from user ongoing sessions
-                runTransaction(child(db, 'userId/' + currentUser.uid), (user) => {
-                    if (user) {
-                        user.ongoingSessions = user.ongoingSessions.filter((id) => id !== sessionId);
-                        return user;
-                    } else {
-                        return user;
-                    }
-                })
-            ])
-            .then(() => {
-                navigation.goBack();
-            });
-        } catch (error) {
-            console.log(error);
-            Alert.alert("An error occurs when quiting session")
-        }
     };
 
     const addFriend = (id) => {
@@ -203,16 +175,13 @@ const Participants = ({session, navigation}) => {
         <View style={styles.container}>
             <View style={styles.header}>
                 <View style={styles.headerTop}>
-                    <TouchableOpacity 
-                    onPress={quitSession}
-                    style={styles.button} 
-                    >
-                    <Text style={styles.back}>{'\u2190'}</Text >  
-                    </TouchableOpacity>
                     <Text style={styles.headerText}>Participants</Text>
+                    <View style={styles.arrow}>
+                        <Text>Chat Room</Text>
+                        <MaterialIcons name='arrow-right' size={30} />
+                    </View>
                 </View>
                 <View style={styles.searchContainer}>
-                
                     <Ionicons 
                     style={styles.searchIcon}
                     name='search' 
@@ -300,11 +269,16 @@ const styles = StyleSheet.create({
     },
     header: {
         width: "100%",
-        height: 140,
+        height: 130,
         backgroundColor: '#8A2BE2',
         alignItems: 'center',
         justifyContent: 'center',
-        borderRadius: 20
+    },
+    arrow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        bottom: 22
     },
     headerText: {
         fontSize: 24,
@@ -349,18 +323,9 @@ const styles = StyleSheet.create({
         height: 1,
         backgroundColor: 'thistle',
     },
-    back: {
-        fontSize: 35,
-        color: "white",
-        fontWeight: "bold",
-    },
-    button: {
-       bottom: 20,
-       right: 80
-    },
     search: {
         backgroundColor: 'white',
-        width: "50%",
+        width: "60%",
         height: 30,
         borderRadius: 10,
         textAlign: 'left',
@@ -368,12 +333,14 @@ const styles = StyleSheet.create({
     },
     headerTop: {
         flexDirection: 'row',
-        top: 30
+        top: 25,
+        left: 20,
+        left: 70
     },
     searchContainer: {
         flexDirection: 'row',
-        right: 35,
-        top: 20,
+        right: 30,
+        top: 25,
         alignItems: 'center',
         marginLeft: 30,
     },
@@ -492,7 +459,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgb(0, 200, 0)',
         borderRadius: 6,
         position: 'absolute',
-        left: 75, 
+        left: 77, 
         top: 65
     },
     modalContainer: {
@@ -549,6 +516,18 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         textAlign: 'center',
     },
+    presentContainer: {
+        width: 90,
+        borderRadius: 10,
+        backgroundColor: 'mediumpurple',
+        alignItems: 'center',
+        justifyContent: 'center',
+        right: 50
+    },
+    presentText: {
+        fontSize: 18,
+        color: 'white'
+    }
 });
 
 

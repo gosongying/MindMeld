@@ -21,13 +21,13 @@ import ChatRoom from '../../../../components/Home/Session/ChatRoom';
 import ToDoList from './ToDoList';
 import Participants from './Participants';
 
-const SessionRoom = ({route}) => {
+const SessionRoom = ({route, navigation}) => {
   const session = route.params.session;
 
   const renderScreen = ({item}) => {
     return (
       <View style={styles.pageContainer}>
-          <item.component session={session}/>
+          <item.component session={session} navigation={navigation}/>
       </View>
     )
   };
@@ -55,8 +55,8 @@ const SessionRoom = ({route}) => {
     };*/
 
     const getItemLayout = (_, index) => ({
-      length: 200, // Set the height of each item
-      offset: 200 * index, // Calculate the offset based on item height and index
+      length: Dimensions.get('screen').width, // Set the height of each item
+      offset: Dimensions.get('screen').width * index, // Calculate the offset based on item height and index
       index,
     });
   
@@ -70,7 +70,7 @@ const SessionRoom = ({route}) => {
   keyExtractor={(item) => item.id}
   horizontal
   contentContainerStyle={{flexGrow: 1}}
-  initialScrollIndex={2}
+  initialScrollIndex={1}
   getItemLayout={getItemLayout}
   />
  )

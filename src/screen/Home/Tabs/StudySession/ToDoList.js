@@ -15,7 +15,8 @@ import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AntDesign } from '@expo/vector-icons';
 import { onValue, ref, runTransaction } from 'firebase/database';
-import { database } from '../../../../../firebase';
+import { database, auth } from '../../../../../firebase';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 const ToDoList = ({ navigation, session }) => {
   const [tasks, setTasks] = useState([]);
@@ -106,11 +107,11 @@ const ToDoList = ({ navigation, session }) => {
             if (session.tasks) {
                 //if there is existing tasks
                 session.tasks.push({ title: newTask, checked: false, time: newTaskTime });
-                return session;
             } else {
                 //if there is no existing tasks in the session
                 session.tasks = [{ title: newTask, checked: false, time: newTaskTime }];
             }
+            return session;
         } else {
             return session;
         }
@@ -144,11 +145,10 @@ const ToDoList = ({ navigation, session }) => {
 
   const minimumDate = new Date(new Date().getTime() + 60000); 
 
-  const goToHome = () => navigation.navigate('StudyDashboard');
   const confirmReset = () => {
     setShowModal2(true)
-    
-  }
+  };
+
   const confirmDelete = () => {
     runTransaction(ref(database, 'sessions/' + session.id), (session) => {
         if (session) {
@@ -176,9 +176,10 @@ const ToDoList = ({ navigation, session }) => {
   return (
     <KeyboardAvoidingView style={styles.container} behavior="padding">
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={goToHome}>
-          <Text style={styles.back}>{'\u2190'}</Text>
-        </TouchableOpacity>
+        <View style={styles.arrow}>
+            <MaterialIcons name='arrow-left' size={30} />
+            <Text>Chat Room</Text>
+        </View>
         <Text style={styles.title}>Tasks</Text>
         <TouchableOpacity style={styles.closeButton} onPress={confirmReset}>
           <AntDesign name="close" size={24} color="#fff" />
@@ -310,13 +311,22 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     backgroundColor: '#8A2BE2',
     paddingHorizontal: 20,
-    paddingVertical: 10,
+    paddingVertical: 20,
     paddingTop: 50
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#fff'
+    color: '#fff',
+    right: 30,
+    top: 10
+  },
+  arrow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    right: 20,
+    bottom: 10
   },
   taskContainer: {
     flex: 1,
