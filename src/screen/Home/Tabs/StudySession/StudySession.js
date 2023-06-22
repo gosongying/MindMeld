@@ -5,7 +5,7 @@ import Entypo from 'react-native-vector-icons/Entypo';
 import Fontisto from 'react-native-vector-icons/Fontisto';
 import React, { useState, useEffect } from "react";
 import { auth, database } from '../../../../../firebase';
-import { onValue, ref, get, runTransaction, child, update } from "firebase/database";
+import { onValue, ref, get, runTransaction, child, update, remove } from "firebase/database";
 import { AntDesign } from '@expo/vector-icons';
 
 const StudySession = ({navigation}) => {
@@ -24,29 +24,16 @@ const StudySession = ({navigation}) => {
 
     const currentUser = auth.currentUser;
 
-    /*const checkExpired = () => {
-        const currentTimestamp = new Date().getTime();
-        let expired = [];
-        if (invitationIds) {
-            const newInvitationData = invitationData.filter((session) => {
-                if (session.endTime.timestamp - currentTimestamp < 60000) {
-                    expired.push(session.id);
-                    return false;
-                } else {
-                    return true;
-                }
-            });
-            const newInvitationIds = invitationIds.filter((id) => !expired.includes(id));
-            update(ref(database, 'userId/' + currentUser.uid), {
-                invitationList: newInvitationIds
-            });
-        } 
-    };*/
-
     useEffect(() => {
         const interval = setInterval(() => {
             setCurrentTimestamp(new Date().getTime());
-        }, 30000);
+        }, 10000);
+        return () => {
+            clearInterval(interval);
+        }
+    }, [])
+
+    useEffect(() => {
         const unsubscribe = onValue(ref(database, 'userId/' + currentUser.uid), async (snapshot) => {
             let sessions = [];
             let ended = [];
@@ -69,10 +56,18 @@ const StudySession = ({navigation}) => {
                     })
                     .catch((error) => {
                         console.log(error);
-                        Alert.alert("An error occurs2");
+                        Alert.alert("An error occurs");
                     });
                     return;
                 }));
+                ended.map((sessionId) => {
+                    const db = ref(database);
+                    const updates = {};
+                    updates['sessions/' + sessionId] = null;
+                    updates['chat/' + sessionId] = null;
+                    update(db, updates);
+
+                });
                 const newSessionsList = sessionList.filter((id) => !ended.includes(id));
                 update(ref(database, 'userId/' + currentUser.uid), {
                     upcomingSessions: newSessionsList
@@ -80,6 +75,10 @@ const StudySession = ({navigation}) => {
                 .then(() => {
                     setSessionIds(newSessionsList);
                     setSessionData(sessions);
+                })
+                .catch((error) => {
+                    console.log(error);
+                    Alert.alert("An error occurs");
                 });
             } else {
                 setSessionIds([]);
@@ -87,7 +86,6 @@ const StudySession = ({navigation}) => {
             }
         });
         return () => {
-            clearInterval(interval);
             unsubscribe();
         }
     }, [currentTimestamp]);
@@ -105,7 +103,7 @@ const StudySession = ({navigation}) => {
                         const sessionRef = ref(database, 'sessions/' + id);   
                         await get(sessionRef)
                         .then((session) => {
-                            if (session.val().endTime.timestamp - currentTimestamp < 300000) {
+                            if (session.val().endTime.timestamp - currentTimestamp < 180000) {
                                 expired.push(session.val().id);
                             } else {
                                 invitation.push(session.val());
@@ -164,6 +162,10 @@ const StudySession = ({navigation}) => {
                 } else {
                     return session2;
                 }
+            }).then(() => {
+                showJoin();
+                setInDetail(inDetail.filter((id) => id !== session.id));
+                //setSessionData([...sessionData, session])
             });
 
             //remove the invitation from the user
@@ -181,11 +183,7 @@ const StudySession = ({navigation}) => {
                 } else {
                     return user;
                 }
-            }).then(() => {
-                showJoin();
-                setInDetail(inDetail.filter((id) => id !== session.id));
-                setSessionData([...sessionData, session])
-            });
+            })
         } catch (error) {
             console.log(error);
             Alert.alert("An error occurs during accepting invitation");
@@ -229,9 +227,15 @@ const StudySession = ({navigation}) => {
             });
             runTransaction(sessionRef, (session) => {
                 if (session) {
-                    //to delete the user from session's participants
-                    session.participants = session.participants.filter((uid) => uid !== currentUser.uid);
-                    return session;
+                    if (session.host.uid === currentUser.uid) {
+                        //only host can delete the whole study session
+                        remove(child(db, 'chat/' + sessionId));
+                        return null;
+                    } else {
+                        //to delete the user from session's participants
+                        session.participants = session.participants.filter((user) => user.uid !== currentUser.uid);
+                        return session;
+                    }
                 } else {
                     return session;
                 }
@@ -691,7 +695,7 @@ const styles = StyleSheet.create({
     inProgress: {
         position: 'absolute',
         width: 100,
-        bottom: 100,
+        bottom: 95,
         right: 10,
         borderRadius: 10,
         backgroundColor: '#8A2BE2',

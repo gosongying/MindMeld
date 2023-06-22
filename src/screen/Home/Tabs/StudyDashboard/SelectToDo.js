@@ -125,6 +125,7 @@ const SelectToDo = ({ navigation, route }) => {
   const createSession = () => {
     const currentUser = auth.currentUser;
     const sessionRef = ref(database, 'sessions/');
+    const chatRef = ref(database, 'chat/');
     const newSessionKey = push(sessionRef).key;
     const invitationList = currentUser.isAnonymous? []: route.params.buddiesInvited
     runTransaction(ref(database, 'userId/' + currentUser.uid), (profile) => {
@@ -159,16 +160,22 @@ const SelectToDo = ({ navigation, route }) => {
       });
     });
     delete route.params.buddiesInvited;
-    set(child(sessionRef, newSessionKey), {
+    Promise.all([
+      set(child(chatRef, newSessionKey), {
+        sessionId: newSessionKey
+      }),
+      set(child(sessionRef, newSessionKey), {
         ...route.params,
         tasks,
         participants: [{username: currentUser.displayName, uid: currentUser.uid}],
         host: {username: currentUser.displayName, uid: currentUser.uid},
-        id: newSessionKey
+        id: newSessionKey,
+        chatId: newSessionKey
     })
+    ])
     .then(() => {
         goToHome();
-    })
+    });
   };
 
   const handleFinish = () => {

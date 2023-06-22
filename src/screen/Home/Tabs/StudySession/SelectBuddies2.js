@@ -69,7 +69,7 @@ const SelectBuddies2 = ({navigation, route}) => {
                 return () => {
                   unsubscribe();
                 }
-              })
+              });
             })
             return;
           } 

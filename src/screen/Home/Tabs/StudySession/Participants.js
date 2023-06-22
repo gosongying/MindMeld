@@ -6,6 +6,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 import { auth, database } from '../../../../../firebase';
 import { get, onValue, ref, runTransaction, child } from 'firebase/database';
+import InviteBuddies from './InviteBuddies';
 
 const Participants = ({session, navigation}) => {
     const currentUser = auth.currentUser;
@@ -13,7 +14,9 @@ const Participants = ({session, navigation}) => {
     const [participantsData, setParticipantsData] = useState([]);
     const [participantsId, setParticipantsId] = useState([]);
     const [friendListId, setFriendListId] = useState([]);
+    const [friendListData, setFriendListData] = useState([]);
     const [username, setUsername] = useState('');
+    const [isInvitingBuddies, setIsInvitingBuddies] = useState(false);
 
     const sessionId = session.id;
     
@@ -65,17 +68,52 @@ const Participants = ({session, navigation}) => {
     }
 }, []);
 
-    useEffect(() => {
-        const unsubscribe = onValue(ref(database, 'userId/' + currentUser.uid), (snapshot) => {
-            const friendList = snapshot.val().friendList? snapshot.val().friendList: [];
-            if (friendList) {
-                setFriendListId(friendList);
+useEffect(() => {
+    //listen to the change of friend list
+    //to get the latest friend list
+    const unsubscribe = onValue(ref(database, 'userId/' + currentUser.uid), async (snapshot) => {
+    let friends = [];
+    const friendList = snapshot.val().friendList ? snapshot.val().friendList : [];
+    if (friendList) {
+        setFriendListId(friendList);
+        //to make sure friendlist is added before set
+        await Promise.all(friendList.map(async (id) => {
+            const userRef = ref(database, 'userId/' + id);   
+            await get(userRef)
+            .then((user) => {
+                friends.push(user.val());
+            })
+            .catch((error) => {
+                console.log(error);
+                Alert.alert("Error");
+            });
+            return;
+        }));
+        setFriendListData(friends);
+        friendList.map((id) => {
+        //attach listener to each of the friend to get their status update
+        const unsubscribe = onValue(ref(database, 'userId/' + id), (snapshot) => {
+            const user = snapshot.val();
+            if (user) {
+                const id = user.uid;
+                //update the specific user with status update
+                const newFriendList = friends.map((item) => item.uid === id ? user : item)
+                setFriendListData(newFriendList);
+                return () => {
+                    unsubscribe();
+                }
             }
         });
-        return () => {
-            unsubscribe();
-        }
-    }, []);  
+    })
+    return;
+} 
+    setFriendListId([]);
+    setFriendListData(friends);
+    });
+    return () => {
+    unsubscribe();
+    }
+    }, []);
 
     const clickUser = (user) => {
         setParticipantClicked(user)
@@ -195,6 +233,15 @@ const Participants = ({session, navigation}) => {
                     value={username}
                     onChangeText={(text) => setUsername(text)}>
                     </TextInput>
+                    <TouchableOpacity 
+                    style={styles.add}
+                    onPress={() => setIsInvitingBuddies(true)}
+                    >
+                    <Ionicons 
+                    name="person-add-outline" 
+                    size={30}
+                    color={'white'}/>
+                    </TouchableOpacity>
                 </View>
             </View>
             <View style={styles.flatListContainer}>
@@ -257,6 +304,16 @@ const Participants = ({session, navigation}) => {
                     </View>
                 </View>
                 )}
+            </Modal>
+
+            {/* screen for inviting friends */}
+            <Modal visible={isInvitingBuddies}>
+                <InviteBuddies
+                friendListData={friendListData}
+                friendListId={friendListId}
+                sessionId={sessionId}
+                setIsInvitingBuddies={setIsInvitingBuddies}
+                participantsId={participantsId}/>
             </Modal>
         </View>
     )
@@ -339,7 +396,7 @@ const styles = StyleSheet.create({
     },
     searchContainer: {
         flexDirection: 'row',
-        right: 30,
+        right: 15,
         top: 25,
         alignItems: 'center',
         marginLeft: 30,
@@ -527,6 +584,9 @@ const styles = StyleSheet.create({
     presentText: {
         fontSize: 18,
         color: 'white'
+    },
+    add: {
+        left: 30
     }
 });
 

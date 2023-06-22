@@ -128,7 +128,6 @@ const SelectToDo2 = ({ navigation, route }) => {
     const sessionRef = ref(database, 'sessions/');
     const chatRef = ref(database, 'chat/');
     const newSessionKey = push(sessionRef).key;
-    const newChatKey = push(chatRef).key;
     const invitationList = route.params.buddiesInvited
     runTransaction(ref(database, 'userId/' + currentUser.uid), (profile) => {
       if (profile) {
@@ -163,7 +162,7 @@ const SelectToDo2 = ({ navigation, route }) => {
     });
     delete route.params.buddiesInvited;
     Promise.all([
-      set(child(chatRef, newChatKey), {
+      set(child(chatRef, newSessionKey), {
         sessionId: newSessionKey
       }),
       set(child(sessionRef, newSessionKey), {
@@ -172,12 +171,12 @@ const SelectToDo2 = ({ navigation, route }) => {
         participants: [{username: currentUser.displayName, uid: currentUser.uid}],
         host: {username: currentUser.displayName, uid: currentUser.uid},
         id: newSessionKey,
-        chatId: newChatKey
+        chatId: newSessionKey
     })
     ])
     .then(() => {
         goToHome();
-    })
+    });
   };
 
   const handleFinish = () => {
