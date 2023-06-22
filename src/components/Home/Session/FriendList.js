@@ -275,13 +275,13 @@ const styles = StyleSheet.create({
     color: 'white'
   },
   statusIndicator: {
-    height: 8,
-    width: 8,
+    height: 10,
+    width: 10,
     backgroundColor: 'rgb(0, 200, 0)',
     borderRadius: 5,
     position: 'absolute',
-    left: 42,
-    top: 35
+    left: 36,
+    top: 39
   }
 });
 

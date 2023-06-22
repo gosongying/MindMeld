@@ -176,7 +176,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   detailsContainer: {
-    paddingTop: 30,
+    paddingTop: 20,
+    marginLeft: 3
   },
   separator: {
     borderBottomColor: 'black',
