@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   TouchableOpacity,
   StyleSheet,
@@ -9,14 +9,15 @@ import {
   KeyboardAvoidingView,
   Modal,
   Keyboard,
-  Animated
+  Alert,
 } from 'react-native';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AntDesign } from '@expo/vector-icons';
-import { auth, database } from '../../../../../firebase';
-import { ref, set, push, child, runTransaction } from 'firebase/database';
+import { onValue, ref, runTransaction } from 'firebase/database';
+import { database } from '../../../../../firebase';
 
-const SelectToDo2 = ({ navigation, route }) => {
+const ToDoList = ({ navigation, session }) => {
   const [tasks, setTasks] = useState([]);
   const [newTask, setNewTask] = useState('');
   const [showModal, setShowModal] = useState(false);
@@ -24,13 +25,7 @@ const SelectToDo2 = ({ navigation, route }) => {
   const [taskTime, setTaskTime] = useState('');
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
-  //to show the message hold to remove
   const [showMessage, setShowMessage] = useState(false);
-  //to show creating session
-  const [showText, setShowText] = useState(false);
-
-  const opacity = useRef(new Animated.Value(0)).current;
-  const translateY = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -41,6 +36,19 @@ const SelectToDo2 = ({ navigation, route }) => {
       clearInterval(interval); 
     };
   }, []);
+
+  useEffect(() => {
+    const unsubscribe = onValue(ref(database, 'sessions/' + session.id), (snapshot) => {
+        if (snapshot.val()) {
+            const toDoList = snapshot.val().tasks? snapshot.val().tasks: [];
+            setTasks(toDoList);
+        }
+    });
+    return () => {
+        unsubscribe();
+    }
+  }, [])
+  
 
   const showDatepicker = () => {
     setShowDatePicker(true);
@@ -74,6 +82,18 @@ const SelectToDo2 = ({ navigation, route }) => {
     setTasks((prevTasks) => {
       const updatedTasks = [...prevTasks];
       updatedTasks.splice(index, 1);
+      runTransaction(ref(database, 'sessions/' + session.id), (session) => {
+        if (session) {
+            session.tasks = updatedTasks;
+            return session;
+        } else {
+            return session;
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+        Alert.alert("An error occurs when deleting tasks");
+      });
       return updatedTasks;
     });
   };
@@ -81,10 +101,30 @@ const SelectToDo2 = ({ navigation, route }) => {
   const handleConfirm = () => {
     const newTaskTime = taskTime ? taskTime : `${selectedDate.getDate()}/${selectedDate.getMonth() + 1} ${selectedDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
     setTasks((prevTasks) => [...prevTasks, { title: newTask, checked: false, time: newTaskTime }]);
-    setNewTask('');
-    setTaskTime('');
-    setShowModal(false);
-    Keyboard.dismiss();
+    runTransaction(ref(database, 'sessions/' + session.id), (session) => {
+        if (session) {
+            if (session.tasks) {
+                //if there is existing tasks
+                session.tasks.push({ title: newTask, checked: false, time: newTaskTime });
+                return session;
+            } else {
+                //if there is no existing tasks in the session
+                session.tasks = [{ title: newTask, checked: false, time: newTaskTime }];
+            }
+        } else {
+            return session;
+        }
+    })
+    .then(() => {
+        setNewTask('');
+        setTaskTime('');
+        setShowModal(false);
+        Keyboard.dismiss();
+    })
+    .catch((error) => {
+        console.log(error);
+        Alert.alert("An error occurs when adding new tasks");
+    })
   };
 
   const handleCancel = () => {
@@ -95,27 +135,6 @@ const SelectToDo2 = ({ navigation, route }) => {
     Keyboard.dismiss();
   };
 
-  const minimumDate = new Date(new Date().getTime() + 60000); 
-
-  //move to home screen
-  const goToHome = () => {
-    if (auth.currentUser.isAnonymous) {
-        navigation.pop(2);
-    } else {
-        navigation.pop(3);
-    }
-  }
-  const confirmReset = () => {
-    setShowModal2(true);
-  };
-  const confirmDelete = () => {
-    setTasks([]);
-    setShowModal2(false)
-  };
-  const cancelDelete = () => {
-    setShowModal2(false)
-  };
-
   const handleShowMessage = () => {
     setShowMessage(true);
     setTimeout(() => {
@@ -123,110 +142,53 @@ const SelectToDo2 = ({ navigation, route }) => {
     }, 2000);
   };
 
-  const createSession = () => {
-    const currentUser = auth.currentUser;
-    const sessionRef = ref(database, 'sessions/');
-    const chatRef = ref(database, 'chat/');
-    const newSessionKey = push(sessionRef).key;
-    const newChatKey = push(chatRef).key;
-    const invitationList = route.params.buddiesInvited
-    runTransaction(ref(database, 'userId/' + currentUser.uid), (profile) => {
-      if (profile) {
-        if (profile.upcomingSessions) {
-          //if the user has other upcoming sessions
-          profile.upcomingSessions.push(newSessionKey);
-          return profile;
-        } else {
-          //if the user does have any upcoming sessions so far
-          profile.upcomingSessions = [newSessionKey];
-          return profile;
-        }
-      } else {
-        return profile;
-      }
-    })
-    invitationList.forEach(id => {
-      const userRef = ref(database, 'userId/' + id);
-      runTransaction(userRef, (profile) => {
-        if (profile) {
-          if (profile.invitationList) {
-            profile.invitationList.push(newSessionKey);
-            return profile;
-          } else {
-            profile.invitationList = [newSessionKey];
-            return profile;
-          }
-        } else {
-          return profile;
-        }
-      });
-    });
-    delete route.params.buddiesInvited;
-    Promise.all([
-      set(child(chatRef, newChatKey), {
-        sessionId: newSessionKey
-      }),
-      set(child(sessionRef, newSessionKey), {
-        ...route.params,
-        tasks,
-        participants: [{username: currentUser.displayName, uid: currentUser.uid}],
-        host: {username: currentUser.displayName, uid: currentUser.uid},
-        id: newSessionKey,
-        chatId: newChatKey
-    })
-    ])
-    .then(() => {
-        goToHome();
-    })
-  };
+  const minimumDate = new Date(new Date().getTime() + 60000); 
 
-  const handleFinish = () => {
-    setShowText(true);
-    Animated.sequence([
-        Animated.timing(opacity, {
-          toValue: 1,
-          duration: 500,
-          useNativeDriver: true,
-        }),
-        Animated.spring(translateY, {
-          toValue: -100,
-          useNativeDriver: true,
-        }),
-        Animated.spring(translateY, {
-          toValue: 100,
-          useNativeDriver: true,
-        }),
-        Animated.spring(translateY, {
-          toValue: 0,
-          useNativeDriver: true,
-        }),
-      ]).start();
-    setTimeout(() => {
-        setShowText(false);
-        createSession();
-    }, 3500);
-};
+  const goToHome = () => navigation.navigate('StudyDashboard');
+  const confirmReset = () => {
+    setShowModal2(true)
+    
+  }
+  const confirmDelete = () => {
+    runTransaction(ref(database, 'sessions/' + session.id), (session) => {
+        if (session) {
+            if (session.tasks) {
+                session.tasks = null;
+                return;
+            }
+        } else {
+            return session;
+        }
+    })
+    .then(() => {
+        setTasks([]);
+        setShowModal2(false);
+    })
+    .catch((error) => {
+        console.log(error);
+        Alert.alert("An error occurs when deleting all tasks");
+    })
+  }
+  const cancelDelete = () => {
+    setShowModal2(false)
+  }
 
   return (
     <KeyboardAvoidingView style={styles.container} behavior="padding">
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+        <TouchableOpacity style={styles.backButton} onPress={goToHome}>
           <Text style={styles.back}>{'\u2190'}</Text>
         </TouchableOpacity>
-        <Text style={styles.title}>Select Tasks</Text>
-        <TouchableOpacity style={styles.finishButton} onPress={handleFinish}>
-            <Text style={styles.finish}>Finish</Text>
+        <Text style={styles.title}>Tasks</Text>
+        <TouchableOpacity style={styles.closeButton} onPress={confirmReset}>
+          <AntDesign name="close" size={24} color="#fff" />
         </TouchableOpacity>
-        <View style={styles.dots}>
-            <View style={styles.dot1}/>
-            <View style={styles.dot2}/>
-        </View>
       </View>
-      {showMessage && (
-        <View style={styles.message}> 
-            <Text style={styles.messageText}>Hold to remove</Text>
-        </View>
-      )}
+        {showMessage && (
+            <View style={styles.message}> 
+                <Text style={styles.messageText}>Hold to remove</Text>
+            </View>
+        )}
         <View style={styles.taskContainer}>
           <FlatList
             data={tasks}
@@ -259,7 +221,6 @@ const SelectToDo2 = ({ navigation, route }) => {
             value={newTask}
             placeholder="Enter a new task"
             placeholderTextColor="#777777"
-            autoCapitalize='none'
           />
           <TouchableOpacity style={styles.addButton} onPress={addTask}>
             <Text style={styles.addButtonText}>Add</Text>
@@ -322,23 +283,6 @@ const SelectToDo2 = ({ navigation, route }) => {
               </View>
             </View>
         </Modal>
-
-        {/* for loading */}
-        <Modal 
-        visible={showText} 
-        transparent 
-        animationType='fade'>
-            <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.4)'}}>
-                <Animated.Text style={{
-                    opacity,
-                    transform: [{ translateY }],
-                    color: 'black',
-                    fontSize: 24,
-                    fontWeight: 'bold'}}>
-                    Creating Study Session...
-                </Animated.Text>
-            </View>
-        </Modal>
     </KeyboardAvoidingView>
   );
 };
@@ -346,33 +290,33 @@ const SelectToDo2 = ({ navigation, route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff'
+    backgroundColor: '#fff',
   },
   backButton: {
     marginRight: 10,
-    bottom: 10
   },
   back: {
     fontSize: 35,
     fontWeight: 'bold',
     color: '#fff',
   },
+  closeButton: {
+    marginLeft: 10,
+  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     marginBottom: 10,
-    backgroundColor: '#DC582A',
+    backgroundColor: '#8A2BE2',
     paddingHorizontal: 20,
-    paddingVertical: 20,
+    paddingVertical: 10,
     paddingTop: 50
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#fff',
-    top: 20,
-    left: 5
+    color: '#fff'
   },
   taskContainer: {
     flex: 1,
@@ -380,7 +324,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 8,
     padding: 10,
-    top: 5
   },
   taskList: {
     flexGrow: 1,
@@ -545,34 +488,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: 'white'
   },
-  finish: {
-    fontSize: 20,
-    color: "white",
-    fontWeight: 'bold',
-    bottom: 10
-  },
-  dots: {
-    position: "absolute",
-    flexDirection: "row",
-    alignItems: 'center',
-    top: 55,
-    left: 175
-  },
-  dot1: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: 'gray',
-    right: 5
-  },
-  dot2: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: 'orange',
-    left: 5
-  },
 });
 
-
-export default SelectToDo2;
+export default ToDoList;

@@ -10,6 +10,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import * as ImagePicker from 'expo-image-picker';
 import { ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage"
 import Fontisto from 'react-native-vector-icons/Fontisto';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const Details = ({ navigation }) => {
   //since the the profile settings page hasn't been done,
@@ -233,12 +234,11 @@ const Details = ({ navigation }) => {
   };
 
   return (
-    //for cancel changing username
+    // for cancel changing username 
     <TouchableWithoutFeedback  onPress={() => {
       setIsEditingUsername(false);
       setNewUsername(oldUsername);
     }}>
-      <View>
       <View style={styles.container}>
         <View style={[styles.statusIndicator, isAnonymous && styles.anonymous]} />
         <View style={styles.outerPhotoContainer}>
@@ -255,12 +255,12 @@ const Details = ({ navigation }) => {
             <TouchableOpacity 
             onPress={selectImageLibrary}
             disabled={isLoading}>
-              <FontAwesome name={'photo'} size={15} />
+              <FontAwesome name={'photo'} size={22} />
             </TouchableOpacity>
             <TouchableOpacity 
             onPress={selectImageCamera}
             disabled={isLoading}>
-              <MaterialCommunityIcons name={'camera-outline'} size={19} />
+              <MaterialCommunityIcons name={'camera-outline'} size={27} />
             </TouchableOpacity>
             </View>
           )}
@@ -290,9 +290,9 @@ const Details = ({ navigation }) => {
               { !isAnonymous && (
                 <TouchableOpacity 
                 onPress={editUsername}
-                style={{left: 20, marginBottom: 0,}}
+                style={{left: 15}}
                 disabled={isLoading}>
-                  <Ionicons name="create" size={22} />
+                  <Ionicons name="create" size={20} />
                 </TouchableOpacity>
               )}
             </View>
@@ -308,7 +308,6 @@ const Details = ({ navigation }) => {
           )}
         </View>
       </View>
-      </View>
     </TouchableWithoutFeedback>
   );
 };
@@ -318,19 +317,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: 5,
-    marginTop: 35,
-    marginBottom: 10,
+    padding: 10,
+    left: 25
     //height: 120
   },
   profile: {
-    height: 55,
-    width: 55,
-    marginTop: 10,
-    marginLeft: 20,
+    height: 85,
+    width: 85,
+    marginRight: 20,
   },
   name: {
-    fontSize: 28,
+    fontSize: 26,
     fontWeight: 'bold',
   },
   nameWhenEditing: {
@@ -350,7 +347,6 @@ const styles = StyleSheet.create({
   },
   levelText: {
     marginRight: 10,
-    fontSize: 16,
   },
   trophyContainer: {
     flexDirection: 'row',
@@ -358,7 +354,6 @@ const styles = StyleSheet.create({
   },
   trophyText: {
     marginRight: 5,
-    fontSize: 16,
   },
   trophyIcon: {
     marginLeft: 5,
@@ -381,8 +376,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems:'center',
     justifyContent:'space-evenly',
-    marginRight: 5,
-    marginTop: -10,
+    right: 10
   },
   outerPhotoContainer: {
     alignItems: 'center',
@@ -393,7 +387,7 @@ const styles = StyleSheet.create({
     width: 12,
     height: 12,
     borderRadius: 6,
-    bottom: 33,
+    bottom: 45,
     left: 63,
     zIndex: 1
   },
