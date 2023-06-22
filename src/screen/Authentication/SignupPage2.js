@@ -164,7 +164,13 @@ const SignupPage2 = ({ navigation}) => {
   };
 
   const handleToggleConfirmUsername = () => {
-    // username cannot be guest (case-insensitive)
+    
+    if (!/^[a-zA-Z0-9]+$/.test(username)) {
+      Alert.alert('Username cannot contain special characters');
+      setUsername('');
+      return;
+    }
+      
     if (username.trim().toLowerCase() === 'guest') {
       Alert.alert('Username cannot be "Guest"');
       return;

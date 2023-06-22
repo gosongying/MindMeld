@@ -126,7 +126,9 @@ const FriendListMore = ({navigation, route}) => {
                     setFriedOrFriendSearchedId(snapshot.val().uid);
                 })
             } else {
+                <View>   
                 Alert.alert("Username not found");
+                </View>
             }
         })
         .catch((error) => {
@@ -302,7 +304,7 @@ const FriendListMore = ({navigation, route}) => {
                             placeholder='Enter username'
                             placeholderTextColor={'gray'}
                             value={usernameAdded}
-                            onChangeText={(text) => setUsernameAdded(text.trim())}
+                            onChangeText={(text) => setUsernameAdded(text.replace(/^[^a-zA-Z0-9]+|[^a-zA-Z0-9]+$/g, '').trim())}
                             autoCapitalize='none'
                             clearButtonMode='while-editing'
                             autoCorrect={false}
