@@ -126,7 +126,9 @@ const FriendListMore = ({navigation, route}) => {
                     setFriedOrFriendSearchedId(snapshot.val().uid);
                 })
             } else {
+                <View>   
                 Alert.alert("Username not found");
+                </View>
             }
         })
         .catch((error) => {
@@ -299,10 +301,10 @@ const FriendListMore = ({navigation, route}) => {
                         <View style={styles.addFriendSearchContainer}>
                             <TextInput
                             style={styles.addFriend}
-                            placeholder='Username'
+                            placeholder='Enter username'
                             placeholderTextColor={'gray'}
                             value={usernameAdded}
-                            onChangeText={(text) => setUsernameAdded(text)}
+                            onChangeText={(text) => setUsernameAdded(text.replace(/^[^a-zA-Z0-9]+|[^a-zA-Z0-9]+$/g, '').trim())}
                             autoCapitalize='none'
                             clearButtonMode='while-editing'
                             autoCorrect={false}
@@ -332,7 +334,7 @@ const FriendListMore = ({navigation, route}) => {
                         <View style={styles.labelContainer}>
                             <AntDesign name="exclamationcircle" style={styles.warningIcon} />
                             {deletingFriend !== null &&
-                            <Text style={styles.label}>Confirm to delete {deletingFriend.username}?</Text>
+                            <Text style={styles.label}>Confirm to unfriend {deletingFriend.username}?</Text>
                             }   
                         </View>
                         <View style={styles.buttonContainer}>
@@ -361,7 +363,8 @@ const styles = StyleSheet.create({
         backgroundColor: '#8A2BE2',
         alignItems: 'center',
         justifyContent: 'center',
-        borderRadius: 20
+        borderRadius: 20,
+        marginBottom: 5,
     },
     headerText: {
         fontSize: 24,
@@ -376,8 +379,8 @@ const styles = StyleSheet.create({
         width: "100%",
     },
     avatar: {
-        width: 90,
-        height: 90,
+        width: 60,
+        height: 60,
         borderRadius: 45,
         marginRight: 10,
     },
@@ -388,7 +391,7 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     friendName: {
-        fontSize: 24,
+        fontSize: 20,
         fontWeight: 'bold',
     },
     friendStatus: {
@@ -450,7 +453,7 @@ const styles = StyleSheet.create({
     prompt: {
         bottom: 30,
         width: 300, 
-        backgroundColor: '#BAA8BA',
+        backgroundColor: 'thistle',
         padding: 30, 
         borderRadius: 10,
         alignItems: 'center',
@@ -480,7 +483,8 @@ const styles = StyleSheet.create({
     cancel: {
         fontSize: 20,
         color: 'white',
-        top: 15
+        top: 10,
+        fontWeight: 'bold'
     },
     userSearchedContainer: {
         flex: 1,
@@ -549,8 +553,8 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgb(0, 200, 0)',
         borderRadius: 6,
         position: 'absolute',
-        left: 75, 
-        top: 65
+        left: 41 ,
+        top: 48
     },
     modalContainer: {
         flex: 1,

@@ -194,52 +194,6 @@ const Feeds = ( {navigation}) => {
     }
   }, [showModal]);
 
-//   const likePost = (postId) => {
-//     const postRef = database.ref(`posts/${postId}`);
-
-
-//     postRef.transaction((post) => {
-//       if (post) {
-//         if (post.isLiked) {
-//           post.likes -= 1;
-//           post.isLiked = false;
-//         }
-//         else if (!post.likes) {
-//           post.likes = 1;
-//           post.isLiked = true;
-//         } else {
-//           post.likes += 1;
-//           post.isLiked = true;
-//         }
-//         post.aggregateScore = (post.likes || 0) - (post.dislikes || 0);
-//       }
-      
-//       return post;
-//     });
-//   };
-  
-//   const dislikePost = (postId) => {
-//     const postRef = database.ref(`posts/${postId}`);
-  
-//     postRef.transaction((post) => {
-//       if (post) {
-//         if (post.isDisliked) {
-//           post.dislikes -= 1
-//           post.isDisliked = false;
-//         }
-//         else if (!post.dislikes) {
-//           post.dislikes = 1;
-//           post.isDisliked = true;
-//         } else {
-//           post.dislikes += 1;
-//           post.isDisliked = true;
-//         }
-//         post.aggregateScore = (post.likes || 0) - (post.dislikes || 0);
-//       }
-      
-//       return post;
-//     });
-//   };
 
 const closePost = (postId) => {
     Alert.alert(
@@ -347,7 +301,15 @@ const closePost = (postId) => {
         <TouchableOpacity style={styles.closeButton} onPress={clearSearch}>
           <Ionicons name="close-outline" size={36} color="#8A2BE2" />
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => setShowModal(true)} style={styles.newFeedButton}>
+        <TouchableOpacity
+          onPress={() => {
+            if (firebase.auth().currentUser && firebase.auth().currentUser.isAnonymous) {
+              Alert.alert('Error', 'Guests cannot create posts');
+            } else {
+              setShowModal(true);
+            }
+          }}
+          style={styles.newFeedButton}>
           <Ionicons name="add" size={36} color="#8A2BE2" />
         </TouchableOpacity>
       </View>
@@ -360,63 +322,15 @@ const closePost = (postId) => {
             onPress={() => navigateToFeed(post)} // Pass the selected post to the navigateToFeed function
           >
 
-            <View style={{ flexDirection: 'row' }}>
-              <View style={{ maxWidth: screenWidth * 0.65 }}>
+            <View>
+              <View>
                 <Text numberOfLines={2} style={styles.forumTitle}>{post.title}</Text>
               </View>
-
               <View style={{ 
                  flex: 1,
                  alignItems: 'flex-end',
                  marginTop: -8,
                  marginBottom: 10}}>
-                
-                <View>
-                {/* Lock, Edit and Delete Pressables */}
-
-                {userAuthenticated && post.author === firebase.auth().currentUser?.displayName && (
-                <View style={styles.postButtons}>
-                    {post.isClosed ? (
-                    <TouchableOpacity
-                        style={styles.openButton}
-                        onPress={() => openPost(post.id)}
-                    >
-                        <Ionicons name="lock-closed-outline" size={22} color="red" />
-                    </TouchableOpacity>
-                    ) : (
-                    <TouchableOpacity
-                        style={styles.closeButton}
-                        onPress={() => closePost(post.id)}
-                    >
-                        <Ionicons name="lock-open-outline" size={22} color="green" />
-                    </TouchableOpacity>
-                    )}
-
-                    <TouchableOpacity
-                    style={styles.editButton}
-                    onPress={() => {
-                        if (post.isClosed) {
-                        Alert.alert("Error", "You cannot edit a closed post.");
-                        } else {
-                        openEditModal(post);
-                        }
-                    }}
-                    >
-                    <Ionicons name="pencil" size={22} color="#8A2BE2" />
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                    style={styles.deleteButton}
-                    onPress={() => deletePost(post.id)}
-                    >
-                    <Ionicons name="trash" size={22} color="red" />
-                    </TouchableOpacity>
-                </View>
-                )}
-
-
-                {/* <Text style={{marginLeft: 10, marginTop: 5}}>{post.author}</Text> */}
-                </View>
               </View>
             </View>
 
@@ -427,24 +341,6 @@ const closePost = (postId) => {
               <View style={styles.postMetrics}>
 
               <Text style={{ color: post.isClosed ? 'red' : 'green' }}>{post.isClosed ? 'Closed' : 'Open'}</Text>
-
-                {/* <View style={styles.itemContainer}>   
-                  <TouchableOpacity
-                    onPress={() => likePost(post.id)}
-                    style={styles.likeButton}
-                    disabled={post.isDisliked}
-                  >
-                    <Ionicons name="arrow-up" size={24} color={post.isLiked ? 'green' : '#888'} />
-                  </TouchableOpacity>
-                   <Text style={styles.aggregateScore}>{post.aggregateScore}</Text>
-                  <TouchableOpacity
-                    onPress={() => dislikePost(post.id)}
-                    style={styles.dislikeButton}
-                    disabled={post.isLiked}
-                  >
-                    <Ionicons name="arrow-down" size={24} color={post.isDisliked ? 'red' : "#888"} />
-                  </TouchableOpacity>
-                </View> */}
               
               <View style={{marginLeft: 85}}> 
                 <View style={styles.commentsCount}>
@@ -456,9 +352,51 @@ const closePost = (postId) => {
              <View>
                 <View style={styles.timeSinceCreation}>
                  <DynamicTimeText timestamp={post.timestamp} />
+                    {/* Lock, Edit and Delete Pressables */}
+                    {userAuthenticated && post.author === firebase.auth().currentUser?.displayName && (
+                      <View style={styles.postButtons}>
+                          {post.isClosed ? (
+                          <TouchableOpacity
+                              style={styles.openButton}
+                              onPress={() => openPost(post.id)}
+                          >
+                              <Ionicons name="lock-closed-outline" size={22} color="red" />
+                          </TouchableOpacity>
+                          ) : (
+                          <TouchableOpacity
+                              style={styles.closeButton}
+                              onPress={() => closePost(post.id)}
+                          >
+                              <Ionicons name="lock-open-outline" size={22} color="green" />
+                          </TouchableOpacity>
+                          )}
+
+                          <TouchableOpacity
+                          style={styles.editButton}
+                          onPress={() => {
+                              if (post.isClosed) {
+                              Alert.alert("Error", "You cannot edit a closed post.");
+                              } else {
+                              openEditModal(post);
+                              }
+                          }}
+                          >
+                          <Ionicons name="pencil" size={22} color="#8A2BE2" />
+                          </TouchableOpacity>
+
+                          <TouchableOpacity
+                          style={styles.deleteButton}
+                          onPress={() => deletePost(post.id)}
+                          >
+                          <Ionicons name="trash" size={22} color="red" />
+                          </TouchableOpacity>
+                      </View>
+                      )}
                 </View>
               </View>
             </View>
+          <View>
+          </View>
           </TouchableOpacity>
         ))}
       </ScrollView>
@@ -643,6 +581,7 @@ const styles = StyleSheet.create({
   },
   timeSinceCreation: {
     color: '#888',
+    marginLeft: 20
   },
   searchInput: {
     borderWidth: 1,
@@ -655,7 +594,8 @@ const styles = StyleSheet.create({
   },
   postButtons: {
     flexDirection: 'row',
-    marginTop: 3,
+    justifyContent: 'flex-end',
+    marginRight: -2,
   },
   editButton: {
     marginRight: 5,

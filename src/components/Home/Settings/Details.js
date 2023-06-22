@@ -11,6 +11,9 @@ import * as ImagePicker from 'expo-image-picker';
 import { ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage"
 import Fontisto from 'react-native-vector-icons/Fontisto';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Dimensions } from 'react-native';
+
+const screenWidth = Dimensions.get('window').width;
 
 const Details = ({ navigation }) => {
   //since the the profile settings page hasn't been done,
@@ -20,7 +23,7 @@ const Details = ({ navigation }) => {
 
   const currentUser = auth.currentUser;
 
-  const oldUsername = currentUser.displayName;
+  const oldUsername = currentUser ? currentUser.displayName : null;
 
   const [isEditingUsername, setIsEditingUsername] = useState(false);
 
@@ -28,11 +31,11 @@ const Details = ({ navigation }) => {
 
   const [isLoading, setLoading] = useState(false);
 
-  const [image, setImage] = useState(currentUser.photoURL);
+  const [image, setImage] = useState(currentUser ? currentUser.photoURL : null);
 
   const [gender, setGender] = useState('');
 
-  const isAnonymous = currentUser.isAnonymous;
+  const isAnonymous = currentUser ? currentUser.isAnonymous : null;
 
   useEffect(() => {
     if (!isAnonymous) {
@@ -53,20 +56,43 @@ const Details = ({ navigation }) => {
 
   const handleChangedUsername = () => {
     setLoading(true);
-    if (!newUsername) {
+
+    if (!/^[a-zA-Z0-9]+$/.test(newUsername)) {
+      Alert.alert('Username cannot contain special characters');
+      setLoading(false);
+      return
+    }
+
+
+    if (!(newUsername.trim())) {
       //if the new username is empty
       Alert.alert("Username cannot be empty");
       setLoading(false);
       return;
     }
-    if (newUsername === oldUsername) {
+    if (newUsername.trim().toLowerCase() === 'guest') {
+      Alert.alert('Username cannot be "Guest"');
+      setLoading(false);
+      return
+    }
+
+    if (newUsername.trim() === oldUsername) {
       //if the username does not change
+      Alert.alert("No changes made")
+      setNewUsername(newUsername.trim());
       setLoading(false);
       setIsEditingUsername(false);
       return;
     }
+
+    if (newUsername.trim().includes(' ')) {
+      Alert.alert('No whitespace allowed in the username');
+      setLoading(false);
+      return
+    }
+
     //if the username changes
-    const newUsernameRef = databaseRef(database, 'usernames/' + newUsername);
+    const newUsernameRef = databaseRef(database, 'usernames/' + newUsername.trim());
     const oldUsernameRef = databaseRef(database, 'usernames/' + oldUsername);
     const userIdRef = databaseRef(database, 'userId/' + currentUser.uid);
     try {
@@ -74,9 +100,9 @@ const Details = ({ navigation }) => {
       get(oldUsernameRef)
       .then((oldUser) => runTransaction(newUsernameRef, (user) => {
         if (user) {
-          //if the username already existed
+          //if the username already exists
           setLoading(false);
-          Alert.alert("Username already existed");
+          Alert.alert("Username already exists");
           setIsEditingUsername(true);
           return;
         } else {
@@ -88,12 +114,13 @@ const Details = ({ navigation }) => {
       .then((result) => {
         if (result.committed) {
           //if set username successfully
+          Alert.alert("Success", 'Username updated')
           remove(oldUsernameRef);
           update(userIdRef, {
-            username: newUsername
+            username: newUsername.trim()
           })
           updateProfile(currentUser, {
-          displayName: newUsername,
+          displayName: newUsername.trim(),
           }).then(() => {
             setLoading(false);
             setIsEditingUsername(false);
@@ -239,8 +266,9 @@ const Details = ({ navigation }) => {
       setIsEditingUsername(false);
       setNewUsername(oldUsername);
     }}>
+      <View>
       <View style={styles.container}>
-        <View style={[styles.statusIndicator, isAnonymous && styles.anonymous]} />
+        <View style={[styles.statusIndicator]} />
         <View style={styles.outerPhotoContainer}>
           <View style={styles.photoContainer}>
             {image ? (
@@ -249,21 +277,6 @@ const Details = ({ navigation }) => {
               <Image source={require("../../../../assets/profileholder.png")} style={styles.profile}/> 
             )}      
             </View>
-          {/* anonymous user cannot change profile picture */}
-          {!isAnonymous && (
-            <View style={styles.libraryAndCamera}>
-            <TouchableOpacity 
-            onPress={selectImageLibrary}
-            disabled={isLoading}>
-              <FontAwesome name={'photo'} size={22} />
-            </TouchableOpacity>
-            <TouchableOpacity 
-            onPress={selectImageCamera}
-            disabled={isLoading}>
-              <MaterialCommunityIcons name={'camera-outline'} size={27} />
-            </TouchableOpacity>
-            </View>
-          )}
         </View>
         <View style={styles.detailsContainer}>
           {isEditingUsername ? (
@@ -273,11 +286,14 @@ const Details = ({ navigation }) => {
             onChangeText={(text) => setNewUsername(text)}
             onSubmitEditing={handleChangedUsername}
             autoCapitalize='none'
-            autoFocus={true}/>
+            autoFocus={true}
+            onBlur={() => setNewUsername(newUsername.trim())}/>
           ) : (
             <View style={styles.nameAndEdit}>
-              <View style={{flexDirection: 'row', alignItems:'center', width: 200}}>
-                <Text style={styles.name} numberOfLines={1}>{oldUsername}</Text>
+              <View style={{flexDirection: 'row', alignItems:'center'}}>
+                <View>
+                  <Text style={[styles.name, {maxWidth: screenWidth * 0.5}]} numberOfLines={1}>{oldUsername}</Text>
+                </View>
                 {gender === 'male' ? (
                   <Fontisto name='male' size={15} color='dodgerblue' style={{marginLeft:5}}/>
                 ) : gender === 'female' ? (
@@ -286,14 +302,40 @@ const Details = ({ navigation }) => {
                   <View />
                 )}
               </View>
-              {/* anonymous user cannot change username */}
-              { !isAnonymous && (
+              {/* anonymous user cannot change profile picture */}
+              {/* edit pictures and username */}
+              {!isAnonymous && (
+                <View style={styles.icons}>
                 <TouchableOpacity 
                 onPress={editUsername}
-                style={{left: 15}}
                 disabled={isLoading}>
                   <Ionicons name="create" size={20} />
                 </TouchableOpacity>
+
+                <TouchableOpacity 
+                onPress={selectImageLibrary}
+                disabled={isLoading}>
+                  <FontAwesome name={'photo'} size={15} />
+                </TouchableOpacity>
+
+                <TouchableOpacity 
+                onPress={selectImageCamera}
+                disabled={isLoading}>
+                  <MaterialCommunityIcons name={'camera-outline'} size={19} />
+                </TouchableOpacity>
+
+
+                </View>
+              )}
+
+              {/* Display MindMeld logo for anonymous users */}
+              {isAnonymous && (
+                <Image source={require('../../../../assets/logoOnly.png')} 
+                style={{
+                  width: 188 / 2,
+                  height: 120 / 2,
+                  marginLeft: 75,
+                }} />
               )}
             </View>
           )}
@@ -308,6 +350,7 @@ const Details = ({ navigation }) => {
           )}
         </View>
       </View>
+      </View>
     </TouchableWithoutFeedback>
   );
 };
@@ -317,28 +360,30 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: 10,
-    left: 25
+    padding: 5,
+    marginTop: 35,
+    marginBottom: 10,
     //height: 120
   },
   profile: {
-    height: 85,
-    width: 85,
+    height: 70,
+    width: 70,
     marginRight: 20,
   },
   name: {
-    fontSize: 26,
+    fontSize: 22,
     fontWeight: 'bold',
   },
   nameWhenEditing: {
     textAlign: 'left',
     borderBottomColor: "gray",
     borderBottomWidth: 2,
-    width: "90%"
+    width: "60%"
   },
   detailsContainer: {
     flex: 1,
-    left: 5,
+    left: 30,
+    bottom: 11,
   },
   levelContainer: {
     flexDirection: 'row',
@@ -347,6 +392,7 @@ const styles = StyleSheet.create({
   },
   levelText: {
     marginRight: 10,
+    fontSize: 14,
   },
   trophyContainer: {
     flexDirection: 'row',
@@ -354,29 +400,30 @@ const styles = StyleSheet.create({
   },
   trophyText: {
     marginRight: 5,
+    fontSize: 14,
   },
   trophyIcon: {
     marginLeft: 5,
   },
   photoContainer: {
     borderRadius: 42.5,
-    height: 85,
-    width: 85,
+    height: 70,
+    width: 70,
     overflow: 'hidden',
-    right: 10,
+    left: 10,
     justifyContent: 'center',
-    bottom: 5
+    bottom: 10
   },
   nameAndEdit: {
     flexDirection: 'row',
     alignItems: 'center',
   },
-  libraryAndCamera: {
-    width:80,
+  icons: {
+    width: 70,
     flexDirection: 'row',
     alignItems:'center',
-    justifyContent:'space-evenly',
-    right: 10
+    justifyContent: 'space-between',
+    marginLeft: 10,
   },
   outerPhotoContainer: {
     alignItems: 'center',
@@ -384,11 +431,11 @@ const styles = StyleSheet.create({
   statusIndicator: {
     position: 'absolute',    
     backgroundColor: 'rgb(0, 200, 0)',
-    width: 12,
-    height: 12,
+    width: 14,
+    height: 14,
     borderRadius: 6,
-    bottom: 45,
-    left: 63,
+    bottom: 21,
+    left: 69,
     zIndex: 1
   },
   anonymous: {
