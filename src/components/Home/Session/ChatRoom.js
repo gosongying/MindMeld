@@ -5,34 +5,21 @@ import { auth, database } from "../../../../firebase";
 import { runTransaction, ref, onValue } from 'firebase/database';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
-//import firebase from 'firebase/compat/app';
-//import 'firebase/compat/database';
-//import 'firebase/compat/auth';
-
-/*const firebaseConfig = {
-  apiKey: "AIzaSyBW9gyTZcDHmnAIzCXQKfKmrz1yCrot2ZQ",
-  authDomain: "orbital-265b4.firebaseapp.com",
-  databaseURL: "https://orbital-265b4-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "orbital-265b4",
-  storageBucket: "orbital-265b4.appspot.com",
-  messagingSenderId: "927371819112",
-  appId: "1:927371819112:web:0320800c1c8e8edf9763dd"
-};
-
-if (!firebase.apps.length) {
-  firebase.initializeApp(firebaseConfig);
-}
-
-const database = firebase.database();*/
-
 const ChatRoom = ({ navigation, session }) => {
   const [inputMessage, setInputMessage] = useState('');
   const [messages, setMessages] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  const [currentTimestamp, setCurrentTimestamp] = useState(new Date().getTime());
 
 
   const chatId = session.chatId;
+
+  const differenceInMilliseconds = Math.abs(session.endTime.timestamp - currentTimestamp);
+  const hours = Math.floor(differenceInMilliseconds / (1000 * 60 * 60));
+  const minutes = Math.floor((differenceInMilliseconds / (1000 * 60)) % 60);
   
+  console.log(session.endTime.timestamp);
+  console.log(currentTimestamp)
   // To scroll to bottom of scrollList 
   const scrollViewRef = useRef(null);
 
@@ -66,7 +53,6 @@ const ChatRoom = ({ navigation, session }) => {
       }
     })
 
-    //database.ref('messages').push(newMessage);
     setInputMessage('');
   };
   
@@ -74,25 +60,14 @@ const ChatRoom = ({ navigation, session }) => {
   useEffect(() => {
     const messagesRef = ref(database, 'chat/' + chatId);
   
-    /*const handleSnapshot = (snapshot) => {
-      const data = snapshot.val();
-      if (data) {
-        const messageList = Object.values(data);
-        setMessages(messageList);
-      }
-    };*/
-
     const unsubscribe = onValue(messagesRef, (snapshot) => {
       if (snapshot.val()) {
         const messageList = snapshot.val().messages? snapshot.val().messages: [];
         setMessages(messageList);
       }
     })
-  
-    //messagesRef.on('value', handleSnapshot);
-  
+    
     return () => {
-      //messagesRef.off('value', handleSnapshot);
       unsubscribe();
     };
   }, []);
@@ -103,7 +78,25 @@ const ChatRoom = ({ navigation, session }) => {
       scrollViewRef.current.scrollToEnd({ animated: true });
     }
   }, [messages]);
+
+  useEffect(() => {
+    //to update current timestamp periodically
+    const interval = setInterval(() => {
+      setCurrentTimestamp(new Date().getTime());
+    }, 30000);
+    return () => {
+      clearInterval(interval);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (session.endTime.timestamp <= currentTimestamp) {
+      Alert.alert("The session is ended");
+      goToHome();
+    }
+  }, [currentTimestamp])
   
+
   const renderMessageItems = () => {
     return messages.map((item) => {
       const isCurrentUser = item.sender === currentUser?.displayName;
@@ -166,7 +159,7 @@ const ChatRoom = ({ navigation, session }) => {
           </View>
           <View style={styles.header}>
           <TouchableOpacity style={styles.quitButton} onPress={goToHome}>
-            <Text style={styles.quit}>quit</Text>
+            <Text style={styles.quit}>Quit</Text>
           </TouchableOpacity>
           <Text style={styles.title}>Chat</Text>
           <TouchableOpacity style={styles.closeButton}>
@@ -204,7 +197,7 @@ const ChatRoom = ({ navigation, session }) => {
             <View style={styles.labelContainer}>
               <Text style={styles.label}>Session Information:</Text>
             </View>
-              <Text style={styles.label2}>
+              <Text style={styles.label1}>
                 Date: {session.selectedDate}
               </Text>
               <Text style={styles.label2}>
@@ -212,6 +205,9 @@ const ChatRoom = ({ navigation, session }) => {
               </Text>
               <Text style={styles.label2}>
                 End Time: {session.endTime.string}
+              </Text>
+              <Text style={styles.label2}>
+                Time Left: {hours} hours {minutes} mins
               </Text>
               <TouchableOpacity style={styles.returnButton} onPress={() => setShowModal(false)}>
                 <Text style={styles.buttonText}>Return</Text>
@@ -317,17 +313,25 @@ const styles = StyleSheet.create({
     color: '#333333',
     marginBottom: -10,
   },
+  label1: {
+    fontSize: 15, 
+    marginLeft: 20,
+    textAlign: 'center',
+    paddingVertical: 2,
+    right: 8
+  },
   label2: {
     fontSize: 15, 
     marginLeft: 20,
     textAlign: 'center',
     paddingVertical: 2,
+    right: 12
   },
   returnButton: {
     backgroundColor: '#007AFF',
     paddingVertical: 12,
     borderRadius: 10,
-    marginTop: 10,
+    marginTop: 10,  
   },
   buttonText: {
     color: '#FFF',
@@ -359,6 +363,7 @@ const styles = StyleSheet.create({
   },
   messageContent: {
     fontSize: 16,
+    maxWidth: "75%"
   },
   headerContainer: {
     height: 120,

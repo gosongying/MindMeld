@@ -5,20 +5,25 @@ import { auth, database } from '../../../../../firebase';
 import { ref, runTransaction, set, get, onValue, update, child } from 'firebase/database';
 import Fontisto from 'react-native-vector-icons/Fontisto';
 
-const SelectBuddies = ({navigation, route}) => {
+const InviteBuddies = ({
+    friendListData, 
+    friendListId, 
+    sessionId, 
+    setIsInvitingBuddies, 
+    participantsId}) => {
     const currentUser = auth.currentUser;
 
     const [username, setUsername] = useState('');
     //when clicking friends' profile
     const [isCheckingFriend, setIsCheckingFriend] = useState(false);
-    const [friendListData, setFriendListData] = useState([]);
-    const [friendListId, setFriendListId] = useState([]);
     const [friendClicked, setFriendClicked] = useState(null);
     const [buddiesInvited, setBuddiesInvited] = useState([]);
     const [isSelectingInterests, setIsSelectingInterests] = useState(false);
     const [isSelectingGender, setIsSelectingGender] = useState(false);
     const [interests, setInterests] = useState([]);
     const [gender, setGender] = useState('');
+
+    const participants = participantsId.map((user) => user.uid);
 
     const data = [
         { key: '1', value: 'Sciences' },
@@ -35,52 +40,6 @@ const SelectBuddies = ({navigation, route}) => {
         { key: '12', value: 'Language' },
         { key: '13', value: 'Math and Statistics' },
       ];
-
-    useEffect(() => {
-        //listen to the change of friend list
-        //to get the latest friend list
-        const unsubscribe = onValue(ref(database, 'userId/' + currentUser.uid), async (snapshot) => {
-          let friends = [];
-          const friendList = snapshot.val().friendList ? snapshot.val().friendList : [];
-          if (friendList) {
-            setFriendListId(friendList);
-            //to make sure friendlist is added before set
-            await Promise.all(friendList.map(async (id) => {
-              const userRef = ref(database, 'userId/' + id);   
-              await get(userRef)
-              .then((user) => {
-                friends.push(user.val());
-              })
-              .catch((error) => {
-                console.log(error);
-                Alert.alert("Error");
-              });
-              return;
-            }));
-            setFriendListData(friends);
-            friendList.map((id) => {
-              //attach listener to each of the friend to get their status update
-              const unsubscribe = onValue(ref(database, 'userId/' + id), (snapshot) => {
-                const user = snapshot.val();
-                const id = user.uid;
-                //update the specific user with status update
-                const newFriendList = friends.map((item) => item.uid === id ? user : item)
-                setFriendListData(newFriendList);
-                return () => {
-                  unsubscribe();
-                }
-              });
-            })
-            return;
-          } 
-          setFriendListId([]);
-          setFriendListData(friends);
-        });
-    
-        return () => {
-          unsubscribe();
-        }
-      }, []);
 
 
     const clickUser = (user) => {
@@ -181,15 +140,21 @@ const SelectBuddies = ({navigation, route}) => {
                                     )}
                             </View>
                         </View>
-                        <TouchableOpacity 
-                        style={[styles.invite, buddiesInvited.includes(item.uid) && styles.invited]}
-                        onPress={() => toggleInvite(item)}>
-                            {buddiesInvited.includes(item.uid) ? (
-                                <Text style={styles.inviteText}>{'\u2713'}</Text>
-                            ) : (
-                                <Text style={styles.inviteText}>Invite</Text>
-                            )}
-                        </TouchableOpacity>
+                        {participants.includes(item.uid) ? (
+                            <View style={styles.invite}>
+                                <Text style={styles.inviteText}>Joined</Text>
+                            </View>
+                        ) : (
+                            <TouchableOpacity 
+                            style={[styles.invite, buddiesInvited.includes(item.uid) && styles.invited]}
+                            onPress={() => toggleInvite(item)}>
+                                {buddiesInvited.includes(item.uid) ? (
+                                    <Text style={styles.inviteText}>{'\u2713'}</Text>
+                                ) : (
+                                    <Text style={styles.inviteText}>Invite</Text>
+                                )}
+                            </TouchableOpacity>
+                        )}
                     </TouchableOpacity>
                     {/* separator */}
                     <View style={styles.separator} />
@@ -204,18 +169,33 @@ const SelectBuddies = ({navigation, route}) => {
     };
 
     const next = () => {
-        navigation.navigate("SelectToDo", {
-            ...route.params,
-            buddiesInvited
-        })
-    }
+        buddiesInvited.forEach(id => {
+            const userRef = ref(database, 'userId/' + id);
+            runTransaction(userRef, (profile) => {
+              if (profile) {
+                if (profile.invitationList) {
+                    if (!profile.invitationList.includes(sessionId)) {
+                        profile.invitationList.push(sessionId);
+                        return profile;
+                    }
+                } else {
+                  profile.invitationList = [sessionId];
+                  return profile;
+                }
+              } else {
+                return profile;
+              }
+            });
+          });
+          setIsInvitingBuddies(false);
+    };
 
     return (
         <View style={styles.container}>
             <View style={styles.header}>
                 <View style={styles.headerTop}>
                     <TouchableOpacity 
-                    onPress={() => navigation.goBack()}
+                    onPress={() => setIsInvitingBuddies(false)}
                     style={styles.backButton} 
                     >
                       <Text style={styles.back}>{'\u2190'}</Text >  
@@ -224,9 +204,9 @@ const SelectBuddies = ({navigation, route}) => {
                     onPress={next}
                     style={styles.nextButton} 
                     >
-                      <Text style={styles.next}>Next</Text >  
+                      <Text style={styles.next}>Invite</Text >  
                     </TouchableOpacity>
-                    <Text style={styles.headerText}>Select Buddies</Text>
+                    <Text style={styles.headerText}>Invite Buddies</Text>
                 </View>
                 <View style={styles.searchContainer}>
                   <Ionicons 
@@ -268,7 +248,6 @@ const SelectBuddies = ({navigation, route}) => {
                 data={friendListData}
                 renderItem={renderFriendItem}
                 keyExtractor={(item) => item.username}
-                contentContainerStyle={styles.flatListContent}
                 style={{ flex: 1}}
                 />
             </View>
@@ -368,7 +347,7 @@ const styles = StyleSheet.create({
     header: {
         width: "100%",
         height: 150,
-        backgroundColor: '#DC582A',
+        backgroundColor: '#8A2BE2',
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -376,7 +355,8 @@ const styles = StyleSheet.create({
         fontSize: 24,
         fontWeight: 'bold',
         color: '#FFF',
-        right: 30,
+        right: 40,
+        bottom: 10
     },
     flatListContainer: {
         height: "100%",
@@ -389,9 +369,6 @@ const styles = StyleSheet.create({
         height: 90,
         borderRadius: 45,
         marginRight: 10,
-    },
-    flatListContent: {
-        //paddingBottom: 40,
     },
     friendInfo: {
         flex: 1,
@@ -413,7 +390,7 @@ const styles = StyleSheet.create({
     },
     separator: {
         height: 1,
-        backgroundColor: '#DC582A',
+        backgroundColor: '#8A2BE2',
     },
     back: {
         fontSize: 35,
@@ -443,7 +420,7 @@ const styles = StyleSheet.create({
     searchContainer: {
         right: 10,
         flexDirection: 'row',
-        top: 30,
+        top: 25,
         alignItems: 'center'
     },
     searchIcon: {
@@ -466,16 +443,6 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         alignItems: 'center',
     },
-    addFriend: {
-        width: "90%",
-        backgroundColor: 'white',
-        borderRadius: 10,
-        height: 40,
-        paddingLeft: 10,
-        textAlign: 'left',
-        right: 20,
-        fontSize: 18,
-    }, 
     promptText: {
         fontSize: 24,
         fontWeight: 'bold',
@@ -495,7 +462,7 @@ const styles = StyleSheet.create({
     },
     userSearched: {
         width: 300,
-        backgroundColor: 'salmon',
+        backgroundColor: 'mediumpurple',
         //height: 250,
         borderRadius: 10,
         alignItems: 'center',
@@ -615,7 +582,7 @@ const styles = StyleSheet.create({
         width: 70,
         height: 25,
         borderRadius: 10,
-        backgroundColor: 'navy',
+        backgroundColor: 'mediumpurple',
         right: 50,
         alignItems: 'center',
         justifyContent: 'center'
@@ -625,7 +592,7 @@ const styles = StyleSheet.create({
         color: 'white'
     },
     invited: {
-        backgroundColor: '#DC582A'
+        backgroundColor: '#8A2BE2'
     },
     filter: {
         width: '100%',
@@ -656,7 +623,6 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         paddingHorizontal: 15,
         paddingVertical: 10,
-      //  marginBottom: 10,
         marginRight: 10,
         width: 150,
         alignItems: "center",
@@ -690,36 +656,17 @@ const styles = StyleSheet.create({
     },
     separator2: {
         height: 1,
-        backgroundColor: '#DC582A',
+        backgroundColor: '#8A2BE2',
         top: 20
     },
     next: {
         fontSize: 20,
         color: 'white',
         top: 10,
-        fontWeight: 'bold'
+        fontWeight: 'bold',
+        right: 10
     },
-    dots: {
-        position: "absolute",
-        flexDirection: "row",
-        alignItems: 'center',
-        top: 55,
-    },
-    dot1: {
-        width: 10,
-        height: 10,
-        borderRadius: 5,
-        backgroundColor: 'orange',
-        right: 5
-    },
-    dot2: {
-        width: 10,
-        height: 10,
-        borderRadius: 5,
-        backgroundColor: 'gray',
-        left: 5
-    }
 });
 
 
-export default SelectBuddies;
+export default InviteBuddies;

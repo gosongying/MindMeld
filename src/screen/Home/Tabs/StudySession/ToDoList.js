@@ -80,8 +80,8 @@ const ToDoList = ({ navigation, session }) => {
   };  
 
   const removeTask = (index) => {
-    setTasks((prevTasks) => {
-      const updatedTasks = [...prevTasks];
+    //setTasks((prevTasks) => {
+      const updatedTasks = [...tasks];
       updatedTasks.splice(index, 1);
       runTransaction(ref(database, 'sessions/' + session.id), (session) => {
         if (session) {
@@ -95,8 +95,8 @@ const ToDoList = ({ navigation, session }) => {
         console.log(error);
         Alert.alert("An error occurs when deleting tasks");
       });
-      return updatedTasks;
-    });
+     // return updatedTasks;
+    //});
   };
   
   const handleConfirm = () => {
@@ -154,14 +154,13 @@ const ToDoList = ({ navigation, session }) => {
         if (session) {
             if (session.tasks) {
                 session.tasks = null;
-                return;
+                return session;
             }
         } else {
             return session;
         }
     })
     .then(() => {
-        setTasks([]);
         setShowModal2(false);
     })
     .catch((error) => {

@@ -7,7 +7,7 @@ import Fontisto from 'react-native-vector-icons/Fontisto';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { AntDesign } from '@expo/vector-icons';
 
-const FriendListMore = ({navigation, route}) => {
+const FriendListMore = ({navigation}) => {
     const currentUser = auth.currentUser;
 
     const [username, setUsername] = useState('');
@@ -17,13 +17,57 @@ const FriendListMore = ({navigation, route}) => {
     const [usernameAdded, setUsernameAdded] = useState('');
     const [friendOrFriendSearched, setFriendOrFriendSearched] = useState(null);
     const [friendOrFriendSearchedId, setFriedOrFriendSearchedId] = useState('');
-    const [friendListData, setFriendListData] = useState(route.params.friendListData);
-    const [friendListId, setFriendListId] = useState(route.params.friendListId);
+    const [friendListData, setFriendListData] = useState([]);
+    const [friendListId, setFriendListId] = useState([]);
     //friend being deleted
     const [deletingFriend, setDeletingFriend] = useState(null);
 
-    console.log(deletingFriend)
-
+    useEffect(() => {
+        //listen to the change of friend list
+        //to get the latest friend list
+        const unsubscribe = onValue(ref(database, 'userId/' + currentUser.uid), async (snapshot) => {
+        let friends = [];
+        const friendList = snapshot.val().friendList ? snapshot.val().friendList : [];
+        if (friendList) {
+            setFriendListId(friendList);
+            //to make sure friendlist is added before set
+            await Promise.all(friendList.map(async (id) => {
+                const userRef = ref(database, 'userId/' + id);   
+                await get(userRef)
+                .then((user) => {
+                    friends.push(user.val());
+                })
+                .catch((error) => {
+                    console.log(error);
+                    Alert.alert("Error");
+                });
+                return;
+            }));
+            setFriendListData(friends);
+            friendList.map((id) => {
+            //attach listener to each of the friend to get their status update
+            const unsubscribe = onValue(ref(database, 'userId/' + id), (snapshot) => {
+                const user = snapshot.val();
+                if (user) {
+                    const id = user.uid;
+                    //update the specific user with status update
+                    const newFriendList = friends.map((item) => item.uid === id ? user : item)
+                    setFriendListData(newFriendList);
+                    return () => {
+                        unsubscribe();
+                    }
+                }
+            })
+        })
+        return;
+    } 
+    setFriendListId([]);
+    setFriendListData(friends);
+});
+    return () => {
+    unsubscribe();
+    }
+}, []);
 
     const clickUser = (user) => {
         setIsCheckingFriend(true);
@@ -126,9 +170,7 @@ const FriendListMore = ({navigation, route}) => {
                     setFriedOrFriendSearchedId(snapshot.val().uid);
                 })
             } else {
-                <View>   
                 Alert.alert("Username not found");
-                </View>
             }
         })
         .catch((error) => {

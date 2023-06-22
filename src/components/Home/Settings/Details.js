@@ -363,6 +363,7 @@ const styles = StyleSheet.create({
     padding: 5,
     marginTop: 35,
     marginBottom: 10,
+    top: 10
     //height: 120
   },
   profile: {
