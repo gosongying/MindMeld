@@ -34,23 +34,70 @@ const StudySession = ({navigation}) => {
     }, [])
 
     useEffect(() => {
+        // to remove all ongoing sessions
+        runTransaction(ref(database, 'userId/' + currentUser.uid), (user) => {
+            if (user) {
+                if (user.ongoingSessions) {
+                    user.ongoingSessions = null;
+                    return user;
+                } else {
+                    return user;
+                }
+            } else {
+                return user;
+            }
+        })
+    }, [])
+
+    useEffect(() => {
         const unsubscribe = onValue(ref(database, 'userId/' + currentUser.uid), async (snapshot) => {
             let sessions = [];
             let ended = [];
             const sessionList = snapshot.val().upcomingSessions? snapshot.val().upcomingSessions: [];
-            if (sessionList) {
+            if (sessionList.length > 0) {
                 await Promise.all(sessionList.map(async (id) => {
                     console.log(currentUser.displayName)
                     const sessionRef = ref(database, 'sessions/' + id);
                     await get(sessionRef)
-                    .then((session) => {
-                        if (session.val()) {
+                    .then(async (session) => {
+                        if (session.exists()) {
                             if (session.val().endTime.timestamp <= currentTimestamp) {
                                 ended.push(session.val().id);
                             } else {
-                                sessions.push(session.val());
+                                const hostId = session.val().host;
+                                const participantsId = session.val().participants? session.val().participants: [];
+                                let hostName;
+                                let participantsName = [];
+                                await Promise.all([
+                                    //to get host name
+                                    await get(ref(database, 'userId/' + hostId))
+                                    .then((snapshot) => {
+                                        if (snapshot.exists()) {
+                                            hostName = snapshot.val().username;
+                                        }
+                                    })
+                                    .catch((error) => console.log(error)),
+                                    //to get the participants name
+                                    participantsId.forEach((id) => {
+                                        get(ref(database, 'userId/' + id))
+                                        .then((snapshot) => {
+                                            if (snapshot.exists()) {
+                                                participantsName.push(snapshot.val().username);
+                                            }
+                                        })
+                                        .catch((error) => console.log(error));
+                                    })
+                                ])
+                                .then(() => {
+                                    sessions.push({
+                                        ...session.val(),
+                                        hostName: hostName,
+                                        participantsName: participantsName
+                                    });
+                                });
                             }
                         } else {
+                            ended.push(id);
                             return;
                         }
                     })
@@ -62,10 +109,20 @@ const StudySession = ({navigation}) => {
                 }));
                 ended.map((sessionId) => {
                     const db = ref(database);
-                    const updates = {};
-                    updates['sessions/' + sessionId] = null;
-                    updates['chat/' + sessionId] = null;
-                    update(db, updates);
+                    runTransaction(child(db, 'sessions/' + sessionId), (session) => {
+                        if (session) {
+                            return null;
+                        } else {
+                            return session;
+                        }
+                    });
+                    runTransaction(child(db, 'chat/' + sessionId), (chat) => {
+                        if (chat) {
+                            return null;
+                        } else {
+                            return chat;
+                        }
+                    })
 
                 });
                 const newSessionsList = sessionList.filter((id) => !ended.includes(id));
@@ -89,49 +146,84 @@ const StudySession = ({navigation}) => {
             unsubscribe();
         }
     }, [currentTimestamp]);
-    
-        useEffect(() => {
-            //to check if any invitation expired
-            //listen to the change of invitation list
-            //to get the latest invitation list
-            const unsubscribe = onValue(ref(database, 'userId/' + currentUser.uid), async (snapshot) => {
-                let invitation = [];
-                let expired = [];
-                const invitationList = snapshot.val().invitationList ? snapshot.val().invitationList : [];
-                if (invitationList) {
-                    await Promise.all(invitationList.map(async (id) => {
-                        const sessionRef = ref(database, 'sessions/' + id);   
-                        await get(sessionRef)
-                        .then((session) => {
-                            if (session.val().endTime.timestamp - currentTimestamp < 180000) {
+
+    useEffect(() => {
+        //to check if any invitation expired
+        //listen to the change of invitation list
+        //to get the latest invitation list
+        const unsubscribe = onValue(ref(database, 'userId/' + currentUser.uid), async (snapshot) => {
+            let invitation = [];
+            let expired = [];
+            const invitationList = snapshot.exists()? (snapshot.val().invitationList? snapshot.val().invitationList: []): [];
+            if (invitationList.length > 0) {
+                await Promise.all(invitationList.map(async (id) => {
+                    const sessionRef = ref(database, 'sessions/' + id);   
+                    await get(sessionRef)
+                    .then(async (session) => {
+                        if (session.exists()) {
+                            if (session.val().endTime.timestamp <= currentTimestamp ) {
                                 expired.push(session.val().id);
                             } else {
-                                invitation.push(session.val());
+                                    const hostId = session.val().host;
+                                    const participantsId = session.val().participants? session.val().participants: [];
+                                    let hostName;
+                                    let participantsName = [];
+                                    await Promise.all([
+                                        //to get host name
+                                        await get(ref(database, 'userId/' + hostId))
+                                        .then((snapshot) => {
+                                            if (snapshot.exists()) {
+                                                hostName = snapshot.val().username;
+                                            }
+                                        })
+                                        .catch((error) => console.log(error)),
+                                        //to get the participants name
+                                        participantsId.forEach((id) => {
+                                            get(ref(database, 'userId/' + id))
+                                            .then((snapshot) => {
+                                                if (snapshot.exists()) {
+                                                    participantsName.push(snapshot.val().username);
+                                                }
+                                            })
+                                            .catch((error) => console.log(error));
+                                        })
+                                    ])
+                                    .then(() => {
+                                        invitation.push({
+                                            ...session.val(),
+                                            hostName: hostName,
+                                            participantsName: participantsName
+                                        });
+                                    });
                             }
-                        })
-                        .catch((error) => {
-                            console.log(error);
-                            Alert.alert("Error");
-                        });
-                        return;
-                    }));
-                    const newInvitationList = invitationList.filter((id) => !expired.includes(id));
-                    update(ref(database, 'userId/' + currentUser.uid), {
-                        invitationList: newInvitationList
+                        } else {
+                            expired.push(id);
+                            return;
+                        }
                     })
-                    .then(() => {
-                        setInvitationIds(newInvitationList);
-                        setInvitationData(invitation);
+                    .catch((error) => {
+                        console.log(error);
+                        Alert.alert("Error");
                     });
-                } else {
-                    setInvitationIds([]);
-                    setInvitationData([]);
-                }
-            });
-            return () => {
-                unsubscribe();
+                    return;
+                }));
+                const newInvitationList = invitationList.filter((id) => !expired.includes(id));
+                update(ref(database, 'userId/' + currentUser.uid), {
+                    invitationList: newInvitationList
+                })
+                .then(() => {
+                    setInvitationIds(newInvitationList);
+                    setInvitationData(invitation);
+                });
+            } else {
+                setInvitationIds([]);
+                setInvitationData([]);
             }
-        }, [currentTimestamp]);
+        });
+        return () => {
+            unsubscribe();
+        }
+    }, [currentTimestamp]);
     
 
     const showJoin = () => {
@@ -148,42 +240,39 @@ const StudySession = ({navigation}) => {
         }, 2000);
     };
 
-    const acceptInvitation = (session) => {
+    const acceptInvitation = async (session) => {
         const db = ref(database);
         //add the user into participants list of the session
         try {
-            runTransaction(child(db, 'sessions/' + session.id), (session2) => {
-                if (session2) {
-                    session2.participants.push({
-                        uid: currentUser.uid, 
-                        username: currentUser.displayName
-                    });
-                    return session2;
-                } else {
-                    return session2;
-                }
-            }).then(() => {
-                showJoin();
-                setInDetail(inDetail.filter((id) => id !== session.id));
-                //setSessionData([...sessionData, session])
-            });
-
-            //remove the invitation from the user
-            runTransaction(child(db, 'userId/' + currentUser.uid), (user) => {
-                if (user) {
-                    user.invitationList = user.invitationList.filter((id) => id !== session.id);
-                    if (user.upcomingSessions) {
-                        user.upcomingSessions.push(session.id);
+                await runTransaction(child(db, 'sessions/' + session.id), (session2) => {
+                    if (session2) {
+                        session2.participants.push(currentUser.uid);
+                        return session2;
                     } else {
-                        console.log('sss')
-                        user.upcomingSessions = [session.id];
-                        console.log('ssaaaa')
+                        return session2;
                     }
-                    return user;
-                } else {
-                    return user;
-                }
-            })
+                }).then(() => {
+                    //remove the invitation from the user
+                runTransaction(child(db, 'userId/' + currentUser.uid), (user) => {
+                    if (user) {
+                        if (user.invitationList) {
+                            user.invitationList = user.invitationList.filter((id) => id !== session.id);
+                        }
+                        if (user.upcomingSessions) {
+                            user.upcomingSessions.push(session.id);
+                        } else {
+                            user.upcomingSessions = [session.id];
+                        }
+                        return user;
+                    } else {
+                        return user;
+                    }
+                }).then(() => {
+                    showJoin();
+                    setInDetail(inDetail.filter((id) => id !== session.id));
+                    //setSessionData([...sessionData, session])
+                });
+                })
         } catch (error) {
             console.log(error);
             Alert.alert("An error occurs during accepting invitation");
@@ -227,13 +316,13 @@ const StudySession = ({navigation}) => {
             });
             runTransaction(sessionRef, (session) => {
                 if (session) {
-                    if (session.host.uid === currentUser.uid) {
+                    if (session.host === currentUser.uid) {
                         //only host can delete the whole study session
                         remove(child(db, 'chat/' + sessionId));
                         return null;
                     } else {
                         //to delete the user from session's participants
-                        session.participants = session.participants.filter((user) => user.uid !== currentUser.uid);
+                        session.participants = session.participants.filter((uid) => uid !== currentUser.uid);
                         return session;
                     }
                 } else {
@@ -289,7 +378,7 @@ const StudySession = ({navigation}) => {
     };
 
     const renderSession = ({item}) => {
-        const inProgress = item.startTime.timestamp < currentTimestamp
+        const inProgress = item.startTime.timestamp < currentTimestamp;
         if (item.sessionName.startsWith(sessionName) || item.sessionName === sessionName || !sessionName) {
             return (
                 <View style={[styles.session, inProgress && {backgroundColor: 'lavender'}]}>
@@ -305,8 +394,8 @@ const StudySession = ({navigation}) => {
                             <Ionicons name='time-outline' size={20}/>
                             <Text style={[{marginLeft: 5}, styles.text]}>{item.startTime.string} - {item.endTime.string}</Text>
                         </View>
-                        <Text style={styles.text2}>Host: {item.host.username}</Text>
-                        <Text style={styles.text2}>Participants: {item.participants.map((user) => user.username).join(', ')}</Text>
+                        <Text style={styles.text2}>Host: {item.hostName}</Text>
+                        <Text style={styles.text2}>Participants: {item.participantsName.join(', ')}</Text>
                         <Text style={styles.text2}>To-do's: {item.tasks ? item.tasks.map((task) => task.title).join(', ') : ''}</Text>
                         <Text style={[styles.text2, !item.studyModeEnabled && {textDecorationLine: 'line-through'}]}>Study Mode</Text>
                     </View>
@@ -351,9 +440,9 @@ const StudySession = ({navigation}) => {
                             <Ionicons name='time-outline' size={20}/>
                             <Text style={[{marginLeft: 5}, styles.text]}>{item.startTime.string} - {item.endTime.string}</Text>
                         </View>
-                        <Text style={styles.text}>Host: {item.host.username}</Text>
-                        <Text style={styles.text}>Participants: {item.participants.map((user) => user.username).join(', ')}</Text>
-                        <Text style={styles.text}>To-do's: {item.tasks ? item.tasks.map((task) => task.title).join(', ') : ''}</Text>
+                        <Text style={styles.text}>Host: {item.hostName}</Text>
+                        <Text style={styles.text}>Participants: {item.participantsName.join(', ')}</Text>
+                        <Text style={styles.text}>To-do's: {item.tasks ? item.tasks.map((task) => task.title).join(', '): ''}</Text>
                         <Text style={[styles.text, !item.studyModeEnabled && {textDecorationLine: 'line-through'}]}>Study Mode</Text>
                     </View>
                     <View style={styles.acceptOrDecline}>

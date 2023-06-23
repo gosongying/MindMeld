@@ -127,38 +127,7 @@ const SelectToDo = ({ navigation, route }) => {
     const sessionRef = ref(database, 'sessions/');
     const chatRef = ref(database, 'chat/');
     const newSessionKey = push(sessionRef).key;
-    const invitationList = currentUser.isAnonymous? []: route.params.buddiesInvited
-    runTransaction(ref(database, 'userId/' + currentUser.uid), (profile) => {
-      if (profile) {
-        if (profile.upcomingSessions) {
-          //if the user has other upcoming sessions
-          profile.upcomingSessions.push(newSessionKey);
-          return profile;
-        } else {
-          //if the user does have any upcoming sessions so far
-          profile.upcomingSessions = [newSessionKey];
-          return profile;
-        }
-      } else {
-        return profile;
-      }
-    })
-    invitationList.forEach(id => {
-      const userRef = ref(database, 'userId/' + id);
-      runTransaction(userRef, (profile) => {
-        if (profile) {
-          if (profile.invitationList) {
-            profile.invitationList.push(newSessionKey);
-            return profile;
-          } else {
-            profile.invitationList = [newSessionKey];
-            return profile;
-          }
-        } else {
-          return profile;
-        }
-      });
-    });
+    const invitationList = route.params.buddiesInvited
     delete route.params.buddiesInvited;
     Promise.all([
       set(child(chatRef, newSessionKey), {
@@ -167,17 +136,52 @@ const SelectToDo = ({ navigation, route }) => {
       set(child(sessionRef, newSessionKey), {
         ...route.params,
         tasks,
-        participants: [{username: currentUser.displayName, uid: currentUser.uid}],
-        host: {username: currentUser.displayName, uid: currentUser.uid},
+        participants: [currentUser.uid],
+        host: currentUser.uid,
         id: newSessionKey,
         chatId: newSessionKey
     })
     ])
     .then(() => {
+      Promise.all([
+        runTransaction(ref(database, 'userId/' + currentUser.uid), (profile) => {
+          if (profile) {
+            if (profile.upcomingSessions) {
+              //if the user has other upcoming sessions
+              profile.upcomingSessions.push(newSessionKey);
+              return profile;
+            } else {
+              //if the user does have any upcoming sessions so far
+              profile.upcomingSessions = [newSessionKey];
+              return profile;
+            }
+          } else {
+            return profile;
+          }
+        }),
+        invitationList.forEach(id => {
+          const userRef = ref(database, 'userId/' + id);
+          runTransaction(userRef, (profile) => {
+            if (profile) {
+              if (profile.invitationList) {
+                profile.invitationList.push(newSessionKey);
+                return profile;
+              } else {
+                profile.invitationList = [newSessionKey];
+                return profile;
+              }
+            } else {
+              return profile;
+            }
+          });
+        })
+      ])
+      .then(() => {
         goToHome();
+      })
     });
   };
-
+  
   const handleFinish = () => {
     setShowText(true);
     Animated.sequence([
