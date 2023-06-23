@@ -9,6 +9,7 @@ import {
   const Privacy = ({navigation}) => {
     const goToHome = () => navigation.navigate('Settings');
 
+
     return (
         <SafeAreaView>
             <TouchableOpacity style={styles.button} onPress={goToHome}>

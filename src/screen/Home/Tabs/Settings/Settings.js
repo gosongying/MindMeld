@@ -8,6 +8,7 @@ import { goOffline, update, ref, increment, runTransaction, remove } from 'fireb
 
 const Settings = ({navigation}) => {
   const [isGuest, setIsGuest] = useState(false);
+  const [isNavigating, setIsNavigating] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -35,6 +36,12 @@ const Settings = ({navigation}) => {
   ];
 
   const navigateToScreen = (screen) => {
+    if (isNavigating) {
+      return; // Disable interaction if navigation is already in progress
+    }
+
+    setIsNavigating(true); // Set the navigation flag
+
     if (screen === 'Landing') {  //when Logout is clicked.
       if (auth.currentUser.isAnonymous) {
         auth.currentUser.delete()
@@ -65,11 +72,13 @@ const Settings = ({navigation}) => {
           } else if (id) { // Check if id exists (non-null)
             remove(ref(database, 'userId/' + id));
           }
-          navigation.replace("Landing");
+          setIsNavigating(false);
         })
         .catch((error) => console.log(error));
+        isNavigating.current = false;
     } else {
       navigation.replace(screen);
+      setIsNavigating(false);
     }
   };
   
@@ -105,7 +114,10 @@ const Settings = ({navigation}) => {
       return null; // Hide the option if it should be hidden
     }
     return (
-      <TouchableOpacity onPress={() => navigateToScreen(item.screen)}>
+      <TouchableOpacity
+        onPress={() => navigateToScreen(item.screen)}
+        disabled={isNavigating} // Disable the TouchableOpacity during navigation
+      >
         <View style={styles.optionContainer}>
           <View style={styles.leftContainer}>
             <Ionicons name={icon(item)} size={25} style={styles.icon} />
