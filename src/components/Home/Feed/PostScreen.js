@@ -21,22 +21,48 @@ if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
 }
 
-const database = firebase.database()
+const database = firebase.database();
+
+const useUsername = (uid) => {
+  const [username, setUsername] = useState(null);
+
+  useEffect(() => {
+    const userIdRef = firebase.database().ref(`userId/${uid}/username`);
+
+    const handleSnapshot = (snapshot) => {
+      const username = snapshot.val();
+      setUsername(username);
+    };
+
+    userIdRef.on('value', handleSnapshot);
+
+    return () => {
+      // Cleanup the event listener when the component unmounts
+      userIdRef.off('value', handleSnapshot);
+    };
+  }, [uid]);
+
+  return username;
+};
 
 const PostScreen = ({ route, navigation }) => {
   const { post } = route.params;
   const [comments, setComments] = useState([]);
   const [commentText, setCommentText] = useState('');
   const [userAuthenticated, setUserAuthenticated] = useState(false);
-  const [isOpen, setIsOpen] = useState(post.open);
   const [editCommentModal, setEditCommentModal] = useState(false)
   const [editedComment, setEditedComment] = useState('');
   const [selectedItem, setSelectedItem] = useState(null);
-
   const [currentPostId, setCurrentPostId] = useState(null);
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [editedPostTitle, setEditedPostTitle] = useState('');
   const [editedPostContent, setEditedPostContent] = useState('');
+  const [commentsCount, setCommentsCount] = useState(post.commentsCount);
+  const [postTitle, setPostTitle] = useState(post.title)
+  const [postContent, setPostContent] = useState(post.content)
+  const [postIsClosed, setPostIsClosed] = useState(post.isClosed)
+
+  const username = useUsername(post.userId);
 
   const editPost = () => {
     const postRef = database.ref(`posts/${currentPostId}`);
@@ -51,20 +77,30 @@ const PostScreen = ({ route, navigation }) => {
     setCurrentPostId(null);
   };
 
-  const openEditModal = (post) => {
-    setCurrentPostId(post.id);
-    setEditedPostTitle(post.title);
-    setEditedPostContent(post.content);
-    setEditModalVisible(true);
-  };
-
   const closeEditModal = () => {
     setEditModalVisible(false);
     setEditedPostTitle('');
     setEditedPostContent('');
   };
 
-
+  useEffect(() => {
+    // Check if the post exists
+    const postRef = firebase.database().ref(`posts/${post.id}`);
+    const postListener = postRef.on('value', (snapshot) => {
+      const postData = snapshot.val();
+      if (!postData) {
+        Alert.alert('Post Deleted', 'The post you are viewing has been deleted.', [
+          { text: 'OK', onPress: () => navigation.goBack() }
+        ]);
+      }
+    });
+  
+    return () => {
+      // Cleanup event listener when the component unmounts
+      postRef.off('value', postListener);
+    };
+  }, [navigation, post.id]);
+  ;
 
   useEffect(() => {
     // Check the user authentication status
@@ -87,56 +123,68 @@ const PostScreen = ({ route, navigation }) => {
       }
     });
   
+    // Listen for changes to the comments count specifically
+    const commentsCountRef = database.ref(`posts/${post.id}/commentsCount`);
+    const commentsCountListener = commentsCountRef.on('value', (snapshot) => {
+      const commentsCount = snapshot.val();
+      setCommentsCount(commentsCount);
+    });
+  
+    // Listen for changes to the title, content, and isClosed properties of the post
+    const postRef = database.ref(`posts/${post.id}`);
+    const postListener = postRef.on('value', (snapshot) => {
+      const postData = snapshot.val();
+      if (
+        postData &&
+        (postTitle !== postData.title ||
+          postContent !== postData.content ||
+          postIsClosed !== postData.isClosed)
+      ) {
+        setPostTitle(postData.title);
+        setPostContent(postData.content);
+        setPostIsClosed(postData.isClosed);
+        Alert.alert('Post Updated', 'The post has been modified.');
+      }
+    });
+  
     return () => {
       authListener(); // Remove the auth listener
       postCommentsRef.off('value', commentsListener); // Remove the comments listener
+      commentsCountRef.off('value', commentsCountListener); // Remove the comments count listener
+      postRef.off('value', postListener); // Remove the post listener
     };
   }, [post.id]);
+
   
-  useEffect(() => {
-    const postRef = database.ref(`posts/${post.id}`);
+
+  const CommentItem = ({ item }) => {
+    const [displayName, setDisplayName] = useState('');
+
+    useEffect(() => {
+      const userIdRef = firebase.database().ref(`userId/${item.uid}/username`);
     
-    // Fetch the initial value of commentsCount
-    postRef.child('commentsCount').once('value', (snapshot) => {
-      const count = snapshot.val();
-      post.commentsCount = count || 0;
-    });
+      const handleSnapshot = (snapshot) => {
+        const commentUsername = snapshot.val();
+        const displayName = commentUsername || 'Unknown User';
+        setDisplayName(displayName);
+      };
+    
+      userIdRef.on('value', handleSnapshot);
+    
+      return () => {
+        userIdRef.off('value', handleSnapshot);
+      };
+    }, [item.uid]);
+    
   
-    // Store the initial value of commentsCount
-    let previousCount = post.commentsCount;
-  
-    // Listen for changes to the commentsCount property
-    const commentsCountListener = postRef.child('commentsCount').on('value', (snapshot) => {
-      const count = snapshot.val() || 0;
-  
-      if (count > previousCount) {
-        // Handle the increase in commentsCount here
-        // For example, you can update the UI or perform any necessary actions
-      } else if (count < previousCount) {
-        // Handle the decrease in commentsCount here
-        // For example, you can update the UI or perform any necessary actions
-      }
-  
-      post.commentsCount = count;
-      previousCount = count;
-    });
-  
-    return () => {
-      postRef.child('commentsCount').off('value', commentsCountListener); // Remove the commentsCount listener
-    };
-  }, [post.id]);
+    const isCurrentUser = item.uid === firebase.auth().currentUser?.uid;
 
-
-  const renderComment = ({ item }) => {
-    const isCurrentUser = item.author === firebase.auth().currentUser.displayName;
-  
     const deleteComment = (postId) => {
-
       if (post.isClosed) {
         Alert.alert('Error', 'You cannot delete comments on a closed post');
         return;
       }
-      
+  
       const commentRef = database.ref(`posts/${post.id}/comments/${item.id}`);
       commentRef.remove();
       const postRef = database.ref(`posts/${postId}`);
@@ -147,7 +195,6 @@ const PostScreen = ({ route, navigation }) => {
         return post;
       });
     };
-
     return (
       <View
         style={[
@@ -155,122 +202,91 @@ const PostScreen = ({ route, navigation }) => {
           isCurrentUser ? styles.currentUserComment : styles.otherUserComment,
         ]}
       >
-        <View style={{    
-          flexDirection: 'row',
-          justifyContent: 'space-between',}}>
-          <View style={{flexDirection: 'row'}}>
-            <Text style={styles.username}>{item.author}</Text>
-              {isCurrentUser && (
-              <View style={{flexDirection: 'row', marginLeft: 10, marginTop: -2}}>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+          <View style={{ flexDirection: 'row' }}>
+            <Text style={styles.username}>{displayName}</Text>
 
-              <TouchableOpacity style={{ marginRight: 3 }} 
-              onPress={() => {
-                  if (post.isClosed) {
-                    Alert.alert('Error', 'You cannot edit comments on a closed post.');
-                  } else {
-                    setSelectedItem(item);
-                    setEditCommentModal(true);
-                  }
-                }}>
-                <Ionicons name="pencil" size={18} color="#8A2BE2" />
-              </TouchableOpacity>
-              <TouchableOpacity style={{marginLeft: 3}} onPress={() => deleteComment(post.id)}>
-                <Ionicons name="trash" size={18} color="red" />
-              </TouchableOpacity>
-               </View>
-              )}
-           </View>
-
+            {isCurrentUser && (
+              <View style={{ flexDirection: 'row', marginLeft: 10, marginTop: -2 }}>
+                <TouchableOpacity
+                  style={{ marginRight: 3 }}
+                  onPress={() => {
+                    if (post.isClosed) {
+                      Alert.alert('Error', 'You cannot edit comments on a closed post.');
+                    } else {
+                      setSelectedItem(item);
+                      setEditCommentModal(true);
+                    }
+                  }}
+                >
+                  <Ionicons name="pencil" size={18} color="#8A2BE2" />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={{ marginLeft: 3 }}
+                  onPress={() => deleteComment(post.id)}
+                >
+                  <Ionicons name="trash" size={18} color="red" />
+                </TouchableOpacity>
+              </View>
+            )}
+          </View>
+  
           <DynamicTimeText timestamp={item.timestamp} />
         </View>
         <Text style={styles.comment}>{item.comment}</Text>
-
       </View>
     );
   };
+
   
   const goBack = () => {
     navigation.goBack();
   };
 
-  const addComment = (postId, comment) => {
-    const user = firebase.auth().currentUser;
-    const username = user ? user.displayName : 'Anonymous User';
+const addComment = (postId, comment) => {
+  const postCommentsRef = database.ref(`posts/${postId}/comments`);
+  const postRef = database.ref(`posts/${postId}`);
 
-    // Create the comment data object
-    const commentData = {
-      author: username,
-      comment,
-      timestamp: new Date().getTime()
-    };
+  // Save the comment to the database
+  const saveComment = (user) => {
+    const { uid } = user;
 
-    // Save the comment to the database
-    const postCommentsRef = database.ref(`posts/${postId}/comments`);
-    postCommentsRef.push(commentData);
+    // Retrieve the username from the database using the uid
+    const usernameRef = database.ref(`userId/${uid}/username`);
+    usernameRef.once('value', (snapshot) => {
+      const username = snapshot.val();
 
-    // Increment the comments count for the post
-    const postRef = database.ref(`posts/${postId}`);
-    postRef.transaction((post) => {
-      if (post) {
-        post.commentsCount = (post.commentsCount || 0) + 1;
-      }
-      return post;
+      // Create the comment data object
+      const commentData = {
+        comment,
+        uid,
+        timestamp: new Date().getTime()
+      };
+
+      postCommentsRef.push(commentData);
+
+      postRef.transaction((post) => {
+        if (post) {
+          post.commentsCount = (post.commentsCount || 0) + 1;
+        }
+        return post;
+      });
+
+      scrollToBottom();
+      setCommentText('');
+      Keyboard.dismiss();
     });
-
-    scrollToBottom();
-    setCommentText('');
-    Keyboard.dismiss();
   };
 
-  const closePost = (postId) => {
-    Alert.alert(
-      'Confirmation',
-      'The post cannot be opened again after closed.',
-      [
-        {
-          text: 'Cancel',
-          style: 'cancel',
-        },
-        {
-          text: 'Confirm',
-          style: 'destructive',
-          onPress: () => {
-            const postRef = database.ref(`posts/${postId}`);
-            postRef.update({
-              isClosed: true,
-            });
-          },
-        },
-      ],
-      { cancelable: false }
-    );
-  };
-  
-    
-  const openPost = () => {
-    Alert.alert(
-      'Post Closed',
-      'Closed post cannot be opened.',
-    );
-  };
+  // Listen for authentication state changes
+  firebase.auth().onAuthStateChanged((user) => {
+    if (user) {
+      // User is signed in, save the comment with updated displayName
+      saveComment(user);
+    }
+  });
+};
 
-  const deletePost = () => {
-    Alert.alert('Confirmation', 'Are you sure you want to delete this post?', [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Delete',
-        style: 'destructive',
-        onPress: () => {
-          // Delete the post from the database
-          const postRef = database.ref(`posts/${post.id}`);
-          postRef.remove();
-  
-          // Navigate back to the previous screen
-          navigation.goBack();
-        },
-      },
-    ]);
-  };
 
 
   const DynamicTimeText = ({ timestamp }) => {
@@ -364,42 +380,29 @@ const editComment = (newText) => {
 
             <View style={{ flexDirection: 'row' }}>
               <View>
-                <Text style={styles.title}>{post.title}</Text>
-              </View>
-
-              <View style={{ 
-                 flex: 1,
-                 alignItems: 'flex-end',
-                 marginTop: -8,
-                 marginBottom: 10}}>
-                
-                <View style={{marginTop: -3}}>
-                {/* Lock, Edit and Delete Pressables */}
-                {userAuthenticated && post.author === firebase.auth().currentUser?.displayName && (
-                <View style={styles.postButtons}>
-                </View>
-                )}
-                </View>
+                <Text style={styles.title}>{postTitle}</Text>
               </View>
             </View>
 
 
-        <Text style={styles.content}>{post.content}</Text>
+        <Text style={styles.content}>{postContent}</Text>
 
         
         <View style={styles.postFooter}>
-          <Text style={{ color: post.isClosed ? 'red' : 'green' }}>{post.isClosed ? 'Closed' : 'Open'}</Text>
+          <Text style={{ color: postIsClosed  ? 'red' : 'green' }}>{postIsClosed ? 'Closed' : 'Open'}</Text>
 
           <View style={styles.commentsCount}>
             <Ionicons name="chatbubble-outline" size={20} color="#888" />
-            <Text style={styles.commentsCountText}>{post.commentsCount}</Text>
+            <Text style={styles.commentsCountText}>{commentsCount}</Text>
           </View>
 
           <View>
             <DynamicTimeText timestamp={post.timestamp} />
           </View>
         </View>
-        <Text style={{marginTop: 25}}>Posted by: {post.author}</Text>
+        <Text style={{ marginTop: 25 }}>
+          Posted by: {username}
+        </Text>
       </View>
         
       <View style={{ 
@@ -409,7 +412,7 @@ const editComment = (newText) => {
           ref={flatListRef} 
           data={comments}
           keyExtractor={(item) => item.id.toString()}
-          renderItem={renderComment}
+          renderItem={({ item }) => <CommentItem item={item} />}
           contentContainerStyle={styles.commentsContainer}
           scrollEnabled={false} // Disable scrolling of the FlatList
         />
@@ -417,7 +420,7 @@ const editComment = (newText) => {
     </ScrollView>   
         
     <View style={styles.footerContainer}>
-      {post.isClosed ? (
+      {postIsClosed ? (
         <View style={styles.commentInputContainer}>
           <TextInput
             style={[styles.commentInput, { backgroundColor: '#E0E0E0', textAlign: 'center' }]}
@@ -457,7 +460,6 @@ const editComment = (newText) => {
         </View>
       )}
     </View>
-
 
       <Modal visible={editModalVisible && currentPostId !== null} animationType="fade">
         <View style={styles.modalContainer2}>

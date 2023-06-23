@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, ScrollView, Keyboard, Dimensions, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
-
+import { getDatabase, ref, set, push, update, remove, onValue, get } from "firebase/database";
 
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/database';
@@ -89,14 +89,6 @@ const Feeds = ( {navigation}) => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [editedImage, setEditedImage] = useState(null);
 
-  
-
-
-  // Function to toggle the sorting order
-  const toggleSortOrder = () => {
-    setSortOrder((prevOrder) => (prevOrder === 'newest' ? 'oldest' : 'newest'));
-  };
-
   const sortPosts = (filteredPosts) => {
     if (sortOrder === 'newest') {
       return filteredPosts.sort((a, b) => b.timestamp - a.timestamp);
@@ -131,32 +123,31 @@ const Feeds = ( {navigation}) => {
     navigation.navigate('PostScreen', { post });
   };
   
-  const createNewPost = async => {
-    const user = firebase.auth().currentUser;
-    const username = user ? user.displayName : 'Anonymous User';
-    // Create the post data object
-    const postData = {
-      title: newPostTitle,
-      author: username,
-      content: newPostContent,
-      timestamp: new Date().getTime(),
-      aggregateScore: 0, 
-      commentsCount: 0, 
-      comments: []
-    };
-  
-    // Save the post data to the Realtime Database
-    const newPostRef = database.ref(`posts`).push(postData);
-    const postId = newPostRef.key;
-    newPostRef.set(postData)
+  const createNewPost = async () => {
+    const userId = firebase.auth().currentUser.uid;
+    console.log(userId);
 
-    // Close the modal and reset the input values and scroll to top.
-    scrollViewRef.current.scrollTo({ y: 0, animated: true });
-    setShowModal(false);
-    setNewPostTitle('');
-    setNewPostContent('');
+      const postData = {
+        title: newPostTitle,
+        userId: userId,
+        content: newPostContent,
+        isClosed: false,
+        timestamp: new Date().getTime(),
+        commentsCount: 0,
+        comments: []
+      }
+      
+      // Save the post data to the Realtime Database
+      const newPostRef = database.ref('posts').push();
+      newPostRef.set(postData);
+
+      // Close the modal and reset the input values and scroll to top.
+      scrollViewRef.current.scrollTo({ y: 0, animated: true });
+      setShowModal(false);
+      setNewPostTitle('');
+      setNewPostContent('');
+
   };
-
   
   useEffect(() => {
     // Check the user authentication status
@@ -219,7 +210,6 @@ const closePost = (postId) => {
     );
   };
   
-    
   const openPost = () => {
     Alert.alert(
       'Error',
@@ -227,10 +217,6 @@ const closePost = (postId) => {
     );
   };
   
-  
-  
-  const screenWidth = Dimensions.get('window').width;
-
   const deletePost = (postId) => {
     Alert.alert(
       'Confirmation',
@@ -285,8 +271,6 @@ const closePost = (postId) => {
     }
 
   const scrollViewRef = useRef(null);
-
-
 
   return (
     <View style={styles.container}>
@@ -353,7 +337,7 @@ const closePost = (postId) => {
                 <View style={styles.timeSinceCreation}>
                  <DynamicTimeText timestamp={post.timestamp} />
                     {/* Lock, Edit and Delete Pressables */}
-                    {userAuthenticated && post.author === firebase.auth().currentUser?.displayName && (
+                    {userAuthenticated && post.userId === firebase.auth().currentUser.uid && (
                       <View style={styles.postButtons}>
                           {post.isClosed ? (
                           <TouchableOpacity

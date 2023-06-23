@@ -20,19 +20,21 @@ const SettingTab = () => {
   const Stack = createStackNavigator();
 
   return (
-      <Stack.Navigator initialRouteName='Settings' screenOptions={{headerShown:false}}>
-        <Stack.Screen name="Settings" component={Settings} />
-        <Stack.Screen name="About" component={About} />
-        <Stack.Screen name="AchievementSettings" component={AchievementSettings} />
-        <Stack.Screen name="Feedback" component={Feedback} />
-        <Stack.Screen name="FriendListSetting" component={FriendListSetting} />
-        <Stack.Screen name="GroupList" component={GroupList} />
-        <Stack.Screen name="HelpAndSupport" component={HelpAndSupport} />
-        <Stack.Screen name="Privacy" component={Privacy} />
-        <Stack.Screen name="SessionsSetting" component={SessionsSetting} />
-        <Stack.Screen name="TermsAndCondition" component={TermsAndCondition} />
-        <Stack.Screen name="FriendListMore" component={FriendListMore} />
-      </Stack.Navigator>
+    <NavigationContainer independent={true}>
+    <Stack.Navigator initialRouteName="Settings" screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="About" component={About} options={{ gestureDirection: 'horizontal' }} />
+      <Stack.Screen name="AchievementSettings" component={AchievementSettings} />
+      <Stack.Screen name="Feedback" component={Feedback} />
+      <Stack.Screen name="FriendListSetting" component={FriendListSetting} />
+      <Stack.Screen name="GroupList" component={GroupList} />
+      <Stack.Screen name="HelpAndSupport" component={HelpAndSupport} />
+      <Stack.Screen name="Privacy" component={Privacy} />
+      <Stack.Screen name="SessionsSetting" component={SessionsSetting} />
+      <Stack.Screen name="TermsAndCondition" component={TermsAndCondition} />
+      <Stack.Screen name="FriendListMore" component={FriendListMore} />
+      <Stack.Screen name="Settings" component={Settings} />
+    </Stack.Navigator>
+    </NavigationContainer>
    );
 }
 
