@@ -61,34 +61,33 @@ const ChatRoom = ({ navigation, session }) => {
     const unsubscribe = onValue(messagesRef, async (snapshot) => {
       let newMessageList = [];
       if (snapshot.exists()) {
-        const messageList = snapshot.val().messages? snapshot.val().messages: [];
+        const messageList = snapshot.exists()? (snapshot.val().messages? snapshot.val().messages: []): [];
+        if (messageList) {
         await Promise.all(
-          messageList.map(async (message) => {
-            //to get username of sender
-            const userRef = ref(database, 'userId/' + message.sender);
-            await get(userRef)
-            .then((snapshot) => {
-              const username = snapshot.val().username;
-              const newMessage = {
-                ...message, 
-                username: username
-              }
-              newMessageList.push(newMessage);
+            messageList.map(async (message) => {
+              //to get username of sender
+              const userRef = ref(database, 'userId/' + message.sender);
+              await get(userRef)
+              .then((snapshot) => {
+                const username = snapshot.val().username;
+                const newMessage = {
+                  ...message, 
+                  username: username
+                }
+                newMessageList.push(newMessage);
+              })
+              .catch((error) => {
+                console.log(error);
+                Alert.alert("An error occurs");
+              });
+              return
             })
-            .catch((error) => {
-              console.log(error);
-              Alert.alert("An error occurs");
-            });
-            return;
-          })
         )
         setMessages(newMessageList);
         messageList.map((message) => {
           //to attach listener to user to get their latest profile
           const unsubscribe = onValue(ref(database, 'userId/' + message.sender), (snapshot) => {
             const username = snapshot.val().username;
-            console.log('oi')
-            console.log(username);
             const uid = snapshot.val().uid;
             //update the specific user with status update
             const newMessageList2 = newMessageList.map((message) => {
@@ -106,6 +105,7 @@ const ChatRoom = ({ navigation, session }) => {
           })
         });
         return;
+      }
       }
       setMessages(newMessageList);
     });
@@ -135,10 +135,17 @@ const ChatRoom = ({ navigation, session }) => {
     if (session.endTime.timestamp <= currentTimestamp) {
       Alert.alert("The session is ended");
       goToHome();
-    }
+      return;
+    } 
+    get(ref(database, 'sessions/' + session.id))
+    .then((snapshot) => {
+      if (!snapshot.exists()) {
+        Alert.alert("The session is closed by the host");
+        goToHome();
+      }
+    })
   }, [currentTimestamp])
   
-
   const renderMessageItems = () => {
     return messages.map((item) => {
       const isCurrentUser = item.sender === currentUser?.uid;

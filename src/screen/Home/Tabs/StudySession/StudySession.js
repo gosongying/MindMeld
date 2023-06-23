@@ -22,8 +22,6 @@ const StudySession = ({navigation}) => {
     const [sessionDeleted, setSessionDelected] = useState('');
     const [sessionName, setSessionName] = useState('');
 
-    console.log(sessionData)
-
     const currentUser = auth.currentUser;
 
     useEffect(() => {
@@ -36,26 +34,73 @@ const StudySession = ({navigation}) => {
     }, [])
 
     useEffect(() => {
+        // to remove all ongoing sessions
+        runTransaction(ref(database, 'userId/' + currentUser.uid), (user) => {
+            if (user) {
+                if (user.ongoingSessions) {
+                    user.ongoingSessions = null;
+                    return user;
+                } else {
+                    return user;
+                }
+            } else {
+                return user;
+            }
+        })
+    }, [])
+
+    useEffect(() => {
         const unsubscribe = onValue(ref(database, 'userId/' + currentUser.uid), async (snapshot) => {
             let sessions = [];
             let ended = [];
-            const sessionList = snapshot.exists()? (snapshot.val().upcomingSessions? snapshot.val().upcomingSessions: []): [];
-            if (sessionList) {
+            const sessionList = snapshot.val().upcomingSessions? snapshot.val().upcomingSessions: [];
+            if (sessionList.length > 0) {
                 await Promise.all(sessionList.map(async (id) => {
+                    console.log(currentUser.displayName)
                     const sessionRef = ref(database, 'sessions/' + id);
                     await get(sessionRef)
-                    .then((session) => {
+                    .then(async (session) => {
                         if (session.exists()) {
                             if (session.val().endTime.timestamp <= currentTimestamp) {
                                 ended.push(session.val().id);
                             } else {
-                                sessions.push(session.val());
+                                const hostId = session.val().host;
+                                const participantsId = session.val().participants? session.val().participants: [];
+                                let hostName;
+                                let participantsName = [];
+                                await Promise.all([
+                                    //to get host name
+                                    await get(ref(database, 'userId/' + hostId))
+                                    .then((snapshot) => {
+                                        if (snapshot.exists()) {
+                                            hostName = snapshot.val().username;
+                                        }
+                                    })
+                                    .catch((error) => console.log(error)),
+                                    //to get the participants name
+                                    participantsId.forEach((id) => {
+                                        get(ref(database, 'userId/' + id))
+                                        .then((snapshot) => {
+                                            if (snapshot.exists()) {
+                                                participantsName.push(snapshot.val().username);
+                                            }
+                                        })
+                                        .catch((error) => console.log(error));
+                                    })
+                                ])
+                                .then(() => {
+                                    sessions.push({
+                                        ...session.val(),
+                                        hostName: hostName,
+                                        participantsName: participantsName
+                                    });
+                                });
                             }
                         } else {
                             ended.push(id);
+                            return;
                         }
-                        }
-                    )
+                    })
                     .catch((error) => {
                         console.log(error);
                         Alert.alert("An error occurs");
@@ -64,10 +109,6 @@ const StudySession = ({navigation}) => {
                 }));
                 ended.map((sessionId) => {
                     const db = ref(database);
-                    /*const updates = {};
-                    updates['sessions/' + sessionId] = null;
-                    updates['chat/' + sessionId] = null;
-                    update(db, updates);*/
                     runTransaction(child(db, 'sessions/' + sessionId), (session) => {
                         if (session) {
                             return null;
@@ -94,7 +135,7 @@ const StudySession = ({navigation}) => {
                 })
                 .catch((error) => {
                     console.log(error);
-                    Alert.alert("An error occurs2");
+                    Alert.alert("An error occurs");
                 });
             } else {
                 setSessionIds([]);
@@ -105,53 +146,84 @@ const StudySession = ({navigation}) => {
             unsubscribe();
         }
     }, [currentTimestamp]);
-    
-        useEffect(() => {
-            //to check if any invitation expired
-            //listen to the change of invitation list
-            //to get the latest invitation list
-            const unsubscribe = onValue(ref(database, 'userId/' + currentUser.uid), async (snapshot) => {
-                let invitation = [];
-                let expired = [];
-                const invitationList = snapshot.val().invitationList ? snapshot.val().invitationList : [];
-                if (invitationList) {
-                    await Promise.all(invitationList.map(async (id) => {
-                        const sessionRef = ref(database, 'sessions/' + id);   
-                        await get(sessionRef)
-                        .then((session) => {
-                            if (session.exists()) {
-                                if (session.val().endTime.timestamp <= currentTimestamp) {
-                                    expired.push(session.val().id);
-                                } else {
-                                    invitation.push(session.val());
-                                }
+
+    useEffect(() => {
+        //to check if any invitation expired
+        //listen to the change of invitation list
+        //to get the latest invitation list
+        const unsubscribe = onValue(ref(database, 'userId/' + currentUser.uid), async (snapshot) => {
+            let invitation = [];
+            let expired = [];
+            const invitationList = snapshot.exists()? (snapshot.val().invitationList? snapshot.val().invitationList: []): [];
+            if (invitationList.length > 0) {
+                await Promise.all(invitationList.map(async (id) => {
+                    const sessionRef = ref(database, 'sessions/' + id);   
+                    await get(sessionRef)
+                    .then(async (session) => {
+                        if (session.exists()) {
+                            if (session.val().endTime.timestamp <= currentTimestamp ) {
+                                expired.push(session.val().id);
                             } else {
-                                expired.push(id);
+                                    const hostId = session.val().host;
+                                    const participantsId = session.val().participants? session.val().participants: [];
+                                    let hostName;
+                                    let participantsName = [];
+                                    await Promise.all([
+                                        //to get host name
+                                        await get(ref(database, 'userId/' + hostId))
+                                        .then((snapshot) => {
+                                            if (snapshot.exists()) {
+                                                hostName = snapshot.val().username;
+                                            }
+                                        })
+                                        .catch((error) => console.log(error)),
+                                        //to get the participants name
+                                        participantsId.forEach((id) => {
+                                            get(ref(database, 'userId/' + id))
+                                            .then((snapshot) => {
+                                                if (snapshot.exists()) {
+                                                    participantsName.push(snapshot.val().username);
+                                                }
+                                            })
+                                            .catch((error) => console.log(error));
+                                        })
+                                    ])
+                                    .then(() => {
+                                        invitation.push({
+                                            ...session.val(),
+                                            hostName: hostName,
+                                            participantsName: participantsName
+                                        });
+                                    });
                             }
-                        })
-                        .catch((error) => {
-                            console.log(error);
-                            Alert.alert("Error");
-                        });
-                        return;
-                    }));
-                    const newInvitationList = invitationList.filter((id) => !expired.includes(id));
-                    update(ref(database, 'userId/' + currentUser.uid), {
-                        invitationList: newInvitationList
+                        } else {
+                            expired.push(id);
+                            return;
+                        }
                     })
-                    .then(() => {
-                        setInvitationIds(newInvitationList);
-                        setInvitationData(invitation);
+                    .catch((error) => {
+                        console.log(error);
+                        Alert.alert("Error");
                     });
-                } else {
-                    setInvitationIds([]);
-                    setInvitationData([]);
-                }
-            });
-            return () => {
-                unsubscribe();
+                    return;
+                }));
+                const newInvitationList = invitationList.filter((id) => !expired.includes(id));
+                update(ref(database, 'userId/' + currentUser.uid), {
+                    invitationList: newInvitationList
+                })
+                .then(() => {
+                    setInvitationIds(newInvitationList);
+                    setInvitationData(invitation);
+                });
+            } else {
+                setInvitationIds([]);
+                setInvitationData([]);
             }
-        }, [currentTimestamp]);
+        });
+        return () => {
+            unsubscribe();
+        }
+    }, [currentTimestamp]);
     
 
     const showJoin = () => {
@@ -172,12 +244,9 @@ const StudySession = ({navigation}) => {
         const db = ref(database);
         //add the user into participants list of the session
         try {
-                runTransaction(child(db, 'sessions/' + session.id), (session2) => {
+                await runTransaction(child(db, 'sessions/' + session.id), (session2) => {
                     if (session2) {
-                        session2.participants.push({
-                            uid: currentUser.uid, 
-                            username: currentUser.displayName
-                        });
+                        session2.participants.push(currentUser.uid);
                         return session2;
                     } else {
                         return session2;
@@ -247,13 +316,13 @@ const StudySession = ({navigation}) => {
             });
             runTransaction(sessionRef, (session) => {
                 if (session) {
-                    if (session.host.uid === currentUser.uid) {
+                    if (session.host === currentUser.uid) {
                         //only host can delete the whole study session
                         remove(child(db, 'chat/' + sessionId));
                         return null;
                     } else {
                         //to delete the user from session's participants
-                        session.participants = session.participants.filter((user) => user.uid !== currentUser.uid);
+                        session.participants = session.participants.filter((uid) => uid !== currentUser.uid);
                         return session;
                     }
                 } else {
@@ -301,41 +370,15 @@ const StudySession = ({navigation}) => {
                     }
                 })
            // ])
-            .then(() => navigation.navigate("SessionRoom", {session: session}));
+            .then(() => navigation.navigate("SessionRoom", {session}));
         } catch (error) {
             console.log(error);
             Alert.alert("An error occurs during joining session");
         }
     };
 
-    const renderSession = async ({item}) => {
+    const renderSession = ({item}) => {
         const inProgress = item.startTime.timestamp < currentTimestamp;
-        /*let hostName;
-        let participantsName = [];
-        await Promise.all([
-            get(ref(database, 'userId/' + item.host))
-            .then((snapshot) => {
-                if (snapshot.exists()) {
-                    hostName = snapshot.val().username;
-                }
-            })
-            .catch((error) => {
-                console.log(error);
-                Alert.alert("An error occurs during displaying upcoming sessions");
-            }),
-            item.participants.forEach(async (id) => {
-                await get(ref(database, 'userId/' + id))
-                .then((snapshot) => {
-                    if (snapshot.exists()) {
-                        participantsName.push(snapshot.val().username);
-                    }
-                })
-                .catch((error) => {
-                    console.log(error);
-                    Alert.alert("An error occurs during displaying upcoming sessions");
-                })
-            })
-        ])*/
         if (item.sessionName.startsWith(sessionName) || item.sessionName === sessionName || !sessionName) {
             return (
                 <View style={[styles.session, inProgress && {backgroundColor: 'lavender'}]}>
@@ -351,8 +394,8 @@ const StudySession = ({navigation}) => {
                             <Ionicons name='time-outline' size={20}/>
                             <Text style={[{marginLeft: 5}, styles.text]}>{item.startTime.string} - {item.endTime.string}</Text>
                         </View>
-                        <Text style={styles.text2}>Host: {item.host}</Text>
-                        <Text style={styles.text2}>Participants: {item.participants.join(', ')}</Text>
+                        <Text style={styles.text2}>Host: {item.hostName}</Text>
+                        <Text style={styles.text2}>Participants: {item.participantsName.join(', ')}</Text>
                         <Text style={styles.text2}>To-do's: {item.tasks ? item.tasks.map((task) => task.title).join(', ') : ''}</Text>
                         <Text style={[styles.text2, !item.studyModeEnabled && {textDecorationLine: 'line-through'}]}>Study Mode</Text>
                     </View>
@@ -397,8 +440,8 @@ const StudySession = ({navigation}) => {
                             <Ionicons name='time-outline' size={20}/>
                             <Text style={[{marginLeft: 5}, styles.text]}>{item.startTime.string} - {item.endTime.string}</Text>
                         </View>
-                        <Text style={styles.text}>Host: {hostName}</Text>
-                        <Text style={styles.text}>Participants: {participantsName.join(', ')}</Text>
+                        <Text style={styles.text}>Host: {item.hostName}</Text>
+                        <Text style={styles.text}>Participants: {item.participantsName.join(', ')}</Text>
                         <Text style={styles.text}>To-do's: {item.tasks ? item.tasks.map((task) => task.title).join(', '): ''}</Text>
                         <Text style={[styles.text, !item.studyModeEnabled && {textDecorationLine: 'line-through'}]}>Study Mode</Text>
                     </View>

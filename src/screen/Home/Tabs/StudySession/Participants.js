@@ -25,13 +25,13 @@ const Participants = ({session, navigation}) => {
     //to get the latest participant list
     const unsubscribe = onValue(ref(database, 'sessions/' + sessionId), async (snapshot) => {
         let participantsData2 = [];
-        if (snapshot.val()) {
+        if (snapshot.exists()) {
             const participantsId2 = snapshot.val().participants? snapshot.val().participants: [];
-            if (participantsId2) {
+            if (participantsId2.length > 0) {
                 setParticipantsId(participantsId2);
             //to make sure participants is added before set
-            await Promise.all(participantsId2.map(async (user) => {
-                const userRef = ref(database, 'userId/' + user.uid);  
+            await Promise.all(participantsId2.map(async (uid) => {
+                const userRef = ref(database, 'userId/' + uid);  
                 await get(userRef)
                 .then((user) => {
                     participantsData2.push(user.val());
@@ -42,11 +42,9 @@ const Participants = ({session, navigation}) => {
                 });
                 return;
             }));
-            console.log(participantsData2)
-            setParticipantsData(participantsData2);
-            participantsId2.map((user) => {
+            participantsId2.map((uid) => {
                 //attach listener to each of the participants to get their status update
-                const unsubscribe = onValue(ref(database, 'userId/' + user.uid), (snapshot) => {
+                const unsubscribe = onValue(ref(database, 'userId/' + uid), (snapshot) => {
                     const user = snapshot.val();
                     const id = user.uid;
                     //update the specific user with status update
@@ -74,7 +72,7 @@ useEffect(() => {
     const unsubscribe = onValue(ref(database, 'userId/' + currentUser.uid), async (snapshot) => {
     let friends = [];
     const friendList = snapshot.val().friendList ? snapshot.val().friendList : [];
-    if (friendList) {
+    if (friendList.length > 0) {
         setFriendListId(friendList);
         //to make sure friendlist is added before set
         await Promise.all(friendList.map(async (id) => {

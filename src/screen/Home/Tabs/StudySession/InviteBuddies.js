@@ -23,8 +23,6 @@ const InviteBuddies = ({
     const [interests, setInterests] = useState([]);
     const [gender, setGender] = useState('');
 
-    const participants = participantsId.map((user) => user.uid);
-
     const data = [
         { key: '1', value: 'Sciences' },
         { key: '2', value: 'Business and Management' },
@@ -140,7 +138,7 @@ const InviteBuddies = ({
                                     )}
                             </View>
                         </View>
-                        {participants.includes(item.uid) ? (
+                        {participantsId.includes(item.uid) ? (
                             <View style={styles.invite}>
                                 <Text style={styles.inviteText}>Joined</Text>
                             </View>
