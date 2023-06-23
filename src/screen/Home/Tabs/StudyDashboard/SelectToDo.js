@@ -167,8 +167,8 @@ const SelectToDo = ({ navigation, route }) => {
       set(child(sessionRef, newSessionKey), {
         ...route.params,
         tasks,
-        participants: [{username: currentUser.displayName, uid: currentUser.uid}],
-        host: {username: currentUser.displayName, uid: currentUser.uid},
+        participants: [currentUser.uid],
+        host: currentUser.uid,
         id: newSessionKey,
         chatId: newSessionKey
     })

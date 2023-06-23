@@ -22,6 +22,8 @@ const StudySession = ({navigation}) => {
     const [sessionDeleted, setSessionDelected] = useState('');
     const [sessionName, setSessionName] = useState('');
 
+    console.log(sessionData)
+
     const currentUser = auth.currentUser;
 
     useEffect(() => {
@@ -37,23 +39,23 @@ const StudySession = ({navigation}) => {
         const unsubscribe = onValue(ref(database, 'userId/' + currentUser.uid), async (snapshot) => {
             let sessions = [];
             let ended = [];
-            const sessionList = snapshot.val().upcomingSessions? snapshot.val().upcomingSessions: [];
+            const sessionList = snapshot.exists()? (snapshot.val().upcomingSessions? snapshot.val().upcomingSessions: []): [];
             if (sessionList) {
                 await Promise.all(sessionList.map(async (id) => {
-                    console.log(currentUser.displayName)
                     const sessionRef = ref(database, 'sessions/' + id);
                     await get(sessionRef)
                     .then((session) => {
-                        if (session.val()) {
+                        if (session.exists()) {
                             if (session.val().endTime.timestamp <= currentTimestamp) {
                                 ended.push(session.val().id);
                             } else {
                                 sessions.push(session.val());
                             }
                         } else {
-                            return;
+                            ended.push(id);
                         }
-                    })
+                        }
+                    )
                     .catch((error) => {
                         console.log(error);
                         Alert.alert("An error occurs");
@@ -62,10 +64,24 @@ const StudySession = ({navigation}) => {
                 }));
                 ended.map((sessionId) => {
                     const db = ref(database);
-                    const updates = {};
+                    /*const updates = {};
                     updates['sessions/' + sessionId] = null;
                     updates['chat/' + sessionId] = null;
-                    update(db, updates);
+                    update(db, updates);*/
+                    runTransaction(child(db, 'sessions/' + sessionId), (session) => {
+                        if (session) {
+                            return null;
+                        } else {
+                            return session;
+                        }
+                    });
+                    runTransaction(child(db, 'chat/' + sessionId), (chat) => {
+                        if (chat) {
+                            return null;
+                        } else {
+                            return chat;
+                        }
+                    })
 
                 });
                 const newSessionsList = sessionList.filter((id) => !ended.includes(id));
@@ -78,7 +94,7 @@ const StudySession = ({navigation}) => {
                 })
                 .catch((error) => {
                     console.log(error);
-                    Alert.alert("An error occurs");
+                    Alert.alert("An error occurs2");
                 });
             } else {
                 setSessionIds([]);
@@ -103,10 +119,14 @@ const StudySession = ({navigation}) => {
                         const sessionRef = ref(database, 'sessions/' + id);   
                         await get(sessionRef)
                         .then((session) => {
-                            if (session.val().endTime.timestamp - currentTimestamp < 180000) {
-                                expired.push(session.val().id);
+                            if (session.exists()) {
+                                if (session.val().endTime.timestamp <= currentTimestamp) {
+                                    expired.push(session.val().id);
+                                } else {
+                                    invitation.push(session.val());
+                                }
                             } else {
-                                invitation.push(session.val());
+                                expired.push(id);
                             }
                         })
                         .catch((error) => {
@@ -148,42 +168,42 @@ const StudySession = ({navigation}) => {
         }, 2000);
     };
 
-    const acceptInvitation = (session) => {
+    const acceptInvitation = async (session) => {
         const db = ref(database);
         //add the user into participants list of the session
         try {
-            runTransaction(child(db, 'sessions/' + session.id), (session2) => {
-                if (session2) {
-                    session2.participants.push({
-                        uid: currentUser.uid, 
-                        username: currentUser.displayName
-                    });
-                    return session2;
-                } else {
-                    return session2;
-                }
-            }).then(() => {
-                showJoin();
-                setInDetail(inDetail.filter((id) => id !== session.id));
-                //setSessionData([...sessionData, session])
-            });
-
-            //remove the invitation from the user
-            runTransaction(child(db, 'userId/' + currentUser.uid), (user) => {
-                if (user) {
-                    user.invitationList = user.invitationList.filter((id) => id !== session.id);
-                    if (user.upcomingSessions) {
-                        user.upcomingSessions.push(session.id);
+                runTransaction(child(db, 'sessions/' + session.id), (session2) => {
+                    if (session2) {
+                        session2.participants.push({
+                            uid: currentUser.uid, 
+                            username: currentUser.displayName
+                        });
+                        return session2;
                     } else {
-                        console.log('sss')
-                        user.upcomingSessions = [session.id];
-                        console.log('ssaaaa')
+                        return session2;
                     }
-                    return user;
-                } else {
-                    return user;
-                }
-            })
+                }).then(() => {
+                    //remove the invitation from the user
+                runTransaction(child(db, 'userId/' + currentUser.uid), (user) => {
+                    if (user) {
+                        if (user.invitationList) {
+                            user.invitationList = user.invitationList.filter((id) => id !== session.id);
+                        }
+                        if (user.upcomingSessions) {
+                            user.upcomingSessions.push(session.id);
+                        } else {
+                            user.upcomingSessions = [session.id];
+                        }
+                        return user;
+                    } else {
+                        return user;
+                    }
+                }).then(() => {
+                    showJoin();
+                    setInDetail(inDetail.filter((id) => id !== session.id));
+                    //setSessionData([...sessionData, session])
+                });
+                })
         } catch (error) {
             console.log(error);
             Alert.alert("An error occurs during accepting invitation");
@@ -281,15 +301,41 @@ const StudySession = ({navigation}) => {
                     }
                 })
            // ])
-            .then(() => navigation.navigate("SessionRoom", {session}));
+            .then(() => navigation.navigate("SessionRoom", {session: session}));
         } catch (error) {
             console.log(error);
             Alert.alert("An error occurs during joining session");
         }
     };
 
-    const renderSession = ({item}) => {
-        const inProgress = item.startTime.timestamp < currentTimestamp
+    const renderSession = async ({item}) => {
+        const inProgress = item.startTime.timestamp < currentTimestamp;
+        /*let hostName;
+        let participantsName = [];
+        await Promise.all([
+            get(ref(database, 'userId/' + item.host))
+            .then((snapshot) => {
+                if (snapshot.exists()) {
+                    hostName = snapshot.val().username;
+                }
+            })
+            .catch((error) => {
+                console.log(error);
+                Alert.alert("An error occurs during displaying upcoming sessions");
+            }),
+            item.participants.forEach(async (id) => {
+                await get(ref(database, 'userId/' + id))
+                .then((snapshot) => {
+                    if (snapshot.exists()) {
+                        participantsName.push(snapshot.val().username);
+                    }
+                })
+                .catch((error) => {
+                    console.log(error);
+                    Alert.alert("An error occurs during displaying upcoming sessions");
+                })
+            })
+        ])*/
         if (item.sessionName.startsWith(sessionName) || item.sessionName === sessionName || !sessionName) {
             return (
                 <View style={[styles.session, inProgress && {backgroundColor: 'lavender'}]}>
@@ -305,8 +351,8 @@ const StudySession = ({navigation}) => {
                             <Ionicons name='time-outline' size={20}/>
                             <Text style={[{marginLeft: 5}, styles.text]}>{item.startTime.string} - {item.endTime.string}</Text>
                         </View>
-                        <Text style={styles.text2}>Host: {item.host.username}</Text>
-                        <Text style={styles.text2}>Participants: {item.participants.map((user) => user.username).join(', ')}</Text>
+                        <Text style={styles.text2}>Host: {item.host}</Text>
+                        <Text style={styles.text2}>Participants: {item.participants.join(', ')}</Text>
                         <Text style={styles.text2}>To-do's: {item.tasks ? item.tasks.map((task) => task.title).join(', ') : ''}</Text>
                         <Text style={[styles.text2, !item.studyModeEnabled && {textDecorationLine: 'line-through'}]}>Study Mode</Text>
                     </View>
@@ -351,9 +397,9 @@ const StudySession = ({navigation}) => {
                             <Ionicons name='time-outline' size={20}/>
                             <Text style={[{marginLeft: 5}, styles.text]}>{item.startTime.string} - {item.endTime.string}</Text>
                         </View>
-                        <Text style={styles.text}>Host: {item.host.username}</Text>
-                        <Text style={styles.text}>Participants: {item.participants.map((user) => user.username).join(', ')}</Text>
-                        <Text style={styles.text}>To-do's: {item.tasks ? item.tasks.map((task) => task.title).join(', ') : ''}</Text>
+                        <Text style={styles.text}>Host: {hostName}</Text>
+                        <Text style={styles.text}>Participants: {participantsName.join(', ')}</Text>
+                        <Text style={styles.text}>To-do's: {item.tasks ? item.tasks.map((task) => task.title).join(', '): ''}</Text>
                         <Text style={[styles.text, !item.studyModeEnabled && {textDecorationLine: 'line-through'}]}>Study Mode</Text>
                     </View>
                     <View style={styles.acceptOrDecline}>

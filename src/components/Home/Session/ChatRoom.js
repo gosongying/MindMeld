@@ -2,8 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard, Modal, Alert } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 import { auth, database } from "../../../../firebase";
-import { runTransaction, ref, onValue } from 'firebase/database';
+import { runTransaction, ref, onValue, get } from 'firebase/database';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import { confirmButtonStyles } from 'react-native-modal-datetime-picker';
 
 const ChatRoom = ({ navigation, session }) => {
   const [inputMessage, setInputMessage] = useState('');
@@ -18,8 +19,6 @@ const ChatRoom = ({ navigation, session }) => {
   const hours = Math.floor(differenceInMilliseconds / (1000 * 60 * 60));
   const minutes = Math.floor((differenceInMilliseconds / (1000 * 60)) % 60);
   
-  console.log(session.endTime.timestamp);
-  console.log(currentTimestamp)
   // To scroll to bottom of scrollList 
   const scrollViewRef = useRef(null);
 
@@ -28,7 +27,7 @@ const ChatRoom = ({ navigation, session }) => {
   const sendMessage = () => {
     if (inputMessage.trim() === '') return;
   
-    const sender = currentUser ? currentUser.displayName : 'Unknown User';
+    const sender = currentUser.uid;
   
     const newMessage = {
       sender,
@@ -44,7 +43,6 @@ const ChatRoom = ({ navigation, session }) => {
           return chat;
         } else {
           //if there is no messages there before
-          console.log(newMessage)
           chat.messages = [newMessage];
           return chat;
         }
@@ -60,13 +58,57 @@ const ChatRoom = ({ navigation, session }) => {
   useEffect(() => {
     const messagesRef = ref(database, 'chat/' + chatId);
   
-    const unsubscribe = onValue(messagesRef, (snapshot) => {
-      if (snapshot.val()) {
+    const unsubscribe = onValue(messagesRef, async (snapshot) => {
+      let newMessageList = [];
+      if (snapshot.exists()) {
         const messageList = snapshot.val().messages? snapshot.val().messages: [];
-        setMessages(messageList);
+        await Promise.all(
+          messageList.map(async (message) => {
+            //to get username of sender
+            const userRef = ref(database, 'userId/' + message.sender);
+            await get(userRef)
+            .then((snapshot) => {
+              const username = snapshot.val().username;
+              const newMessage = {
+                ...message, 
+                username: username
+              }
+              newMessageList.push(newMessage);
+            })
+            .catch((error) => {
+              console.log(error);
+              Alert.alert("An error occurs");
+            });
+            return;
+          })
+        )
+        setMessages(newMessageList);
+        messageList.map((message) => {
+          //to attach listener to user to get their latest profile
+          const unsubscribe = onValue(ref(database, 'userId/' + message.sender), (snapshot) => {
+            const username = snapshot.val().username;
+            console.log('oi')
+            console.log(username);
+            const uid = snapshot.val().uid;
+            //update the specific user with status update
+            const newMessageList2 = newMessageList.map((message) => {
+              if (message.sender === uid) {
+                message.username = username
+                return message;
+              } else {
+                return message;
+              }
+            });
+            setMessages(newMessageList2);
+            return () => {
+              unsubscribe();
+            }
+          })
+        });
+        return;
       }
-    })
-    
+      setMessages(newMessageList);
+    });
     return () => {
       unsubscribe();
     };
@@ -99,7 +141,7 @@ const ChatRoom = ({ navigation, session }) => {
 
   const renderMessageItems = () => {
     return messages.map((item) => {
-      const isCurrentUser = item.sender === currentUser?.displayName;
+      const isCurrentUser = item.sender === currentUser?.uid;
       const messageDate = new Date(item.timestamp);
       const messageTime = messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
@@ -111,7 +153,7 @@ const ChatRoom = ({ navigation, session }) => {
             isCurrentUser ? styles.currentUserMessageContainer : styles.otherUserMessageContainer,
           ]}
         >
-          {!isCurrentUser && <Text style={styles.messageSender}>{item.sender}</Text>}
+          {!isCurrentUser && <Text style={styles.messageSender}>{item.username}</Text>}
           <View style={{ flexDirection: 'row' }}>
             <Text style={styles.messageContent}>{item.content}</Text>
             <Text style={styles.time}>{messageTime}</Text>
