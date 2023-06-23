@@ -10,7 +10,7 @@ import StudySessionTab from './Tabs/StudySessionTab';
 import { update, ref, onDisconnect, serverTimestamp, goOnline, onValue, increment, runTransaction, remove } from 'firebase/database';
 import { database, auth } from '../../../firebase';
 
-const HomePage = () => {
+const HomePage = ({navigation}) => {
   const currentUser = auth.currentUser;
 
   console.log("Home");

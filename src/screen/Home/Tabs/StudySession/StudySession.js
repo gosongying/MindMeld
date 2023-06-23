@@ -53,7 +53,7 @@ const StudySession = ({navigation}) => {
         const unsubscribe = onValue(ref(database, 'userId/' + currentUser.uid), async (snapshot) => {
             let sessions = [];
             let ended = [];
-            const sessionList = snapshot.val().upcomingSessions? snapshot.val().upcomingSessions: [];
+            const sessionList = snapshot.exists()? (snapshot.val().upcomingSessions? snapshot.val().upcomingSessions: []): [];
             if (sessionList.length > 0) {
                 await Promise.all(sessionList.map(async (id) => {
                     console.log(currentUser.displayName)

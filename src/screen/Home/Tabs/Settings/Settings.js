@@ -72,7 +72,8 @@ const Settings = ({navigation}) => {
           } else if (id) { // Check if id exists (non-null)
             remove(ref(database, 'userId/' + id));
           }
-          setIsNavigating(false);
+          navigation.replace('Landing')
+         setIsNavigating(false);
         })
         .catch((error) => console.log(error));
         isNavigating.current = false;

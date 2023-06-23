@@ -20,7 +20,6 @@ const SettingTab = () => {
   const Stack = createStackNavigator();
 
   return (
-    <NavigationContainer independent={true}>
     <Stack.Navigator initialRouteName="Settings" screenOptions={{ headerShown: false }}>
       <Stack.Screen name="About" component={About} options={{ gestureDirection: 'horizontal' }} />
       <Stack.Screen name="AchievementSettings" component={AchievementSettings} />
@@ -34,7 +33,6 @@ const SettingTab = () => {
       <Stack.Screen name="FriendListMore" component={FriendListMore} />
       <Stack.Screen name="Settings" component={Settings} />
     </Stack.Navigator>
-    </NavigationContainer>
    );
 }
 
