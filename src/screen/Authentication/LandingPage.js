@@ -16,6 +16,7 @@ import { set, ref } from "firebase/database";
 const LandingPage = ({navigation}) => {
 
   console.log("Landing")
+  console.log(navigation.getState().routes)
 
   const [isLoading, setLoading] = useState(false);
 

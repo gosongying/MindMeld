@@ -346,6 +346,7 @@ const styles = StyleSheet.create({
         height: "100%",
         flex: 1,
         width: "100%",
+        backgroundColor: 'white'
     },
     avatar: {
         width: 55,
@@ -373,7 +374,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 10,
         left: 20,
-        top: 5
+        top: 5,
     },
     separator: {
         height: 1,
