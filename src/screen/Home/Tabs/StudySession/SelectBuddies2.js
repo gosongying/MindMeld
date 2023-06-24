@@ -387,8 +387,8 @@ const styles = StyleSheet.create({
         top: 20,
     },
     avatar: {
-        width: 90,
-        height: 90,
+        width: 55,
+        height: 55,
         borderRadius: 45,
         marginRight: 10,
     },
@@ -397,9 +397,10 @@ const styles = StyleSheet.create({
     },
     friendInfo: {
         flex: 1,
+        marginLeft: 5
     },
     friendName: {
-        fontSize: 24,
+        fontSize: 20,
         fontWeight: 'bold',
     },
     friendStatus: {
@@ -556,8 +557,8 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgb(0, 200, 0)',
         borderRadius: 6,
         position: 'absolute',
-        left: 75, 
-        top: 65
+        left: 40, 
+        top: 40
     },
     modalContainer: {
         flex: 1,
@@ -624,7 +625,8 @@ const styles = StyleSheet.create({
     },
     inviteText: {
         fontSize: 15,
-        color: 'white'
+        color: 'white',
+        fontWeight:'bold'
     },
     invited: {
         backgroundColor: '#DC582A'
@@ -720,6 +722,9 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         backgroundColor: 'gray',
         left: 5
+    },
+    filterText: {
+        fontWeight: 'bold',
     }
 });
 

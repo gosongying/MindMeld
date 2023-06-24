@@ -239,7 +239,6 @@ const InviteBuddies = ({
                         )}
                     </TouchableOpacity>
                 </View>
-            <View style={styles.separator2} />
             </View>
             <View style={styles.flatListContainer}>
                 <FlatList
@@ -363,8 +362,8 @@ const styles = StyleSheet.create({
         top: 20,
     },
     avatar: {
-        width: 90,
-        height: 90,
+        width: 55,
+        height: 55,
         borderRadius: 45,
         marginRight: 10,
     },
@@ -372,7 +371,7 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     friendName: {
-        fontSize: 24,
+        fontSize: 20,
         fontWeight: 'bold',
     },
     friendStatus: {
@@ -519,8 +518,8 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgb(0, 200, 0)',
         borderRadius: 6,
         position: 'absolute',
-        left: 75, 
-        top: 65
+        left: 43, 
+        top: 39
     },
     modalContainer: {
         flex: 1,
@@ -587,7 +586,8 @@ const styles = StyleSheet.create({
     },
     inviteText: {
         fontSize: 15,
-        color: 'white'
+        color: 'white',
+        fontWeight: 'bold',
     },
     invited: {
         backgroundColor: '#8A2BE2'
@@ -664,6 +664,9 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         right: 10
     },
+    filterText: {
+        fontWeight: 'bold',
+    }
 });
 
 

@@ -175,13 +175,13 @@ const ToDoList = ({ navigation, session }) => {
   return (
     <KeyboardAvoidingView style={styles.container} behavior="padding">
       <View style={styles.header}>
-        <View style={styles.arrow}>
+        <View style={[styles.arrow, {marginTop: -37}]}>
             <MaterialIcons name='arrow-left' size={30} />
             <Text>Chat Room</Text>
         </View>
         <Text style={styles.title}>Tasks</Text>
         <TouchableOpacity style={styles.closeButton} onPress={confirmReset}>
-          <AntDesign name="close" size={24} color="#fff" />
+          <AntDesign name="close" size={28} color="#fff" />
         </TouchableOpacity>
       </View>
         {showMessage && (
@@ -302,6 +302,7 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     marginLeft: 10,
+    marginTop: 15,
   },
   header: {
     flexDirection: 'row',
@@ -311,7 +312,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#8A2BE2',
     paddingHorizontal: 20,
     paddingVertical: 20,
-    paddingTop: 50
+    paddingTop: 50,
+    height: 130,
   },
   title: {
     fontSize: 24,
