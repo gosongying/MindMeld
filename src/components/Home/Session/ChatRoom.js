@@ -23,36 +23,6 @@ const ChatRoom = ({ navigation, session }) => {
   const scrollViewRef = useRef(null);
 
   const currentUser = auth.currentUser;
-
-  const sendMessage = () => {
-    if (inputMessage.trim() === '') return;
-  
-    const sender = currentUser.uid;
-  
-    const newMessage = {
-      sender,
-      content: inputMessage.trim(),
-      timestamp: new Date().getTime(), // Add the timestamp property
-    };
-  
-    runTransaction(ref(database, 'chat/' + chatId), (chat) => {
-      if (chat) {
-        if (chat.messages) {
-          //if there is messages in the chat room alr
-          chat.messages.push(newMessage);
-          return chat;
-        } else {
-          //if there is no messages there before
-          chat.messages = [newMessage];
-          return chat;
-        }
-      } else {
-        return chat;
-      }
-    })
-
-    setInputMessage('');
-  };
   
   // To listen for new messages and update the messages state
   useEffect(() => {
@@ -163,7 +133,9 @@ const ChatRoom = ({ navigation, session }) => {
           {!isCurrentUser && <Text style={styles.messageSender}>{item.username}</Text>}
           <View style={{ flexDirection: 'row' }}>
             <Text style={styles.messageContent}>{item.content}</Text>
+            <View>
             <Text style={styles.time}>{messageTime}</Text>
+            </View>
           </View>
         </View>
       );
@@ -190,6 +162,36 @@ const ChatRoom = ({ navigation, session }) => {
     }
   };
 
+  const sendMessage = () => {
+    if (inputMessage.trim() === '') return;
+  
+    const sender = currentUser.uid;
+  
+    const newMessage = {
+      sender,
+      content: inputMessage.trim(),
+      timestamp: new Date().getTime(), // Add the timestamp property
+    };
+  
+    runTransaction(ref(database, 'chat/' + chatId), (chat) => {
+      if (chat) {
+        if (chat.messages) {
+          //if there is messages in the chat room alr
+          chat.messages.push(newMessage);
+          return chat;
+        } else {
+          //if there is no messages there before
+          chat.messages = [newMessage];
+          return chat;
+        }
+      } else {
+        return chat;
+      }
+    })
+
+    setInputMessage('');
+  };
+
   return (
     <KeyboardAvoidingView
         style={styles.container}
@@ -197,12 +199,12 @@ const ChatRoom = ({ navigation, session }) => {
       >
         <View style={styles.headerContainer}>
           <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', top: 15}}>
-            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+            <View style={{flexDirection: 'row', alignItems: 'center', marginTop: -2}}>
               <MaterialIcons name='arrow-left' size={30}/>
               <Text>Participants</Text>
             </View>
-            <View style={{flexDirection: 'row', alignItems: 'center'}}>
-              <Text>To Do List</Text>
+            <View style={{flexDirection: 'row', alignItems: 'center', marginTop: -2}}>
+              <Text>To-do List</Text>
               <MaterialIcons name="arrow-right" size={30} />
             </View>
           </View>
@@ -304,7 +306,8 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     color: '#fff',
-    right:25
+    right: 25,
+    marginTop: 15,
   },
   messagesContainer: {
     flexGrow: 1,
@@ -412,10 +415,10 @@ const styles = StyleSheet.create({
   },
   messageContent: {
     fontSize: 16,
-    maxWidth: "75%"
+    maxWidth: "85%"
   },
   headerContainer: {
-    height: 120,
+    height: 130,
     backgroundColor: '#8A2BE2',
     justifyContent: 'center'
   }

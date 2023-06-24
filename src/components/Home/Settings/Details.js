@@ -55,14 +55,14 @@ const Details = ({ navigation }) => {
   };
 
   const handleChangedUsername = () => {
+    setNewUsername(newUsername.trim())
     setLoading(true);
 
-    if (!/^[a-zA-Z0-9]+$/.test(newUsername)) {
-      Alert.alert('Username cannot contain special characters');
+    if (newUsername.trim().toLowerCase() === 'guest') {
+      Alert.alert('Username cannot be "Guest"');
       setLoading(false);
       return
     }
-
 
     if (!(newUsername.trim())) {
       //if the new username is empty
@@ -70,8 +70,15 @@ const Details = ({ navigation }) => {
       setLoading(false);
       return;
     }
-    if (newUsername.trim().toLowerCase() === 'guest') {
-      Alert.alert('Username cannot be "Guest"');
+
+    if (newUsername.trim().includes(' ')) {
+      Alert.alert('No whitespace allowed in the username');
+      setLoading(false);
+      return
+    }
+
+    if (!/^[a-zA-Z0-9]+$/.test((newUsername.trim()))) {
+      Alert.alert('Username cannot contain special characters');
       setLoading(false);
       return
     }
@@ -83,12 +90,6 @@ const Details = ({ navigation }) => {
       setLoading(false);
       setIsEditingUsername(false);
       return;
-    }
-
-    if (newUsername.trim().includes(' ')) {
-      Alert.alert('No whitespace allowed in the username');
-      setLoading(false);
-      return
     }
 
     //if the username changes
@@ -287,7 +288,7 @@ const Details = ({ navigation }) => {
             onSubmitEditing={handleChangedUsername}
             autoCapitalize='none'
             autoFocus={true}
-            onBlur={() => setNewUsername(newUsername.trim())}/>
+            />
           ) : (
             <View style={styles.nameAndEdit}>
               <View style={{flexDirection: 'row', alignItems:'center'}}>

@@ -148,7 +148,7 @@ useEffect(() => {
                         </View>
                         {isPresent && (
                             <View style={styles.presentContainer}>
-                                <Text style={styles.presentText}>Present</Text>
+                                <Text style={styles.presentText}>In session</Text>
                             </View>
                         )}
                     </TouchableOpacity>
@@ -348,8 +348,8 @@ const styles = StyleSheet.create({
         width: "100%",
     },
     avatar: {
-        width: 90,
-        height: 90,
+        width: 55,
+        height: 55,
         borderRadius: 45,
         marginRight: 10,
     },
@@ -358,9 +358,10 @@ const styles = StyleSheet.create({
     },
     friendInfo: {
         flex: 1,
+        marginLeft: 5
     },
     friendName: {
-        fontSize: 24,
+        fontSize: 20,
         fontWeight: 'bold',
     },
     friendStatus: {
@@ -400,7 +401,7 @@ const styles = StyleSheet.create({
         marginLeft: 30,
     },
     searchIcon: {
-        right: 5
+        right: 15
     },
     addIcon: {
         left: 80,
@@ -514,8 +515,8 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgb(0, 200, 0)',
         borderRadius: 6,
         position: 'absolute',
-        left: 77, 
-        top: 65
+        left: 40, 
+        top: 40
     },
     modalContainer: {
         flex: 1,
@@ -572,16 +573,20 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     presentContainer: {
-        width: 90,
+        width: 120,
+        height: 30,
         borderRadius: 10,
         backgroundColor: 'mediumpurple',
         alignItems: 'center',
         justifyContent: 'center',
-        right: 50
+        right: 30,
+        marginBottom: 5,
+
     },
     presentText: {
         fontSize: 18,
-        color: 'white'
+        color: 'white',
+        fontWeight: 'bold',
     },
     add: {
         left: 30

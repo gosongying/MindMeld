@@ -8,10 +8,11 @@ import { auth, database } from '../../../../../firebase';
 import { onValue, ref, get, runTransaction, child, update, remove } from "firebase/database";
 import { AntDesign } from '@expo/vector-icons';
 
-const StudySession = ({navigation}) => {
 
+
+const StudySession = ({navigation}) => {
+    const [invitationIds, setInvitationIds] = useState([]); 
     const [isCheckingInvitation, setIsCheckingInvitation] = useState(false);
-    const [invitationIds, setInvitationIds] = useState([]);
     const [invitationData, setInvitationData] = useState([]);
     const [inDetail, setInDetail] = useState([]);
     const [join, setJoin] = useState(false);
@@ -482,7 +483,8 @@ const StudySession = ({navigation}) => {
         <View>
             <SessionHeader 
             setIsCheckingInvitation={setIsCheckingInvitation}
-            setSessionName={setSessionName}/>
+            setSessionName={setSessionName}
+            invitationIds={invitationIds}/>
             <FlatList 
             data={sessionData}
             renderItem={renderSession}
@@ -509,6 +511,10 @@ const StudySession = ({navigation}) => {
                             </TouchableOpacity>
                             <Text style={styles.headerText}>Invitation</Text>
                         </View>
+
+                        {invitationData.length === 0 ? (
+                        <Text style={styles.noInvitationsText}>No current invitations</Text>
+                        ) : (
                         <FlatList
                         data={invitationData}
                         renderItem={renderInvitation}
@@ -516,20 +522,21 @@ const StudySession = ({navigation}) => {
                         style={{flex: 1}}
                         contentContainerStyle={{alignItems: 'center'}}
                         />
+                        )}
                     </View>
                 </View>
 
                 {/* message when accept the invitation */}
                 {join && (
                     <View style={styles.joinContainer}>
-                        <Text style={styles.joinText}>Join successfully!</Text>
+                        <Text style={styles.joinText}>Accepted</Text>
                     </View>
                 )}
 
                 {/* message when decline the invitation */}
                 {decline && (
                     <View style={styles.declineContainer}>
-                        <Text style={styles.declineText}>Decline</Text>
+                        <Text style={styles.declineText}>Declined</Text>
                     </View>
                 )}
             </Modal>
@@ -560,7 +567,7 @@ const StudySession = ({navigation}) => {
     );
 };
 
-const SessionHeader = ({setIsCheckingInvitation, setSessionName}) => {
+const SessionHeader = ({setIsCheckingInvitation, setSessionName, invitationIds}) => {
     return (
         <View style={styles.headerContainer}>
             <View/>
@@ -581,13 +588,25 @@ const SessionHeader = ({setIsCheckingInvitation, setSessionName}) => {
                 </TextInput>
 
                 <TouchableOpacity
-                style={styles.news}
-                onPress={() => setIsCheckingInvitation(true)}>
-                    <MaterialCommunityIcons 
-                    name='bell-outline'
-                    size={30}
-                    color={'white'}/>
-                </TouchableOpacity>
+                    style={styles.news}
+                    onPress={() => {
+                        console.log(invitationIds.length);
+                        setIsCheckingInvitation(true);
+                    }}
+                    >
+                    {invitationIds.length >= 0 && (
+                        <View style={styles.notificationContainer}>
+                            <View style={styles.notificationCircle}>
+                                <Text style={styles.notificationText}>{invitationIds.length}</Text>
+                            </View>
+                        </View>
+                    )}
+                    <MaterialCommunityIcons
+                        name='bell-outline'
+                        size={30}
+                        color={'white'}
+                    />
+                    </TouchableOpacity>
             </View>
         </View>
     )
@@ -783,9 +802,9 @@ const styles = StyleSheet.create({
     },
     inProgress: {
         position: 'absolute',
-        width: 100,
+        width: 120,
         bottom: 95,
-        right: 10,
+        right: 5,
         borderRadius: 10,
         backgroundColor: '#8A2BE2',
         alignItems: 'center',
@@ -793,7 +812,8 @@ const styles = StyleSheet.create({
     },
     inProgressText: {
         fontSize: 18,
-        color: 'white'
+        color: 'white',
+        fontWeight: '600'
     },
     add: {
         width: 50,
@@ -863,6 +883,30 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         marginLeft: 6, 
     },
+    notificationContainer: {
+        position: 'absolute',
+        top: -10,
+        right: -10,
+      },
+    notificationCircle: {
+        backgroundColor: 'white',
+        borderRadius: 15,
+        width: 20,
+        height: 20,
+        justifyContent: 'center',
+        alignItems: 'center',
+      },
+    notificationText: {
+        color: 'black',
+        fontSize: 14,
+        fontWeight: 'bold',
+    },
+    noInvitationsText: {
+        fontSize: 18,
+        color: 'gray',
+        textAlign: 'center',
+        marginTop: 10,
+      },
 });
 
 export default StudySession;
