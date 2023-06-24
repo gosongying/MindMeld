@@ -47,7 +47,7 @@ const Settings = ({navigation}) => {
         auth.currentUser.delete()
           .then(() => {
             console.log("Guest user deleted successfully");
-            navigation.replace(screen);
+            navigation.navigate(screen);
           })
           .catch((error) => {
             console.log("Error deleting guest user:", error);
@@ -72,13 +72,13 @@ const Settings = ({navigation}) => {
           } else if (id) { // Check if id exists (non-null)
             remove(ref(database, 'userId/' + id));
           }
-          navigation.replace('Landing')
+          navigation.navigate('Landing')
          setIsNavigating(false);
         })
         .catch((error) => console.log(error));
         isNavigating.current = false;
     } else {
-      navigation.replace(screen);
+      navigation.navigate(screen);
       setIsNavigating(false);
     }
   };
@@ -144,6 +144,7 @@ const Settings = ({navigation}) => {
         <Details navigation={navigation} /> 
         {/* Pass the navigation prop */}
       </View>
+
       <View style={styles.separator} />
       <View style={styles.optionListContainer}>
         <FlatList

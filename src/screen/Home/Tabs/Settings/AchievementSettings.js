@@ -7,7 +7,7 @@ import {
   } from "react-native";
 
   const AchievementSettings = ({navigation}) => {
-    const goToHome = () => navigation.navigate('Settings');
+    const goToHome = () => navigation.goBack();
 
     return (
         <SafeAreaView>

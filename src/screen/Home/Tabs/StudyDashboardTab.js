@@ -13,6 +13,7 @@ import Notes from './StudyDashboard/Notes';
 import Dictionary from './StudyDashboard/Dictionary';
 import SelectBuddies from './StudyDashboard/SelectBuddies';
 import SelectToDo from './StudyDashboard/SelectToDo';
+import About from './Settings/About';
 
 
 const StudyDashboardTab = () => {

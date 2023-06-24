@@ -29,7 +29,7 @@ const Feedback = ({ navigation }) => {
   const [feedbackText, setFeedbackText] = useState('');
 
 
-  const goToHome = () => navigation.navigate('Settings');
+  const goToHome = () => navigation.goBack();
 
   const handleSendFeedback = async () => {
     if (feedbackTitle.trim() === '' || feedbackText.trim() === '') {

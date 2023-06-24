@@ -246,7 +246,7 @@ const FriendListSetting = ({navigation}) => {
             <View style={styles.header}>
                 <View style={styles.headerTop}>
                     <TouchableOpacity 
-                    onPress={() => navigation.replace("Settings")}
+                    onPress={() => navigation.goBack()}
                     style={styles.button} 
                     >
                     <Text style={styles.back}>{'\u2190'}</Text >  
