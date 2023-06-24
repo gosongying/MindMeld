@@ -3,7 +3,7 @@ import { TouchableOpacity, StyleSheet, Text, SafeAreaView, ScrollView, View } fr
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 const HelpandSupport = ({ navigation }) => {
-  const goToHome = () => navigation.navigate('Settings');
+  const goToHome = () => navigation.goBack();
 
   return (
     <View style={{ flex: 1 }}>

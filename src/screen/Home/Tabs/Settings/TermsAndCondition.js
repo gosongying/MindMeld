@@ -3,7 +3,7 @@ import { TouchableOpacity, StyleSheet, Text, SafeAreaView, ScrollView, View } fr
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 const TermsAndCondition = ({ navigation }) => {
-  const goToHome = () => navigation.navigate('Settings');
+  const goToHome = () => navigation.goBack();
 
   const usageAgreement = `By using this app, you agree to abide by these terms and conditions. If you do not agree, please refrain from using the app.`;
 

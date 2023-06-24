@@ -11,6 +11,8 @@ import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { auth, database } from "../../../../../firebase"
 import { goOffline, update, ref, increment, runTransaction, remove } from 'firebase/database';
 
+import About from '../Settings/About';
+
 const StudyDashboard = () => {
   const [isGuest, setIsGuest] = useState(false);
 
