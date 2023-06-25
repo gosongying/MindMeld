@@ -6,31 +6,23 @@ const HelloName = () => {
   
   console.log("HelloName")
 
-  //const [username, setUsername] = useState('');
-
- // const currentUserId = auth.currentUser.uid;
- // const userIdRef = ref(database, '/users/' + currentUserId);
-
-  //to get the user's username from the database
-  //get(userIdRef).then((snapshot) => {
-  //  if (snapshot.exists()) {
-  //    const data = snapshot.val().username;
-  //    setUsername(data);
-  //  } else {
-  //    setUsername('Anonymous user');
-  //  }
-  //});
+  const [username, setUsername] = useState('');
+  
   const currentUser = auth.currentUser;
-  const username = currentUser ? currentUser.displayName : null;
 
-
-  /*useEffect(() => {
-    if (currentUser.isAnonymous) {
-      setUsername("Anonymous user");
-    } else {
-      setUsername(currentUser.displayName);
+  useEffect(() => {
+    //to be synchronous with database to get
+    //user most up-dated username
+    //listen to user's username change
+    const unsubscribe = onValue(ref(database, 'userId/' + currentUser.uid), (snapshot) => {
+      if (snapshot.exists()) {
+        setUsername(snapshot.val().username);
+      }
+    });
+    return () => {
+      unsubscribe();
     }
-  }, []);*/
+  });
 
   return (
     <View style={styles.container}>
