@@ -47,7 +47,7 @@ const Settings = ({navigation}) => {
         auth.currentUser.delete()
           .then(() => {
             console.log("Guest user deleted successfully");
-            navigation.navigate(screen);
+            navigation.replace(screen);
           })
           .catch((error) => {
             console.log("Error deleting guest user:", error);

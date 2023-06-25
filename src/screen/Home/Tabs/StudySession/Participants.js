@@ -190,12 +190,7 @@ useEffect(() => {
                 } else {
                     return profile;
                 }
-            }).then(() => {
-                get(other)
-                .then((snapshot) => {
-                    setParticipantsData([...participantsData, snapshot.val()])
-                })
-            });
+            })
             Alert.alert("Added successfully!");
         } catch (error) {
             console.log(error);

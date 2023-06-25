@@ -51,7 +51,7 @@ const StudySession = ({navigation}) => {
     }, [])
 
     useEffect(() => {
-        const unsubscribe = onValue(ref(database, 'userId/' + currentUser.uid), async (snapshot) => {
+        const unsubscribe = onValue(ref(database, 'userId/' + currentUser?.uid), async (snapshot) => {
             let sessions = [];
             let ended = [];
             const sessionList = snapshot.exists()? (snapshot.val().upcomingSessions? snapshot.val().upcomingSessions: []): [];

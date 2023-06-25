@@ -41,7 +41,9 @@ const Details = ({ navigation }) => {
     if (!isAnonymous) {
       get(databaseRef(database, 'userId/' + currentUser.uid))
       .then((snapshot) => {
-        setGender(snapshot.val().gender);
+        if (snapshot.exists()) {
+          setGender(snapshot.val().gender);
+        }
       })
       .catch((error) => {
         console.log(error);

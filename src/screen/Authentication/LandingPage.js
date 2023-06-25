@@ -16,6 +16,7 @@ import { set, ref } from "firebase/database";
 const LandingPage = ({navigation}) => {
 
   console.log("Landing")
+  console.log(navigation.getState().routes)
 
   const [isLoading, setLoading] = useState(false);
 
@@ -35,18 +36,15 @@ const LandingPage = ({navigation}) => {
 
     signInAnonymously(auth)
     .then(() => {
-      console.log("Anon");
-      set(ref(database, 'userId/' + auth.currentUser.uid), {
-        uid: auth.currentUser.uid
-      });
       updateProfile(auth.currentUser, {
-        displayName: "Guest"
-      }).then(() => navigation.replace("Home"))
+        displayName: 'Guest'
+      })
+      .then(() => {
+        console.log("Anon");
+        navigation.replace("Home");
+      });
+      })
       .catch((error) => console.log(error));
-    })
-    .catch((error) => {
-      console.error('An error occurred during anonymous sign-in:');
-    })
   };
 
   /*useEffect(() => {

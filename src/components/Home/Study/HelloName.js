@@ -15,25 +15,25 @@ const HelloName = () => {
     //to be synchronous with database to get
     //user most up-dated username
     //listen to user's username change
-    const unsubscribe = onValue(ref(database, 'userId/' + currentUser.uid), (snapshot) => {
-      if (snapshot.exists()) {
-        setUsername(snapshot.val().username);
+    if (!currentUser.isAnonymous) {
+      const unsubscribe = onValue(ref(database, 'userId/' + currentUser.uid), (snapshot) => {
+        if (snapshot.exists()) {
+          setUsername(snapshot.val().username);
+        } 
+      });
+      return () => {
+        unsubscribe();
       }
-    });
-    return () => {
-      unsubscribe();
+    } else {
+      setUsername("Guest");
     }
-  });
+    }, []);
 
   return (
     <View style={styles.container}>
       <View style={styles.textContainer}>
         <Text style={styles.greetingText}>Hello,</Text>
-        {username ? (
-          <Text style={styles.nameText} numberOfLines={1}>{username}</Text>
-        ) : (
-          <Text style={styles.nameText}>Anonymous user</Text>
-        )}
+        <Text style={styles.nameText} numberOfLines={1}>{username}</Text>
       </View>
       <Image
         source={require('../../../../assets/logoOnly.png')}
