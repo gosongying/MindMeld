@@ -150,7 +150,7 @@ const Badge = () => {
               icon={selectedBadge?.icon}
               size={18}
               // Locking and unlocking logic not implemented yet
-              style={[styles.badgeIcon, {marginRight: 8}, !selectedBadge?.unlocked && styles.lockedBadgeIcon]}
+              style={[styles.badgeIcon, !selectedBadge?.unlocked && styles.lockedBadgeIcon]}
               />
               <Text style={styles.badgeName}>{selectedBadge?.name}</Text>
             </View>
