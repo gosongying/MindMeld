@@ -36,7 +36,7 @@ const StudySession = ({navigation}) => {
 
     useEffect(() => {
         // to remove all ongoing sessions
-        runTransaction(ref(database, 'userId/' + currentUser.uid), (user) => {
+        runTransaction(ref(database, 'userId/' + currentUser?.uid), (user) => {
             if (user) {
                 if (user.ongoingSessions) {
                     user.ongoingSessions = null;
@@ -127,7 +127,7 @@ const StudySession = ({navigation}) => {
 
                 });
                 const newSessionsList = sessionList.filter((id) => !ended.includes(id));
-                update(ref(database, 'userId/' + currentUser.uid), {
+                update(ref(database, 'userId/' + currentUser?.uid), {
                     upcomingSessions: newSessionsList
                 })
                 .then(() => {
@@ -152,7 +152,7 @@ const StudySession = ({navigation}) => {
         //to check if any invitation expired
         //listen to the change of invitation list
         //to get the latest invitation list
-        const unsubscribe = onValue(ref(database, 'userId/' + currentUser.uid), async (snapshot) => {
+        const unsubscribe = onValue(ref(database, 'userId/' + currentUser?.uid), async (snapshot) => {
             let invitation = [];
             let expired = [];
             const invitationList = snapshot.exists()? (snapshot.val().invitationList? snapshot.val().invitationList: []): [];
@@ -209,7 +209,7 @@ const StudySession = ({navigation}) => {
                     return;
                 }));
                 const newInvitationList = invitationList.filter((id) => !expired.includes(id));
-                update(ref(database, 'userId/' + currentUser.uid), {
+                update(ref(database, 'userId/' + currentUser?.uid), {
                     invitationList: newInvitationList
                 })
                 .then(() => {
@@ -247,14 +247,14 @@ const StudySession = ({navigation}) => {
         try {
                 await runTransaction(child(db, 'sessions/' + session.id), (session2) => {
                     if (session2) {
-                        session2.participants.push(currentUser.uid);
+                        session2.participants.push(currentUser?.uid);
                         return session2;
                     } else {
                         return session2;
                     }
                 }).then(() => {
                     //remove the invitation from the user
-                runTransaction(child(db, 'userId/' + currentUser.uid), (user) => {
+                runTransaction(child(db, 'userId/' + currentUser?.uid), (user) => {
                     if (user) {
                         if (user.invitationList) {
                             user.invitationList = user.invitationList.filter((id) => id !== session.id);
@@ -284,7 +284,7 @@ const StudySession = ({navigation}) => {
         //add the user into participants list of the session
         try {
             //remove the invitation from the user
-            runTransaction(ref(database, 'userId/' + currentUser.uid), (user) => {
+            runTransaction(ref(database, 'userId/' + currentUser?.uid), (user) => {
                 if (user) {
                     user.invitationList = user.invitationList.filter((id) => id !== sessionId);
                     return user;
@@ -304,7 +304,7 @@ const StudySession = ({navigation}) => {
     const deleteSession = (sessionId) => {
         try {
             const db = ref(database);
-            const userRef = child(db, 'userId/' + currentUser.uid);
+            const userRef = child(db, 'userId/' + currentUser?.uid);
             const sessionRef = child(db, 'sessions/' + sessionId);
             runTransaction(userRef, (user) => {
                 if (user) {
@@ -317,13 +317,13 @@ const StudySession = ({navigation}) => {
             });
             runTransaction(sessionRef, (session) => {
                 if (session) {
-                    if (session.host === currentUser.uid) {
+                    if (session.host === currentUser?.uid) {
                         //only host can delete the whole study session
                         remove(child(db, 'chat/' + sessionId));
                         return null;
                     } else {
                         //to delete the user from session's participants
-                        session.participants = session.participants.filter((uid) => uid !== currentUser.uid);
+                        session.participants = session.participants.filter((uid) => uid !== currentUser?.uid);
                         return session;
                     }
                 } else {
@@ -357,7 +357,7 @@ const StudySession = ({navigation}) => {
                     }
                 }), */
                 //add the session into user's ongoing sessions
-                runTransaction(child(db, 'userId/' + currentUser.uid), (user) => {
+                runTransaction(child(db, 'userId/' + currentUser?.uid), (user) => {
                     if (user) {
                         if (user.ongoingSessions) {
                             user.ongoingSessions.push(session.id);
@@ -803,7 +803,7 @@ const styles = StyleSheet.create({
     inProgress: {
         position: 'absolute',
         width: 120,
-        bottom: 95,
+        top: -80,
         right: 5,
         borderRadius: 10,
         backgroundColor: '#8A2BE2',

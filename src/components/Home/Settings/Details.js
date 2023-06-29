@@ -295,7 +295,7 @@ const Details = ({ navigation }) => {
             <View style={styles.nameAndEdit}>
               <View style={{flexDirection: 'row', alignItems:'center'}}>
                 <View>
-                  <Text style={[styles.name, {maxWidth: screenWidth * 0.5}]} numberOfLines={1}>{oldUsername}</Text>
+                  <Text style={[styles.name, {maxWidth: screenWidth * 0.4}]} numberOfLines={1}>{oldUsername}</Text>
                 </View>
                 {gender === 'male' ? (
                   <Fontisto name='male' size={15} color='dodgerblue' style={{marginLeft:5}}/>
