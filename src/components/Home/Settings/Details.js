@@ -435,11 +435,11 @@ const styles = StyleSheet.create({
   statusIndicator: {
     position: 'absolute',    
     backgroundColor: 'rgb(0, 200, 0)',
-    width: 14,
-    height: 14,
+    width: 12,
+    height: 12,
     borderRadius: 6,
-    bottom: 21,
-    left: 69,
+    bottom: 22,
+    left: 72,
     zIndex: 1
   },
   anonymous: {
