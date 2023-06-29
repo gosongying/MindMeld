@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
-import { auth } from '../../../../firebase';
+import { auth, database } from '../../../../firebase';
+import { ref, onValue} from 'firebase/database';
 
 const HelloName = () => {
   
