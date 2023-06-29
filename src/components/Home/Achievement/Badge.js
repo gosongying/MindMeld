@@ -23,45 +23,39 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
 
 import { auth, database } from '../../../../firebase'
 import { ref, onValue } from 'firebase/database'
-
+import * as Progress from 'react-native-progress';
 
 const Badge = () => {
   const [username, setUsername] = useState('');
-  const [image, setImage] = useState('');
+  const [photo, setPhoto] = useState('');
+  const [xp, setXp] = useState(0);
   const [selectedBadge, setSelectedBadge] = useState(null);
 
   const handleBadgePress = (badge) => {
     setSelectedBadge(badge);
   };
 
-  const uid = auth.currentUser.uid;
+  const currentUser = auth.currentUser;
 
-  // Get Username and listen for changes
   useEffect(() => {
-    const unsubscribe = onValue(ref(database, 'userId/' + uid), (snapshot) => {
+    const unsubscribe = onValue(ref(database, 'userId/' + currentUser.uid), (snapshot) => {
+      //to listen to the change of user profile.
       if (snapshot.exists()) {
-        setUsername(snapshot.val().username);
+        const user = snapshot.val();
+        setUsername(user.username);
+        setPhoto(user.photo);
+        setXp(user.xp);
       }
-    });
-    return () => {
-      unsubscribe();
-    }
-  })
-
-  // Get Image and listens for changes
-  useEffect(() => {
-    const unsubscribe = onValue(ref(database, 'userId/' + uid), (snapshot) => {
-      if (snapshot.exists()) {
-        setImage(snapshot.val().photo)
+      return () => {
+        unsubscribe();
       }
-    });
-    return () => {
-      unsubscribe();
-    }
-  })
+    })
+  }, []);
+  
 
   //Each badge has an id, name, icon, description,
   //requirement (in int), requirementString (the string that follows the int)
@@ -85,30 +79,46 @@ const Badge = () => {
     { id: '16', name:'Dialogue Maestro', icon: faComments, description: 'Comment 1000 times in the Study Feed', requirement: 1000, requirementString: 'comments', unlocked: false },
   ];
 
-  
+  const level = Math.floor(xp / 100);
+  const trophyColour = level<10?"burlywood":level<20?"#CD7F32":level<30? 'gray':level<40?'gold':'seagreen';
+  const trophyText = level<10?'Wooden':level<20?'Bronze':level<30?'Silver':level<40?'Medal':level<50?'Emerald':'Diamond';
+
   return (
     <View style={styles.container}>
       <View style={styles.iconContainer}>
         <View style={styles.iconBorder}>
-          {image ? (
-            <Image source={{uri: image}} style={styles.icon} resizeMode="cover" />
+          {photo ? (
+            <Image source={{uri: photo}} style={styles.icon} resizeMode="cover" />
           ) : (
             <Image source={require("../../../../assets/profileholder.png")} style={styles.icon} />
           )}
         </View>
       </View>
-      <Text style={styles.name}>{username}</Text>
+      <Text style={styles.name} numberOfLines={1}>{username}</Text>
 
-      {/* This view is still hardcoded */}
-      <View>
-        <Text style={styles.xp}>XP: 1302</Text>
+      <View style={{alignItems: 'center'}}>
         <View style={styles.levelContainer}>
-            <Text style={styles.levelText}>Level 10</Text>
+            <Text style={styles.levelText}>Level {level}</Text>
             <View style={styles.trophyContainer}>
-              <Text style={styles.trophyText}>Bronze</Text>
-              <Ionicons name="trophy" color="#CD7F32" style={styles.trophyIcon} />
+              <Text style={styles.trophyText}>{trophyText}</Text>
+              {level<50? (
+                <Ionicons name="trophy" color={trophyColour} style={styles.trophyIcon} size={15}/>
+              ): (
+                <SimpleLineIcons name='diamond' color='gray' style={styles.trophyIcon} size={15}/>
+              )}
             </View>
         </View>
+        <Progress.Bar 
+          progress={(xp%100)/100} 
+          width={200} 
+          height={20}
+          borderRadius={40}
+          color='mediumpurple'
+          unfilledColor='lightgray'
+          borderWidth={0}
+          style={{marginVertical: 5}}/>
+        <Text style={styles.xp}>{xp} XP</Text>
+        <Text>{100 - xp%100} XP to next level</Text>
       </View>
 
       <View style={styles.badgesContainer}>
@@ -174,8 +184,8 @@ const Badge = () => {
 
 const styles = StyleSheet.create({
   container: {
+    marginTop: 20,
     alignItems: 'center',
-    marginTop: 20
   },
   iconContainer: {
     width: 115,
@@ -198,12 +208,14 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     marginTop: 10,
+    maxWidth: '75%'
   },
   xp: {
     fontSize: 16,
-    color: 'gray',
+    color: 'white',
     marginTop: 5,
-    textAlign: 'center',
+    position: "absolute",
+    bottom: 22,
   },
   badgesContainer: {
     flexDirection: 'row',
