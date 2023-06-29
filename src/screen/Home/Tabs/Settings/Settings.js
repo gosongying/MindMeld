@@ -47,7 +47,7 @@ const Settings = ({navigation}) => {
         auth.currentUser.delete()
           .then(() => {
             console.log("Guest user deleted successfully");
-            navigation.navigate(screen);
+            navigation.replace(screen);
           })
           .catch((error) => {
             console.log("Error deleting guest user:", error);
@@ -72,7 +72,7 @@ const Settings = ({navigation}) => {
           } else if (id) { // Check if id exists (non-null)
             remove(ref(database, 'userId/' + id));
           }
-          navigation.navigate('Landing')
+          navigation.replace('Landing')
          setIsNavigating(false);
         })
         .catch((error) => console.log(error));
