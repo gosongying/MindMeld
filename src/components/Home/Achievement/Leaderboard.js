@@ -115,7 +115,7 @@ const Leaderboard = () => {
         {/* Render the second place position */}
         
         <View>
-          <View style={[styles.secondPlaceContainer, currentUserRank == 1 && styles.greenBorder]}>
+          <View style={[styles.secondPlaceContainer, currentUserRank == 1 && styles.pinkBorder]}>
           {leaderboardData.length > 1 && leaderboardData[1].photo ? (
               <Image source={{ uri: leaderboardData[1].photo }} style={styles.secondPlaceImage} />
             ) : (
@@ -135,7 +135,7 @@ const Leaderboard = () => {
 
         {/* Render the first place position */}
         <View>
-          <View style={[styles.firstPlaceContainer, currentUserRank == 0 && styles.greenBorder]}>
+          <View style={[styles.firstPlaceContainer, currentUserRank == 0 && styles.pinkBorder]}>
           {leaderboardData.length > 0 && leaderboardData[0].photo ? (
             <Image source={{ uri: leaderboardData[0].photo }} style={styles.firstPlaceImage} />
           ) : (
@@ -155,7 +155,7 @@ const Leaderboard = () => {
 
         {/* Render the third place position */}
         <View>
-         <View style={[styles.thirdPlaceContainer, currentUserRank == 2 && styles.greenBorder]}>
+         <View style={[styles.thirdPlaceContainer, currentUserRank == 2 && styles.pinkBorder]}>
          {leaderboardData.length > 2 && leaderboardData[2].photo ? (
             <Image source={{ uri: leaderboardData[2].photo }} style={styles.secondPlaceImage} />
           ) : (
@@ -353,10 +353,10 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   currentUserContainer: {
-    backgroundColor: '#98FF98', 
+    backgroundColor: 'pink', 
   },
-  greenBorder: {
-    borderColor: '#98FF98', 
+  pinkBorder: {
+    borderColor: 'pink', 
   },
   leftContainer: {
     flexDirection: 'row',
