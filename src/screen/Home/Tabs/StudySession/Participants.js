@@ -3,6 +3,7 @@ import { View, Text, FlatList, Image, TouchableOpacity, StyleSheet, Modal, TextI
 import Fontisto from 'react-native-vector-icons/Fontisto';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
 
 import { auth, database } from '../../../../../firebase';
 import { get, onValue, ref, runTransaction, child } from 'firebase/database';
@@ -114,8 +115,11 @@ useEffect(() => {
     }, []);
 
     const clickUser = (user) => {
-        setParticipantClicked(user)
-    };
+        const level = Math.floor(user.xp / 100);
+        const trophyColour = level<10?"burlywood":level<20?"#CD7F32":level<30? 'gray':level<40?'gold':'seagreen';
+        const trophyText = level<10?'Wooden':level<20?'Bronze':level<30?'Silver':level<40?'Medal':level<50?'Emerald':'Diamond';
+        setParticipantClicked({...user, trophyColour: trophyColour, trophyText: trophyText, level: level});
+    }
 
     const renderFriendItem = ({ item }) => {
         const isPresent = item.ongoingSessions? item.ongoingSessions.includes(sessionId): false;
@@ -265,7 +269,7 @@ useEffect(() => {
                                     <Ionicons name='add' size={40} style={{color:'white'}}/>
                                 </TouchableOpacity>
                             ) : (
-                                <Ionicons name="checkbox" size={40} color={'green'}/>
+                                <Ionicons name="checkmark" size={35} color={'green'}/>
                             )}
                         </View>
                         <View style={styles.photoContainer}>
@@ -289,6 +293,17 @@ useEffect(() => {
                                 ) : (
                                     <Fontisto name='female' size={15} color='pink' style={{marginLeft: 10}}/>
                                 )}
+                            </View>
+                            <View style={styles.levelContainer}>
+                                <Text style={styles.levelText}>Level {participantClicked.level}</Text>
+                                <View style={styles.trophyContainer}>
+                                <Text style={styles.trophyText}>{participantClicked.trophyText}</Text>
+                                {participantClicked.level<50? (
+                                    <Ionicons name="trophy" color={participantClicked.trophyColour} style={styles.trophyIcon} size={15}/>
+                                ): (
+                                    <SimpleLineIcons name='diamond' color='gray' style={styles.trophyIcon} size={15}/>
+                                )}
+                                </View>
                             </View>
                             <View style={styles.interests}>
                                 <Text style={styles.text2}>Interests: {participantClicked.interests ? participantClicked.interests.join(', ') : "-"}</Text>
@@ -341,7 +356,6 @@ const styles = StyleSheet.create({
         height: "100%",
         flex: 1,
         width: "100%",
-        backgroundColor: 'white'
     },
     avatar: {
         width: 55,
@@ -506,13 +520,13 @@ const styles = StyleSheet.create({
         top: 5,
     },
     statusIndicator: {
-        height: 12,
-        width: 12,
+        height: 10,
+        width: 10,
         backgroundColor: 'rgb(0, 200, 0)',
-        borderRadius: 6,
+        borderRadius: 5,
         position: 'absolute',
-        left: 40, 
-        top: 40
+        left: 42, 
+        top: 43
     },
     modalContainer: {
         flex: 1,
@@ -586,7 +600,31 @@ const styles = StyleSheet.create({
     },
     add: {
         left: 30
-    }
+    },
+    levelContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginTop: 5,
+        marginLeft: 10,
+      },
+      levelText: {
+        marginRight: 10,
+        fontSize: 18,
+        color: 'white'
+      },
+      trophyContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+      },
+      trophyText: {
+        marginRight: 5,
+        fontSize: 18,
+        color: 'white'
+      },
+      trophyIcon: {
+        marginLeft: 5,
+      },
+      
 });
 
 

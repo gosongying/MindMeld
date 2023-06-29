@@ -4,6 +4,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import { auth, database } from '../../../../../firebase';
 import { ref, runTransaction, set, get, onValue, update, child } from 'firebase/database';
 import Fontisto from 'react-native-vector-icons/Fontisto';
+import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
 
 const InviteBuddies = ({
     friendListData, 
@@ -41,8 +42,11 @@ const InviteBuddies = ({
 
 
     const clickUser = (user) => {
+        const level = Math.floor(user.xp / 100);
+        const trophyColour = level<10?"burlywood":level<20?"#CD7F32":level<30? 'gray':level<40?'gold':'seagreen';
+        const trophyText = level<10?'Wooden':level<20?'Bronze':level<30?'Silver':level<40?'Medal':level<50?'Emerald':'Diamond';
         setIsCheckingFriend(true);
-        setFriendClicked(user);
+        setFriendClicked({...user, trophyColour: trophyColour, trophyText: trophyText, level: level});
     };
 
     const toggleInvite = (user) => {
@@ -239,6 +243,7 @@ const InviteBuddies = ({
                         )}
                     </TouchableOpacity>
                 </View>
+                <View style={styles.separator2}/>
             </View>
             <View style={styles.flatListContainer}>
                 <FlatList
@@ -283,6 +288,17 @@ const InviteBuddies = ({
                                 ) : (
                                     <Fontisto name='female' size={15} color='pink' style={{marginLeft: 10}}/>
                                 )}
+                            </View>
+                            <View style={styles.levelContainer}>
+                                <Text style={styles.levelText}>Level {friendClicked.level}</Text>
+                                <View style={styles.trophyContainer}>
+                                <Text style={styles.trophyText}>{friendClicked.trophyText}</Text>
+                                {friendClicked.level<50? (
+                                    <Ionicons name="trophy" color={friendClicked.trophyColour} style={styles.trophyIcon} size={15}/>
+                                ): (
+                                    <SimpleLineIcons name='diamond' color='gray' style={styles.trophyIcon} size={15}/>
+                                )}
+                                </View>
                             </View>
                             <View style={styles.interests}>
                                 <Text style={styles.text2}>Interests: {friendClicked.interests ? friendClicked.interests.join(', ') : "-"}</Text>
@@ -513,13 +529,13 @@ const styles = StyleSheet.create({
         top: 5,
     },
     statusIndicator: {
-        height: 12,
-        width: 12,
+        height: 10,
+        width: 10,
         backgroundColor: 'rgb(0, 200, 0)',
-        borderRadius: 6,
+        borderRadius: 5,
         position: 'absolute',
         left: 43, 
-        top: 39
+        top: 40
     },
     modalContainer: {
         flex: 1,
@@ -666,7 +682,30 @@ const styles = StyleSheet.create({
     },
     filterText: {
         fontWeight: 'bold',
-    }
+    },
+    levelContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginTop: 5,
+        marginLeft: 10,
+      },
+      levelText: {
+        marginRight: 10,
+        fontSize: 18,
+        color: 'white'
+      },
+      trophyContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+      },
+      trophyText: {
+        marginRight: 5,
+        fontSize: 18,
+        color: 'white'
+      },
+      trophyIcon: {
+        marginLeft: 5,
+      },
 });
 
 

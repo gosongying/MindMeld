@@ -803,7 +803,7 @@ const styles = StyleSheet.create({
     inProgress: {
         position: 'absolute',
         width: 120,
-        top: -80,
+        top: -60,
         right: 5,
         borderRadius: 10,
         backgroundColor: '#8A2BE2',
