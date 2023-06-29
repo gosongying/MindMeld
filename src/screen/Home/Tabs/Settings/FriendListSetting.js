@@ -590,13 +590,13 @@ const styles = StyleSheet.create({
         top: 5,
     },
     statusIndicator: {
-        height: 12,
-        width: 12,
+        height: 10,
+        width: 10,
         backgroundColor: 'rgb(0, 200, 0)',
-        borderRadius: 6,
+        borderRadius: 5,
         position: 'absolute',
-        left: 41 ,
-        top: 48
+        left: 45 ,
+        top: 47
     },
     modalContainer: {
         flex: 1,
