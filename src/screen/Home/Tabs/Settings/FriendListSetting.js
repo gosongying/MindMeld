@@ -613,8 +613,8 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgb(0, 200, 0)',
         borderRadius: 5,
         position: 'absolute',
-        left: 47,
-        top: 45
+        left: 45,
+        top: 46
     },
     modalContainer: {
         flex: 1,
