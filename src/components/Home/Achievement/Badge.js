@@ -60,6 +60,7 @@ const Badge = () => {
         setNumberOfStudyBuddies(user.friendList.length);
         setNumberOfFeeds(user.numberOfFeeds);
         setNumberOfComments(user.numberOfComments);   
+        setTimeInStudySession(user.timeInSession);
       }
       return () => {
         unsubscribe();

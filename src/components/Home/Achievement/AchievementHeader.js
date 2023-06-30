@@ -16,7 +16,7 @@ const AchievementHeader = () => {
   const xpSystemExplanation = `
   Each feed post earns you 5 XP.
   Each comment earns you 1 XP.
-  Each hour spent in a study session earns you 50 XP.
+  Each minute spent in a study session earns you 1 XP.
 `;
 
   return (
@@ -31,7 +31,7 @@ const AchievementHeader = () => {
           <View style={styles.modalContainer}>
             <Text style={styles.modalTitle}>XP System</Text>
             <Text style={[styles.modalContent, styles.alignText]}>
-              Study Session: 50 XP / hr{'\n'}
+              Study Session: 1 XP / min{'\n'}
               Feed post: 5 XP{'\n'}
               Feed comment: 1 XP
             </Text>
