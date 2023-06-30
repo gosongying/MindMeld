@@ -123,7 +123,7 @@ const Feeds = ( {navigation}) => {
     navigation.navigate('PostScreen', { post });
   };
   
-  const createNewPost = async () => {
+  const createNewPost = () => {
     const userId = firebase.auth().currentUser.uid;
     console.log(userId);
 
@@ -136,6 +136,18 @@ const Feeds = ( {navigation}) => {
         commentsCount: 0,
         comments: []
       }
+
+      const ref = database.ref('userId/' + userId);
+
+      // Adds 5 XP to the user
+      ref.update({
+        xp: firebase.database.ServerValue.increment(5),
+      });
+
+      // Adds 1 to number of Post
+      ref.update({
+        numberOfFeeds: firebase.database.ServerValue.increment(1),
+      });
       
       // Save the post data to the Realtime Database
       const newPostRef = database.ref('posts').push();

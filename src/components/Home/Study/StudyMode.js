@@ -77,7 +77,7 @@ const StudyMode = () => {
       <View style={styles.overlay}>
         <Text style={styles.title}>Study Mode</Text>
         <Text style={styles.description}>
-          Study Mode restricts access to distractions and helps you focus on your tasks.
+          Study Mode restricts access to other apps and helps you focus on your tasks.
         </Text>
         <Pressable style={[styles.button, studyModeActive && styles.buttonActive]} onPress={toggleStudyMode} disabled={studyModeActive}>
           <Text style={styles.buttonText}>

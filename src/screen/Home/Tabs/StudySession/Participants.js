@@ -115,7 +115,7 @@ useEffect(() => {
     }, []);
 
     const clickUser = (user) => {
-        const level = Math.floor(user.xp / 100);
+        const level = Math.floor(user.xp / 100) + 1;
         const trophyColour = level<10?"#808080":level<20?"#B87333":level<30? '#C0C0C0':level<40?'gold':level<50?'#50C878':'#6EB2D4';
         const trophyText = level<10?'Iron':level<20?'Bronze':level<30?'Silver':level<40?'Gold':level<50?'Emerald':'Diamond';
         setParticipantClicked({...user, trophyColour: trophyColour, trophyText: trophyText, level: level});

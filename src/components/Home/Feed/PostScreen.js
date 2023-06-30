@@ -110,6 +110,9 @@ const PostScreen = ({ route, navigation }) => {
   
     // Fetch the comments for the post from the database
     const postCommentsRef = database.ref(`posts/${post.id}/comments`);
+    // Remove the previous listener before adding a new one
+    postCommentsRef.off('value');
+
     const commentsListener = postCommentsRef.on('value', (snapshot) => {
       const data = snapshot.val();
       if (data) {
@@ -158,6 +161,8 @@ const PostScreen = ({ route, navigation }) => {
   
 
   const CommentItem = ({ item }) => {
+    console.log(item);
+    console.log(firebase.auth().currentUser);
     const [displayName, setDisplayName] = useState('');
 
     useEffect(() => {
@@ -206,7 +211,7 @@ const PostScreen = ({ route, navigation }) => {
           <View style={{ flexDirection: 'row' }}>
             <Text style={styles.username}>{displayName}</Text>
 
-            {isCurrentUser && (
+            {firebase.auth().currentUser?.uid === item?.uid && (
               <View style={{ flexDirection: 'row', marginLeft: 10, marginTop: -2 }}>
                 <TouchableOpacity
                   style={{ marginRight: 3 }}
@@ -243,49 +248,40 @@ const PostScreen = ({ route, navigation }) => {
     navigation.goBack();
   };
 
-const addComment = (postId, comment) => {
-  const postCommentsRef = database.ref(`posts/${postId}/comments`);
-  const postRef = database.ref(`posts/${postId}`);
+  const addComment = (postId, comment) => {
+    const uid = firebase.auth().currentUser.uid;
+    const postCommentsRef = database.ref(`posts/${postId}/comments`);
+    const postRef = database.ref(`posts/${postId}`);
 
-  // Save the comment to the database
-  const saveComment = (user) => {
-    const { uid } = user;
+    const ref = database.ref('userId/' + uid);
 
-    // Retrieve the username from the database using the uid
-    const usernameRef = database.ref(`userId/${uid}/username`);
-    usernameRef.once('value', (snapshot) => {
-      const username = snapshot.val();
+    // Create the comment data object
+    const commentData = {
+      comment,
+      uid,
+      timestamp: new Date().getTime()
+    };
 
-      // Create the comment data object
-      const commentData = {
-        comment,
-        uid,
-        timestamp: new Date().getTime()
-      };
+    postCommentsRef.push(commentData);
 
-      postCommentsRef.push(commentData);
+    postRef.update({
+      commentsCount: firebase.database.ServerValue.increment(1),
+    })
 
-      postRef.transaction((post) => {
-        if (post) {
-          post.commentsCount = (post.commentsCount || 0) + 1;
-        }
-        return post;
-      });
-
-      scrollToBottom();
-      setCommentText('');
-      Keyboard.dismiss();
+    // Adds 1 XP to the user
+    ref.update({
+      xp: firebase.database.ServerValue.increment(1),
     });
-  };
 
-  // Listen for authentication state changes
-  firebase.auth().onAuthStateChanged((user) => {
-    if (user) {
-      // User is signed in, save the comment with updated displayName
-      saveComment(user);
-    }
-  });
-};
+    // Adds 1 to number of Comments
+    ref.update({
+      numberOfComments: firebase.database.ServerValue.increment(1),
+    });
+
+    scrollToBottom();
+    setCommentText('');
+    Keyboard.dismiss();
+  };
 
 
 

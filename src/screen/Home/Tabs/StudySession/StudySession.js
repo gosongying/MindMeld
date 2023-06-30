@@ -654,7 +654,8 @@ const styles = StyleSheet.create({
         fontSize: 24,
         fontWeight: 'bold',
         color: '#FFF',
-        bottom: 10
+        bottom: 10,
+        marginLeft: 15,
     },
     news: {
         left: 45,

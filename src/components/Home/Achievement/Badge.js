@@ -11,7 +11,6 @@ import {
   faHourglass,
   faClock,
   faPencilAlt,
-  faPenSquare,
   faStickyNote,
   faBook,
   faComment,
@@ -35,6 +34,15 @@ const Badge = () => {
   const [xp, setXp] = useState(0);
   const [selectedBadge, setSelectedBadge] = useState(null);
 
+  // States for badges
+  const [numberOfStudyBuddies, setNumberOfStudyBuddies] = useState(0);
+
+  //TODO: progress for study session
+  const [timeInStudySession, setTimeInStudySession] = useState(0);
+
+  const [numberOfComments, setNumberOfComments] = useState(0);
+  const [numberOfFeeds, setNumberOfFeeds] = useState(0)
+
   const handleBadgePress = (badge) => {
     setSelectedBadge(badge);
   };
@@ -49,37 +57,181 @@ const Badge = () => {
         setUsername(user.username);
         setPhoto(user.photo);
         setXp(user.xp);
+        setNumberOfStudyBuddies(user.friendList.length);
+        setNumberOfFeeds(user.numberOfFeeds);
+        setNumberOfComments(user.numberOfComments);   
       }
       return () => {
         unsubscribe();
       }
     })
   }, []);
+
+  const badges = [
+    {
+      id: '1',
+      name: 'Buddy Initiator',
+      icon: faUser,
+      description: 'Make 1 Study Buddy',
+      progress: numberOfStudyBuddies,
+      requirement: 1,
+      requirementString: 'Buddy',
+      unlocked: numberOfStudyBuddies >= 1
+    },
+    {
+      id: '2',
+      name: 'Friendly Collaborator',
+      icon: faUserPlus,
+      description: 'Make 10 Study Buddies',
+      progress: numberOfStudyBuddies,
+      requirement: 10,
+      requirementString: 'Buddies',
+      unlocked: numberOfStudyBuddies >= 10
+    },
+    {
+      id: '3',
+      name: 'Social Connector',
+      icon: faUsers,
+      description: 'Make 25 Study Buddies',
+      progress: numberOfStudyBuddies,
+      requirement: 25,
+      requirementString: 'Buddies',
+      unlocked: numberOfStudyBuddies >= 25
+    },
+    {
+      id: '4',
+      name: 'Kindred Spirit',
+      icon: faHandHoldingHeart,
+      description: 'Make 100 Study Buddies',
+      progress: numberOfStudyBuddies,
+      requirement: 100,
+      requirementString: 'Buddies',
+      unlocked: numberOfStudyBuddies >= 100
+    },
+    {
+      id: '5',
+      name: 'Time Tracker',
+      icon: faClock,
+      description: 'Spend 1 hour in the Study Session',
+      progress: timeInStudySession,
+      requirement: 1,
+      requirementString: 'hour',
+      unlocked: timeInStudySession >= 1
+    },
+    {
+      id: '6',
+      name: 'Time Alchemist',
+      icon: faStopwatch,
+      description: 'Spend 10 hours in the Study Session',
+      progress: timeInStudySession,
+      requirement: 10,
+      requirementString: 'hours',
+      unlocked: timeInStudySession >= 10
+    },
+    {
+      id: '7',
+      name: 'Hourglass Sage',
+      icon: faHourglass,
+      description: 'Spend 25 hours in the Study Session',
+      progress: timeInStudySession,
+      requirement: 25,
+      requirementString: 'hours',
+      unlocked: timeInStudySession >= 25
+    },
+    {
+      id: '8',
+      name: 'Master of Time',
+      icon: faHourglass2,
+      description: 'Spend 100 hours in the Study Session',
+      progress: timeInStudySession,
+      requirement: 100,
+      requirementString: 'hours',
+      unlocked: timeInStudySession >= 100
+    },
+    {
+      id: '9',
+      name: 'Knowledge Scribe',
+      icon: faPencilAlt,
+      description: 'Post 1 time in the Study Feed',
+      progress: numberOfFeeds,
+      requirement: 1,
+      requirementString: 'post',
+      unlocked: numberOfFeeds >= 1
+    },
+    {
+      id: '10',
+      name: 'Active Learner',
+      icon: faStickyNote,
+      description: 'Post 10 times in the Study Feed',
+      progress: numberOfFeeds,
+      requirement: 10,
+      requirementString: 'posts',
+      unlocked: numberOfFeeds >= 10
+    },
+    {
+      id: '11',
+      name: 'Thought Provoker',
+      icon: faPencilSquare,
+      description: 'Post 50 times in the Study Feed',
+      progress: numberOfFeeds,
+      requirement: 50,
+      requirementString: 'posts',
+      unlocked: numberOfFeeds >= 50
+    },
+    {
+      id: '12',
+      name: 'Wisdom Seeker',
+      icon: faBook,
+      description: 'Post 100 times in the Study Feed',
+      progress: numberOfFeeds,
+      requirement: 100,
+      requirementString: 'posts',
+      unlocked: numberOfFeeds >= 100
+    },
+    {
+      id: '13',
+      name: 'Comment Connoisseur',
+      icon: faComment,
+      description: 'Comment 1 time in the Study Feed',
+      progress: numberOfComments,
+      requirement: 1,
+      requirementString: 'comment',
+      unlocked: numberOfComments >= 1
+    },
+    {
+      id: '14',
+      name: 'Opinion Artisan',
+      icon: faCommentSlash,
+      description: 'Comment 10 times in the Study Feed',
+      progress: numberOfComments,
+      requirement: 10,
+      requirementString: 'comments',
+      unlocked: numberOfComments >= 10
+    },
+    {
+      id: '15',
+      name: 'Discussion Aficionado',
+      icon: faCommentDots,
+      description: 'Comment 100 times in the Study Feed',
+      progress: numberOfComments,
+      requirement: 100,
+      requirementString: 'comments',
+      unlocked: numberOfComments >= 100
+    },
+    {
+      id: '16',
+      name: 'Dialogue Maestro',
+      icon: faComments,
+      description: 'Comment 1000 times in the Study Feed',
+      progress: numberOfComments,
+      requirement: 1000,
+      requirementString: 'comments',
+      unlocked: numberOfComments >= 1000
+    }
+  ];
   
 
-  //Each badge has an id, name, icon, description,
-  //requirement (in int), requirementString (the string that follows the int)
-  //and an boolean unlocked
-  const badges = [
-    { id: '1', name:'Buddy Initiator', icon: faUser, description: 'Make 1 Study Buddy', requirement: 1, requirementString: 'Buddy', unlocked: false },
-    { id: '2', name:'Friendly Collaborator', icon: faUserPlus, description: 'Make 10 Study Buddies', requirement: 10, requirementString: 'Buddies', unlocked: false },
-    { id: '3', name:'Social Connector', icon: faUsers, description: 'Make 25 Study Buddies', requirement: 25, requirementString: 'Buddies', unlocked: false },
-    { id: '4', name:'Kindred Spirit', icon: faHandHoldingHeart, description: 'Make 100 Study Buddies', requirement: 100, requirementString: 'Buddies', unlocked: false },
-    { id: '5', name:'Time Tracker', icon: faClock, description: 'Spend 1 hour in the Study Session', requirement: 1, requirementString: 'hour', unlocked: false },
-    { id: '6', name:'Time Alchemist', icon: faStopwatch, description: 'Spend 10 hours in the Study Session', requirement: 10, requirementString: 'hours', unlocked: false },
-    { id: '7', name:'Hourglass Sage', icon: faHourglass, description: 'Spend 25 hours in the Study Session', requirement: 25, requirementString: 'hours', unlocked: false },
-    { id: '8', name:'Master of Time', icon: faHourglass2, description: 'Spend 100 hours in the Study Session', requirement: 100, requirementString: 'hours', unlocked: false },
-    { id: '9', name:'Knowledge Scribe', icon: faPencilAlt, description: 'Post 1 time in the Study Feed', requirement: 1, requirementString: 'post', unlocked: false },
-    { id: '10', name:'Active Learner', icon: faStickyNote, description: 'Post 10 times in the Study Feed', requirement: 10, requirementString: 'posts', unlocked: false },
-    { id: '11', name:'Thought Provoker', icon: faPencilSquare, description: 'Post 50 times in the Study Feed', requirement: 50, requirementString: 'posts', unlocked: false },
-    { id: '12', name:'Wisdom Seeker', icon: faBook, description: 'Post 100 times in the Study Feed', requirement: 100, requirementString: 'posts', unlocked: false },
-    { id: '13', name:'Comment Connoisseur', icon: faComment, description: 'Comment 1 time in the Study Feed', requirement: 1, requirementString: 'comment', unlocked: false },
-    { id: '14', name:'Opinion Artisan', icon: faCommentSlash, description: 'Comment 10 times in the Study Feed', requirement: 10, requirementString: 'comments', unlocked: false },
-    { id: '15', name:'Discussion Aficionado', icon: faCommentDots, description: 'Comment 100 times in the Study Feed', requirement: 100, requirementString: 'comments', unlocked: false },
-    { id: '16', name:'Dialogue Maestro', icon: faComments, description: 'Comment 1000 times in the Study Feed', requirement: 1000, requirementString: 'comments', unlocked: false },
-  ];
-
-  const level = Math.floor(xp / 100);
+  const level = Math.floor(xp / 100) + 1;
   const trophyColour = level<10?"#808080":level<20?"#B87333":level<30? '#C0C0C0':level<40?'gold':level<50?'#50C878':'#6EB2D4';
   const trophyText = level<10?'Iron':level<20?'Bronze':level<30?'Silver':level<40?'Gold':level<50?'Emerald':'Diamond';
 
@@ -127,7 +279,6 @@ const Badge = () => {
           <FontAwesomeIcon
             icon={badge.icon}
             size={32}
-            // Locking and unlocking logic not implemented yet
             style={[styles.badgeIcon, !badge.unlocked && styles.lockedBadgeIcon]}
           />
         </TouchableOpacity>
@@ -145,7 +296,7 @@ const Badge = () => {
               <FontAwesomeIcon
               icon={selectedBadge?.icon}
               size={18}
-              // Locking and unlocking logic not implemented yet
+
               style={[styles.badgeIcon, !selectedBadge?.unlocked && styles.lockedBadgeIcon]}
               />
               <Text style={styles.badgeName}>{selectedBadge?.name}</Text>
@@ -156,17 +307,20 @@ const Badge = () => {
             <View style={styles.progressBarContainer}>
               <View style={[styles.progressBar, { 
                   maxWidth: '100%', 
-                  // Replace 0 with actual progress
-                  width: `${(0 / selectedBadge?.requirement) * 100}%`
-                }]}></View>
+                  width: `${(selectedBadge?.progress / selectedBadge?.requirement) * 100}%`,
+                  backgroundColor: selectedBadge?.progress >= selectedBadge?.requirement ? 'green' : 'red',
+                },
+                ]}></View>
             </View>
 
             <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
               <Text style={styles.progress}>Progress: </Text>
-              {/* Replace 0 with actual progress */}
-              <Text style={styles.progress}>0</Text>
+              <Text style={[styles.progress, selectedBadge?.progress < selectedBadge?.requirement ? styles.red : styles.green]}>
+                {selectedBadge?.progress}
+              </Text>
               <Text style={styles.progress}> / {`${selectedBadge?.requirement} ${selectedBadge?.requirementString}`}</Text>
             </View>
+
 
             <TouchableOpacity onPress={() => setSelectedBadge(null)} style={styles.closeButton}>
               <Text style={styles.closeButtonText}>Close</Text>
@@ -229,10 +383,11 @@ const styles = StyleSheet.create({
     borderRadius: 35,
   },
   badgeIcon: {
-    color: '#e6b800',
+    color: '',
   },
   lockedBadgeIcon: {
     color: 'gray',
+    opacity: 0.5,
   },
   levelContainer: {
     flexDirection: 'row',
@@ -276,9 +431,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: 'black',
   },
-  lockedBadgeIcon: {
-    opacity: 0.5,
-  },
   badgeName: {
     fontWeight: 'bold',
     fontSize: 18,
@@ -316,6 +468,12 @@ const styles = StyleSheet.create({
   closeButtonText: {
     color: 'white',
   }, 
+  red: {
+    color: 'red',
+  },
+  green: {
+    color: 'green',
+  },
 });
 
 export default Badge;
