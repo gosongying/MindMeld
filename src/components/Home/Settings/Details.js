@@ -35,6 +35,13 @@ const Details = ({ navigation }) => {
 
   const [gender, setGender] = useState('');
 
+  const [xp, setXp] = useState(0);
+
+  const level = Math.floor(xp / 100);
+  const trophyColour = level<10?"#808080":level<20?"#B87333":level<30? '#C0C0C0':level<40?'gold':level<50?'#50C878':'#6EB2D4';
+  const trophyText = level<10?'Iron':level<20?'Bronze':level<30?'Silver':level<40?'Gold':level<50?'Emerald':'Diamond';
+
+
   const isAnonymous = currentUser ? currentUser.isAnonymous : null;
 
   useEffect(() => {
@@ -43,6 +50,7 @@ const Details = ({ navigation }) => {
       .then((snapshot) => {
         if (snapshot.exists()) {
           setGender(snapshot.val().gender);
+          setXp(snapshot.val().xp);
         }
       })
       .catch((error) => {
@@ -342,12 +350,13 @@ const Details = ({ navigation }) => {
               )}
             </View>
           )}
+
           {!isAnonymous && (
             <View style={styles.levelContainer}>
-            <Text style={styles.levelText}>Level 10</Text>
+            <Text style={styles.levelText}>Level {level}</Text>
             <View style={styles.trophyContainer}>
-              <Text style={styles.trophyText}>Bronze</Text>
-              <Ionicons name="trophy" color="#CD7F32" style={styles.trophyIcon} />
+              <Text style={styles.trophyText}>{trophyText}</Text>
+              <Ionicons name="trophy" color={trophyColour} style={styles.trophyIcon} size={15}/>
             </View>
           </View>
           )}
