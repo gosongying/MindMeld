@@ -22,6 +22,7 @@ const StudySession = ({navigation}) => {
     const [currentTimestamp, setCurrentTimestamp] = useState(new Date().getTime());
     const [sessionDeleted, setSessionDelected] = useState('');
     const [sessionName, setSessionName] = useState('');
+    const [xpEarned, setXpEarned] = useState(0);
 
     const currentUser = auth.currentUser;
 
@@ -48,7 +49,7 @@ const StudySession = ({navigation}) => {
                 return user;
             }
         })
-    }, [])
+    }, []);
 
     useEffect(() => {
         const unsubscribe = onValue(ref(database, 'userId/' + currentUser?.uid), async (snapshot) => {
@@ -56,9 +57,8 @@ const StudySession = ({navigation}) => {
             let ended = [];
             const sessionList = snapshot.exists()? (snapshot.val().upcomingSessions? snapshot.val().upcomingSessions: []): [];
             if (sessionList.length > 0) {
-                await Promise.all(sessionList.map(async (id) => {
-                    console.log(currentUser.displayName)
-                    const sessionRef = ref(database, 'sessions/' + id);
+                await Promise.all(sessionList.map(async (sessionObj) => {
+                    const sessionRef = ref(database, 'sessions/' + sessionObj.id);
                     await get(sessionRef)
                     .then(async (session) => {
                         if (session.exists()) {
@@ -126,13 +126,29 @@ const StudySession = ({navigation}) => {
                     })
 
                 });
-                const newSessionsList = sessionList.filter((id) => !ended.includes(id));
-                update(ref(database, 'userId/' + currentUser?.uid), {
-                    upcomingSessions: newSessionsList
+                let xp = 0;
+                const newSessionsList = sessionList.filter((sessionObj) => {
+                    if (!ended.includes(sessionObj.id)) {
+                        return true;
+                    } else {
+                        //if ended includes
+                        xp += sessionObj.timeStay;
+                        return false;
+                    }
+                });
+                runTransaction(ref(database, 'userId/' + currentUser?.uid), (user) => {
+                    if (user) {
+                        user.upcomingSessions = newSessionsList;
+                        user.xp += xp;
+                        return user;
+                    } else {
+                        return user;
+                    }
                 })
                 .then(() => {
                     setSessionIds(newSessionsList);
                     setSessionData(sessions);
+                    setXpEarned(xp);
                 })
                 .catch((error) => {
                     console.log(error);
@@ -260,9 +276,9 @@ const StudySession = ({navigation}) => {
                             user.invitationList = user.invitationList.filter((id) => id !== session.id);
                         }
                         if (user.upcomingSessions) {
-                            user.upcomingSessions.push(session.id);
+                            user.upcomingSessions.push({id: session.id, timeStay: 0});
                         } else {
-                            user.upcomingSessions = [session.id];
+                            user.upcomingSessions = [{id: session.id, timeStay: 0}];
                         }
                         return user;
                     } else {
@@ -306,10 +322,19 @@ const StudySession = ({navigation}) => {
             const db = ref(database);
             const userRef = child(db, 'userId/' + currentUser?.uid);
             const sessionRef = child(db, 'sessions/' + sessionId);
+            let xp = 0;
             runTransaction(userRef, (user) => {
                 if (user) {
                     //to delete the session from user's upcoming sessions
-                    user.upcomingSessions = user.upcomingSessions.filter((id) => id !== sessionId);
+                    user.upcomingSessions = user.upcomingSessions.filter((session) => {
+                        if (session.id === sessionId) {
+                            xp = session.timeStay;
+                            return false;
+                        } else {
+                            return true;
+                        }
+                    });
+                    user.xp += xp;
                     return user;
                 } else {
                     return user;
@@ -331,6 +356,7 @@ const StudySession = ({navigation}) => {
                 }
             }).then(() =>{
                 setSessionDelected('');
+                setXpEarned(xp);
             });
         } catch(error) {
             console.log(error);
@@ -560,6 +586,21 @@ const StudySession = ({navigation}) => {
                             <Text style={styles.buttonText}>Confirm</Text>
                             </TouchableOpacity>
                         </View>
+                    </View>
+                </View>
+            </Modal>
+            {/* to display the duration user stayed in the previous session */}
+            <Modal
+            visible={xpEarned > 0}
+            animationType="fade"
+            transparent>
+                <View style={styles.timeBackground}>
+                    <View style={styles.timeContainer}>
+                        <Text style={styles.congrats}>Congratulations!!!</Text>
+                        <Text style={styles.xpEarned}>You have earned a total of {xpEarned} XP from previous study sessions.</Text>
+                        <TouchableOpacity style={styles.continueButton} onPress={() => setXpEarned(0)}>
+                            <Text style={styles.continue}>Continue</Text>
+                        </TouchableOpacity>
                     </View>
                 </View>
             </Modal>
@@ -906,7 +947,43 @@ const styles = StyleSheet.create({
         color: 'gray',
         textAlign: 'center',
         marginTop: 10,
-      },
+    },
+    timeBackground: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: "rgba(0, 0, 0, 0.5)"
+    },
+    timeContainer: {
+        height: '30%',
+        width: '75%',
+        borderRadius: 20,
+        backgroundColor: "lavender",
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    congrats: {
+        fontSize: 25,
+        fontWeight: 'bold',
+        bottom: 30,
+    },
+    xpEarned: {
+        fontSize: 18,
+        maxWidth: '90%'
+    },
+    continue: {
+        fontSize: 16,
+        color: 'white'
+    },
+    continueButton: {
+        height: '15%',
+        width: '80%',
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 20,
+        backgroundColor: 'dodgerblue',
+        top: 40
+    }
 });
 
 export default StudySession;

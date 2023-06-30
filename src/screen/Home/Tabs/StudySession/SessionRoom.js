@@ -1,28 +1,48 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
 import {
-  TouchableOpacity,
   StyleSheet,
-  Text,
-  TextInput,
   View,
   FlatList,
-  KeyboardAvoidingView,
-  Modal,
-  Keyboard,
-  Animated,
-  SafeAreaView,
-  Dimensions
+  Dimensions,
+  Alert
 } from 'react-native';
-import { AntDesign } from '@expo/vector-icons';
 import { auth, database } from '../../../../../firebase';
 import { ref, set, push, child, runTransaction, onValue } from 'firebase/database';
-import Carousel, { Pagination } from 'react-native-snap-carousel'
 import ChatRoom from '../../../../components/Home/Session/ChatRoom';
 import ToDoList from './ToDoList';
 import Participants from './Participants';
 
 const SessionRoom = ({route, navigation}) => {
   const session = route.params.session;
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+        updateTimeStay();
+      }, 60000);
+      return () => {
+        clearInterval(interval);
+      }
+
+  }, [])
+
+  const updateTimeStay = () => {
+    try {
+      runTransaction(ref(database, 'userId/' + auth.currentUser.uid), (user) => {
+        //to update the user time stay in the session every minute.
+        if (user) {
+          user.upcomingSessions = user.upcomingSessions.map((sessionObj) => sessionObj.id === session.id? {...sessionObj, timeStay: sessionObj.timeStay + 1}: sessionObj);
+          user.timeInSession = user.timeInSession + (1 / 60);
+          console.log('update time')
+          return user;
+        } else {
+          return user;
+        }
+      });
+    } catch(error) {
+      console.log(error);
+      Alert.alert("Error");
+    }
+  }
 
   const renderScreen = ({item}) => {
     return (
@@ -32,33 +52,17 @@ const SessionRoom = ({route, navigation}) => {
     )
   };
 
- 
-
-
   const data = [
        {id: 1, component: Participants},
        {id: 2, component: ChatRoom},
        {id: 3, component: ToDoList}
   ];
 
-
-    /*const isCarousel = React.useRef(null);
-
-    const [index, setIndex] = React.useState(0); //to keep track of currently active dot
-
-    const renderDot = (index, active) => {
-      const dotStyle = [styles.dot];
-      if (active) {
-        dotStyle.push(styles.activeDot);
-      }
-      return <View/>;
-    };*/
-
-    const getItemLayout = (_, index) => ({
-      length: Dimensions.get('screen').width, // Set the height of each item
-      offset: Dimensions.get('screen').width * index, // Calculate the offset based on item height and index
-      index,
-    });
+  const getItemLayout = (_, index) => ({
+    length: Dimensions.get('screen').width, // Set the height of each item
+    offset: Dimensions.get('screen').width * index, // Calculate the offset based on item height and index
+    index,
+  });
   
 
 
