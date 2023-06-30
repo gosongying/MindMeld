@@ -4,6 +4,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import { auth, database, storage } from '../../../../firebase';
 import { onValue, ref as databaseRef, get, remove, runTransaction, update } from 'firebase/database';
 import { updateProfile } from 'firebase/auth';
+import { ref } from 'firebase/database'
 import { useRef } from 'react';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -37,7 +38,7 @@ const Details = ({ navigation }) => {
 
   const [xp, setXp] = useState(0);
 
-  const level = Math.floor(xp / 100);
+  const level = Math.floor(xp / 100) + 1;
   const trophyColour = level<10?"#808080":level<20?"#B87333":level<30? '#C0C0C0':level<40?'gold':level<50?'#50C878':'#6EB2D4';
   const trophyText = level<10?'Iron':level<20?'Bronze':level<30?'Silver':level<40?'Gold':level<50?'Emerald':'Diamond';
 
@@ -46,19 +47,22 @@ const Details = ({ navigation }) => {
 
   useEffect(() => {
     if (!isAnonymous) {
-      get(databaseRef(database, 'userId/' + currentUser.uid))
-      .then((snapshot) => {
+      const userRef = ref(database, 'userId/' + currentUser.uid);
+  
+      const unsubscribe = onValue(userRef, (snapshot) => {
         if (snapshot.exists()) {
           setGender(snapshot.val().gender);
           setXp(snapshot.val().xp);
         }
-      })
-      .catch((error) => {
+      }, (error) => {
         console.log(error);
         Alert.alert("An error occurs");
-      })
+      });
+      return () => {
+        unsubscribe();
+      };
     }
-  }, [])
+  }, []);
 
   const editUsername = () => {
     setIsEditingUsername(true);

@@ -140,7 +140,11 @@ const SignupPage2 = ({ navigation}) => {
       groupList: [],
       photo: photo,
       uid: userId,
-      status: 0
+      status: 0,
+      xp: 0,
+      timeInSession: 0,
+      numberOfFeeds: 0,
+      numberOfComments: 0,
     });
     updateProfile(currentUser, {
       displayName: username,
@@ -217,11 +221,6 @@ const SignupPage2 = ({ navigation}) => {
       setGender('female');
     }
   };
-
-  const goToSignUp = () => {
-    navigation.navigate('Signup');
-
-  }
 
   const reset = () => {
     setUsername('');

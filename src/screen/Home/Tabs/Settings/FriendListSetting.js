@@ -71,7 +71,7 @@ const FriendListSetting = ({navigation}) => {
 }, []);
 
     const clickUser = (user) => {
-        const level = Math.floor(user.xp / 100);
+        const level = Math.floor(user.xp / 100) + 1;
         const trophyColour = level<10?"#808080":level<20?"#B87333":level<30? '#C0C0C0':level<40?'gold':level<50?'#50C878':'#6EB2D4';
         const trophyText = level<10?'Iron':level<20?'Bronze':level<30?'Silver':level<40?'Gold':level<50?'Emerald':'Diamond';
         setIsCheckingFriend(true);
@@ -170,7 +170,7 @@ const FriendListSetting = ({navigation}) => {
                 const userIdRef = ref(database, 'userId/' + snapshot.val().uid);
                 get(userIdRef)
                 .then((snapshot) => {
-                    const level = Math.floor(snapshot.val().xp / 100);
+                    const level = Math.floor(snapshot.val().xp / 100) + 1;
                     const trophyColour = level<10?"black":level<20?"#B87333":level<30? '#C0C0C0':level<40?'gold':level<50?'#50C878':'#6EB2D4';
                     const trophyText = level<10?'Iron':level<20?'Bronze':level<30?'Silver':level<40?'Gold':level<50?'Emerald':'Diamond';
                     setFriendOrFriendSearched({...snapshot.val(), level: level, trophyColour: trophyColour, trophyText: trophyText});

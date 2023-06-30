@@ -126,7 +126,7 @@ const Leaderboard = () => {
             </View>
             </View>
           {leaderboardData.length > 1  && (
-            <View style={styles.details}>
+            <View style={[styles.details, {marginRight: -30}]}>
               <Text style={styles.detailsText}>{leaderboardData[1].username}</Text>
               <Text style={styles.xpText}>{leaderboardData[1].xp}</Text>
             </View>
@@ -166,7 +166,7 @@ const Leaderboard = () => {
           </View>
           </View>
           {leaderboardData.length > 2 && (
-            <View style={styles.details}>
+            <View style={[styles.details, {marginLeft: -30}]}>
               <Text style={styles.detailsText}>{leaderboardData[2].username}</Text>
               <Text style={styles.xpText}>{leaderboardData[2].xp}</Text>
             </View>
@@ -202,8 +202,8 @@ const styles = StyleSheet.create({
   },
   firstPlaceContainer: {
     backgroundColor: 'white',
-    width: 120,
-    height: 120,
+    width: 130,
+    height: 130,
     borderRadius: 100,
     marginHorizontal: 20,
     borderWidth: 5,
@@ -213,25 +213,27 @@ const styles = StyleSheet.create({
   },
   secondPlaceContainer: {
     backgroundColor: 'white',
-    width: 95,
-    height: 95,
+    width: 105,
+    height: 105,
     borderRadius: 100,
     marginTop: 70,
     borderWidth: 5,
     borderColor: 'white',
     justifyContent: 'center',
     alignItems: 'center',
+    marginRight: -30,
   },
   thirdPlaceContainer: {
     backgroundColor: 'white',
-    width: 95,
-    height: 95,
+    width: 105,
+    height: 105,
     borderRadius: 100,
     marginTop: 70,
     borderWidth: 5,
     borderColor: 'white',
     justifyContent: 'center',
     alignItems: 'center',
+    marginLeft: -30,
   },
   firstPlace: {
     position: 'absolute',
@@ -242,8 +244,8 @@ const styles = StyleSheet.create({
     marginTop: 50,
     borderWidth: 4,
     borderColor: 'white',
-    left: 35,
-    bottom: 90,
+    left: 38,
+    bottom: 100,
   },
   secondPlace: {
     position: 'absolute',
@@ -254,8 +256,8 @@ const styles = StyleSheet.create({
     marginTop: 50,
     borderWidth: 4,
     borderColor: 'white',
-    left: 25,
-    bottom: 69,
+    left: 28,
+    bottom: 75,
   },
   thirdPlace: {
     position: 'absolute',
@@ -266,8 +268,8 @@ const styles = StyleSheet.create({
     marginTop: 50,
     borderWidth: 4,
     borderColor: 'white',
-    left: 25,
-    bottom: 69,
+    left: 28,
+    bottom: 75,
   },
   numText: {
     fontSize: 21,
@@ -284,18 +286,18 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   firstPlaceImage: {
-    width: 110,
-    height: 110,
+    width: 120,
+    height: 120,
     borderRadius: 80,
   },
   secondPlaceImage: {
-    width: 85,
-    height: 85,
+    width: 95,
+    height: 95,
     borderRadius: 80,
   },
   thirdPlaceImage: {
-    width: 85,
-    height: 85,
+    width: 95,
+    height: 95,
     borderRadius: 80,
   },
   details: {
