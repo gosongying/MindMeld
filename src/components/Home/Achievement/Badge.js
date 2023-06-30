@@ -80,8 +80,8 @@ const Badge = () => {
   ];
 
   const level = Math.floor(xp / 100);
-  const trophyColour = level<10?"burlywood":level<20?"#CD7F32":level<30? 'gray':level<40?'gold':'seagreen';
-  const trophyText = level<10?'Wooden':level<20?'Bronze':level<30?'Silver':level<40?'Medal':level<50?'Emerald':'Diamond';
+  const trophyColour = level<10?"#808080":level<20?"#B87333":level<30? '#C0C0C0':level<40?'gold':level<50?'#50C878':'#6EB2D4';
+  const trophyText = level<10?'Iron':level<20?'Bronze':level<30?'Silver':level<40?'Gold':level<50?'Emerald':'Diamond';
 
   return (
     <View style={styles.container}>
@@ -101,11 +101,7 @@ const Badge = () => {
             <Text style={styles.levelText}>Level {level}</Text>
             <View style={styles.trophyContainer}>
               <Text style={styles.trophyText}>{trophyText}</Text>
-              {level<50? (
                 <Ionicons name="trophy" color={trophyColour} style={styles.trophyIcon} size={15}/>
-              ): (
-                <SimpleLineIcons name='diamond' color='gray' style={styles.trophyIcon} size={15}/>
-              )}
             </View>
         </View>
         <Progress.Bar 
@@ -184,7 +180,7 @@ const Badge = () => {
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 20,
+    marginTop: 12,
     alignItems: 'center',
   },
   iconContainer: {
@@ -287,6 +283,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 18,
     textAlign: 'center',
+    marginLeft: 8,
   },
   description: {
     marginVertical: 10,
