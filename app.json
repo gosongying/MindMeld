@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "MindMeld",
-    "slug": "MindMeld",
+    "slug": "mindmeld",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -11,15 +11,20 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.gosongying.mindmeld"
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/splash.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -32,6 +37,12 @@
           "cameraPermission": "The app access your camera to let you share them with your friends"
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "237dd1f6-5bd7-4d37-95d7-25a605148dac"
+      }
+    },
+    "owner": "gosongying"
   }
 }

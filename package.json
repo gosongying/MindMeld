@@ -50,7 +50,8 @@
     "react-native-swipeable": "^0.6.0",
     "react-redux": "^8.1.0",
     "redux": "^4.2.1",
-    "victory-native": "^36.6.10"
+    "victory-native": "^36.6.10",
+    "expo-updates": "~0.16.4"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

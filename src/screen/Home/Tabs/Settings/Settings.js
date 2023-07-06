@@ -23,10 +23,10 @@ const Settings = ({navigation}) => {
   }, []);
 
   const options = [
-    { id: '2', title: 'Study Buddy Settings', screen: 'FriendListSetting' , hide: isGuest },
+    { id: '2', title: 'Study Buddy', screen: 'FriendListSetting' , hide: isGuest },
     // { id: '3', title: 'Group List', screen: 'GroupList' },
     { id: '4', title: 'Sessions Settings', screen: 'SessionsSetting', hide: isGuest },
-    { id: '5', title: 'Achievement Settings', screen: 'AchievementSettings', hide: isGuest },
+    //{ id: '5', title: 'Achievement Settings', screen: 'AchievementSettings', hide: isGuest },
     { id: '1', title: 'Privacy Settings', screen: 'Privacy', hide: isGuest},
     { id: '9', title: 'About', screen: 'About' },
     { id: '8', title: 'Help & Support', screen: 'HelpAndSupport' },
