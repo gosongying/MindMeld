@@ -14,6 +14,7 @@ import Privacy from './Settings/Privacy';
 import SessionsSetting from './Settings/SessionsSetting';
 import TermsAndCondition from './Settings/TermsAndCondition';
 import FriendListMore from '../../../components/Home/Session/FriendListMore';
+import ChatUser from '../../../components/Home/Settings/ChatUser';
 
 const SettingTab = () => {
 
@@ -31,6 +32,7 @@ const SettingTab = () => {
       <Stack.Screen name="SessionsSetting" component={SessionsSetting} />
       <Stack.Screen name="TermsAndCondition" component={TermsAndCondition} />
       <Stack.Screen name="FriendListMore" component={FriendListMore} />
+      <Stack.Screen name="ChatUser" component={ChatUser} />
       <Stack.Screen name="Settings" component={Settings} />
     </Stack.Navigator>
    );

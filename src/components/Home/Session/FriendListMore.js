@@ -583,7 +583,7 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
     },
     text2: {
-        fontSize: 20,
+        fontSize: 17,
         color: 'white'
     },
     interests: {

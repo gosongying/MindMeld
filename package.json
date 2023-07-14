@@ -26,6 +26,7 @@
     "expo": "~48.0.15",
     "expo-image-picker": "~14.1.1",
     "expo-status-bar": "~1.4.4",
+    "expo-updates": "~0.16.4",
     "firebase": "^9.22.1",
     "react": "18.2.0",
     "react-native": "0.71.8",
@@ -47,11 +48,11 @@
     "react-native-snap-carousel": "^4.0.0-beta.6",
     "react-native-sound": "^0.11.2",
     "react-native-svg": "13.4.0",
+    "react-native-swipe-cards": "^0.1.1",
     "react-native-swipeable": "^0.6.0",
     "react-redux": "^8.1.0",
     "redux": "^4.2.1",
-    "victory-native": "^36.6.10",
-    "expo-updates": "~0.16.4"
+    "victory-native": "^36.6.10"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
