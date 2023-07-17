@@ -6,7 +6,15 @@
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "test": "jest --verbose"
+  },
+  "jest": {
+    "preset": "jest-expo",
+    "setupFiles": ["./setupASMock.js"],
+    "transformIgnorePatterns": [
+      "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|sentry-expo|native-base|react-native-svg|firebase|@firebase|@react-native-async-storage/async-storage|@fortawesome)"
+    ]
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.4.0",
@@ -27,7 +35,9 @@
     "expo-image-picker": "~14.1.1",
     "expo-status-bar": "~1.4.4",
     "expo-updates": "~0.16.4",
-    "firebase": "^9.22.1",
+    "firebase": "^9.23.0",
+    "jest": "^29.2.1",
+    "jest-expo": "^49.0.0",
     "react": "18.2.0",
     "react-native": "0.71.8",
     "react-native-canvas": "^0.1.39",
@@ -56,8 +66,10 @@
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
+    "@testing-library/react-native": "^12.1.2",
     "nodemon": "^2.0.22",
-    "prettier": "2.8.8"
+    "prettier": "2.8.8",
+    "xhr2": "^0.2.1"
   },
   "private": true
 }

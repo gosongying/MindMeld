@@ -7,13 +7,14 @@ import {
   TextInput,
   View,
   ScrollView,
-  Keyboard
+  Keyboard,
+  Alert
 } from 'react-native';
 import axios from 'axios';
 import { AntDesign } from '@expo/vector-icons';
 
 const Dictionary = ({ navigation }) => {
-  const goToHome = () => navigation.navigate('StudyDashboard');
+  const goToHome = () => navigation.goBack();
 
   const [word, setWord] = useState('');
   const [definitions, setDefinitions] = useState([]);
@@ -62,7 +63,7 @@ const Dictionary = ({ navigation }) => {
           <Text style={styles.back}>{'\u2190'}</Text>
         </TouchableOpacity>
         <Text style={styles.title}>Dictionary</Text>
-        <TouchableOpacity style={styles.closeButton} onPress={reset}>
+        <TouchableOpacity style={styles.closeButton} onPress={reset} testID='reset'>
           <AntDesign name="close" size={24} color="#fff" />
         </TouchableOpacity>
       </View>

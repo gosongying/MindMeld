@@ -10,8 +10,6 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import Settings from './src/screen/Home/Tabs/Settings/Settings';
 import EntryPage from './src/screen/Authentication/EntryPage';
-
-
 const App = () => {
 
   const Stack = createStackNavigator();

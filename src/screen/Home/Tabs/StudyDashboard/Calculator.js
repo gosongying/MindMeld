@@ -6,12 +6,13 @@ import {
   SafeAreaView,
   TextInput,
   View,
+  Alert,
 } from 'react-native';
 import axios from 'axios';
 import { AntDesign } from '@expo/vector-icons';
 
 const Calculator = ({ navigation }) => {
-  const goToHome = () => navigation.navigate('StudyDashboard');
+  const goToHome = () => navigation.goBack();
 
   const [input, setInput] = useState('');
   const [result, setResult] = useState('');
@@ -28,6 +29,7 @@ const Calculator = ({ navigation }) => {
 
       setResult(result);
     } catch (error) {
+      Alert.alert('Incorrect mathematical expression');
       console.log(error);
     }
   };
@@ -47,7 +49,7 @@ const Calculator = ({ navigation }) => {
           <Text style={styles.back}>{'\u2190'}</Text>
         </TouchableOpacity>
         <Text style={styles.title}>Calculator</Text>
-        <TouchableOpacity style={styles.closeButton} onPress={reset}>
+        <TouchableOpacity style={styles.closeButton} onPress={reset} testID='reset'>
           <AntDesign name="close" size={24} color="#fff" />
         </TouchableOpacity>
       </View>

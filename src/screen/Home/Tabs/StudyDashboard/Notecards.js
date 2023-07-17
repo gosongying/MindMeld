@@ -55,7 +55,7 @@ const Notecards = ({ navigation }) => {
   }, [flashcards]);
   
 
-  const goToHome = () => navigation.navigate('StudyDashboard');
+  const goToHome = () => navigation.goBack();
 
   const flipCard = () => {
     setIsFrontVisible(!isFrontVisible);
@@ -147,7 +147,7 @@ const Notecards = ({ navigation }) => {
         <View style={[styles.card, isFrontVisible ? styles.frontCard : styles.backCard]}>
           <Text style={styles.cardText}>{isFrontVisible ? card.front : card.back}</Text>
           {isFrontVisible ? null : (
-            <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
+            <TouchableOpacity style={styles.deleteButton} onPress={handleDelete} testID={`${currentIndex}`}>
               <Ionicons name="close-outline" size={36} color="#FF0000"/>
             </TouchableOpacity>
           ) }
@@ -202,7 +202,7 @@ const Notecards = ({ navigation }) => {
           <Text style={styles.back}>{'\u2190'}</Text>
         </TouchableOpacity>
         <Text style={styles.title}>Notecards</Text>
-          <TouchableOpacity style={styles.createCardButton} onPress={() => setIsModalVisible(true)}>
+          <TouchableOpacity style={styles.createCardButton} onPress={() => setIsModalVisible(true)} testID='add'>
             <AntDesign name="plus" size={24} color="#fff" />
           </TouchableOpacity>
       </View>
@@ -240,7 +240,7 @@ const Notecards = ({ navigation }) => {
         </TouchableOpacity>
         </View>
 
-        <TouchableOpacity style={styles.navigationButton} onPress={() => setShowSettingModal(true)}>
+        <TouchableOpacity style={styles.navigationButton} onPress={() => setShowSettingModal(true)} testID='setting'>
           <Ionicons name="settings-outline" size={24} color="#333"/>
         </TouchableOpacity>
       </View>
@@ -303,6 +303,7 @@ const Notecards = ({ navigation }) => {
                 value={deleteToggle}
                 onValueChange={(value) => setDeleteToggle(value)}
                 style={styles.toggleSwitch}
+                testID='reset'
               />
             </View>
                         
