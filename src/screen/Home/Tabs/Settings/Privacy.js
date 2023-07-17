@@ -109,7 +109,7 @@ import { runTransaction, ref, onValue, get, set, push } from 'firebase/database'
             set(interestsRef, interests);
             goToHome();
             setIsLoading(false);
-            Alert.alert("Successfully updated changes");
+            Alert.alert("Updated changes");
           });
         });
       } catch (error) {
