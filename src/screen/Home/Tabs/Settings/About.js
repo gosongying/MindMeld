@@ -23,7 +23,7 @@ const About = ({ navigation }) => {
           {'\n'}As we all know, studying can be a difficult and daunting task for many students, including us. With the ever-increasing number of distractions that surround us, from social media to video games on our mobile phones, it’s no wonder that students often struggle to stay motivated and focused on their studies.
           {'\n\n'}
           <Text style={styles.sectionTitle}>What We Offer:</Text>
-          {'\n'}Our app, MindMeld, aims to address this problem by gamifying {'('}WIP{')'} the studying process and providing a platform that eliminates most distractions. We believe that by turning studying into an engaging and enjoyable experience, students can achieve greater academic success. Our app offers features such as remote study sessions with peers, gamification elements {'('}WIP{')'}, and distraction reduction tools {'('}WIP{')'}.
+          {'\n'}Our app, MindMeld, aims to address this problem by gamifying the studying process and providing a platform that eliminates most distractions. We believe that by turning studying into an engaging and enjoyable experience, students can achieve greater academic success. Our app offers features such as remote study sessions with peers, gamification elements, and a collaborative studying platform.
           {'\n\n'}
           <Text style={styles.sectionTitle}>Our Aim:</Text>
           {'\n'}Our aim is not to force students to study, but to provide them with a helpful platform that serves as a tool to aid their studying journey. By offering a range of features, we hope to empower students to take control of their education and achieve their academic goals.

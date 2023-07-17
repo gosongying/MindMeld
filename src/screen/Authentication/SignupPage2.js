@@ -347,7 +347,7 @@ const SignupPage2 = ({ navigation}) => {
             </View>
 
             <View style={styles.formRow}>
-              <Text style={styles.label}>Study of Interest {'('}Optional{')'}: </Text>
+              <Text style={styles.label}>Study of Interest: </Text>
               <View style={styles.toggleButtonContainer}>
                 <FlatList
                   data={[

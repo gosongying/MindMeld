@@ -36,10 +36,7 @@ const Badge = () => {
 
   // States for badges
   const [numberOfStudyBuddies, setNumberOfStudyBuddies] = useState(0);
-
-  //TODO: progress for study session
   const [timeInStudySession, setTimeInStudySession] = useState(0);
-
   const [numberOfComments, setNumberOfComments] = useState(0);
   const [numberOfFeeds, setNumberOfFeeds] = useState(0)
 
@@ -57,7 +54,7 @@ const Badge = () => {
         setUsername(user.username);
         setPhoto(user.photo);
         setXp(user.xp);
-        setNumberOfStudyBuddies(user.friendList?user.friendList.length: 0);
+        setNumberOfStudyBuddies(user.friendList? user.friendList.length: 0);
         setNumberOfFeeds(user.numberOfFeeds);
         setNumberOfComments(user.numberOfComments);   
         setTimeInStudySession(user.timeInSession);

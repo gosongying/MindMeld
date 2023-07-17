@@ -424,7 +424,7 @@ const StudySession = ({navigation}) => {
                         <Text style={styles.text2}>Host: {item.hostName}</Text>
                         <Text style={styles.text2}>Participants: {item.participantsName.join(', ')}</Text>
                         <Text style={styles.text2}>To-do's: {item.tasks ? item.tasks.map((task) => task.title).join(', ') : ''}</Text>
-                        <Text style={[styles.text2, !item.studyModeEnabled && {textDecorationLine: 'line-through'}]}>Study Mode</Text>
+                        {/* <Text style={[styles.text2, !item.studyModeEnabled && {textDecorationLine: 'line-through'}]}>Study Mode</Text> */}
                     </View>
                     <View style={styles.acceptOrDecline2}>
                         {inProgress && (
