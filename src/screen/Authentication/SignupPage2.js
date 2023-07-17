@@ -7,12 +7,10 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import { updateProfile } from 'firebase/auth';
 import * as ImagePicker from 'expo-image-picker';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { getDownloadURL, uploadBytes, ref as storageRef, deleteObject } from 'firebase/storage';
+import { getDownloadURL, uploadBytes, ref as storageRef } from 'firebase/storage';
 import { AntDesign } from '@expo/vector-icons'
 
 const SignupPage2 = ({ navigation}) => {
-
-  console.log("Signup2")
 
   const [username, setUsername] = useState('');
   const [interests, setInterests] = useState([]);
@@ -21,9 +19,9 @@ const SignupPage2 = ({ navigation}) => {
   const [confirmUsername, setConfirmUsername] = useState(false);
   const [isLoading, setLoading] = useState(false);
   const [image, setImage] = useState(null);
-  const [termsModal, setTermsModal] = useState(false)
+  const [termsModal, setTermsModal] = useState(false);
 
-  const currentUser = auth.currentUser;
+  const currentUser = auth? auth.currentUser: null;
 
   const uploadImageAsync = async (uri) => {
     const blob = await new Promise((resolve, reject) => {
@@ -44,7 +42,7 @@ const SignupPage2 = ({ navigation}) => {
       //to make sure every profile picture in the storage belongs to exactly one user
       const fileRef = storageRef(storage, 'Images/' + currentUser.uid);
       const result = await uploadBytes(fileRef, blob);
-
+  
       blob.close();
       return await getDownloadURL(fileRef);
     } catch (error) {
@@ -96,22 +94,8 @@ const SignupPage2 = ({ navigation}) => {
   const handleConfirmDetails = async () => {
     // Perform any necessary actions to confirm details (e.g., API calls, data validation)
     setLoading(true);
-
-    //handle empty username
-    if (!username) {
-      Alert.alert("Username cannot be empty");
-      setLoading(false);
-      return;
-    }
-
-    //handle empty gender
-    if (!gender) {
-      Alert.alert("Please select your gender");
-      setLoading(false);
-      return;
-    }
     
-  const userId = currentUser.uid;
+  const userId = currentUser?.uid;
 
   //reference to the users node based on their username 
   const usernameRef = databaseRef(database, 'usernames/' + username);
@@ -132,26 +116,31 @@ const SignupPage2 = ({ navigation}) => {
     if (result.committed) {
     //if set username successfully
     const photo = image? await uploadImageAsync(image) : null
-    set(databaseRef(database, 'userId/' + userId), {
-      username: username,
-      interests: interests,
-      gender: gender,
-      friendList: [],
-      groupList: [],
-      photo: photo,
-      uid: userId,
-      status: 0,
-      xp: 0,
-      timeInSession: 0,
-      numberOfFeeds: 0,
-      numberOfComments: 0,
-    });
-    updateProfile(currentUser, {
-      displayName: username,
-      photoURL: photo
-    }).then(() => {
-      navigation.replace("Home");
-    });
+    await Promise.all([
+      updateProfile(currentUser, {
+        displayName: username,
+        photoURL: photo
+      }),
+      set(databaseRef(database, 'userId/' + userId), {
+        username: username,
+        interests: interests,
+        gender: gender,
+        friendList: [],
+        groupList: [],
+        photo: photo,
+        uid: userId,
+        status: 0,
+        xp: 0,
+        timeInSession: 0,
+        numberOfFeeds: 0,
+        numberOfComments: 0,
+      })
+    ])
+    .catch(error => {
+      Alert.alert("Error")
+    })
+    navigation.replace('Home');
+  
     }
   });
   } catch (error) {
@@ -168,29 +157,32 @@ const SignupPage2 = ({ navigation}) => {
   };
 
   const handleToggleConfirmUsername = () => {
-    
-    if (!/^[a-zA-Z0-9]+$/.test(username)) {
-      Alert.alert('Username cannot contain special characters');
-      setUsername('');
-      return;
-    }
-      
     if (username.trim().toLowerCase() === 'guest') {
       Alert.alert('Username cannot be "Guest"');
+      setConfirmUsername(false);
       return;
     }
     if (username.trim() === '') {
       Alert.alert('Username cannot be empty');
       setConfirmUsername(false);
-    } else {
-      setConfirmUsername((prevState) => !prevState);
+      return;
     }
 
     if (username.includes(' ')) {
       Alert.alert('No whitespace allowed in the username');
       setUsername('');
       setConfirmUsername(false);
+      return;
     }
+
+    if (!/^[a-zA-Z0-9]+$/.test(username)) {
+      Alert.alert('Username cannot contain special characters');
+      setUsername('');
+      setConfirmUsername(false);
+      return;
+    }
+
+    setConfirmUsername((prevState) => !prevState);
   };
 
   const handleUsernameBlur = () => {
@@ -304,13 +296,15 @@ const SignupPage2 = ({ navigation}) => {
                   <TouchableOpacity 
                   style={styles.pictureText} 
                   onPress={selectImageLibrary}
-                  disabled={isLoading}>
+                  disabled={isLoading}
+                  testID='1'>
                     <FontAwesome name={'photo'} size={30} />
                   </TouchableOpacity>
                   <TouchableOpacity 
                   style={styles.pictureText} 
                   onPress={selectImageCamera}
-                  disabled={isLoading}>
+                  disabled={isLoading}
+                  testID='2'>
                     <MaterialCommunityIcons name={'camera-outline'} size={35} />
                   </TouchableOpacity>
                 </View>
@@ -338,6 +332,7 @@ const SignupPage2 = ({ navigation}) => {
                 onPress={handleToggleMale}
                 style={[styles.toggleButton, gender === 'male' && styles.toggleMaleSelected]}
                 disabled={isLoading}
+                testID='male'
                 >
                   <MaterialCommunityIcons name={"face-man-outline"} size={30}/>
                 </TouchableOpacity>
@@ -392,6 +387,7 @@ const SignupPage2 = ({ navigation}) => {
                 <TouchableOpacity
                   onPress={handleToggleConfirmUsername}
                   disabled={isLoading}
+                  testID='3'
                 >
                 {confirmUsername ? ( 
                   <View style={styles.checkbox}>
@@ -409,6 +405,7 @@ const SignupPage2 = ({ navigation}) => {
                 <TouchableOpacity 
                   onPress={handleToggleAgreeTerms}
                   disabled={isLoading}
+                  testID='4'
                 >
                   {agreeTerms ? (
                   <View style={styles.checkbox}>
