@@ -107,12 +107,15 @@ const FriendListSetting = ({navigation}) => {
                                     )}
                             </View>
                         </View>
-                        <TouchableOpacity>
+                        <TouchableOpacity onPress={() => handleChat(item)}>
+                            <Ionicons name="chatbubble-outline" size={25} style={{right: 40}} />
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => setDeletingFriend(item)}>
                             <MaterialIcons 
                             name={"delete"}
                             size={25} 
                             style={{right: 35}}
-                            onPress={() => setDeletingFriend(item)}/>
+                            />
                         </TouchableOpacity>
                     </TouchableOpacity>
                     {/* separator */}
@@ -248,6 +251,13 @@ const FriendListSetting = ({navigation}) => {
         setFriendOrFriendSearched(null);
     }
 
+    const handleChat = (item) => {
+        const userIds = [currentUser.uid, item.uid].sort(); // Sort user IDs alphabetically
+        const chatSessionId = userIds.join('-'); // Combine user IDs
+      
+        navigation.navigate('ChatUser', { chatSessionId, otherUser: item });
+      };
+
     return (
         <View style={styles.container}>
             <View style={styles.header}>
@@ -275,12 +285,12 @@ const FriendListSetting = ({navigation}) => {
                     value={username}
                     onChangeText={(text) => setUsername(text)}>
                     </TextInput>
-                    <TouchableOpacity style={styles.addIcon}>
+                    <TouchableOpacity style={styles.addIcon} onPress={() => setIsAddingFriend(true)}>
                         <Ionicons 
                         name='person-add-outline' 
                         size={30} 
                         color='white'
-                        onPress={() => setIsAddingFriend(true)}/>
+                        />
                     </TouchableOpacity>
                 </View>
             </View>
@@ -597,7 +607,7 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
     },
     text2: {
-        fontSize: 20,
+        fontSize: 17,
         color: 'white'
     },
     interests: {

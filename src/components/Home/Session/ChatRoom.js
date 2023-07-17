@@ -103,7 +103,7 @@ const ChatRoom = ({ navigation, session }) => {
 
   useEffect(() => {
     if (session.endTime.timestamp <= currentTimestamp) {
-      Alert.alert("The session is ended");
+      Alert.alert("The session has ended");
       goToHome();
       return;
     } 
@@ -277,7 +277,7 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     right: 20,
-    top: 10
+    top: 8
   },
   quit: {
     fontSize: 20,
@@ -328,6 +328,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 10,
     paddingTop: 8,
+    fontSize: 16
   },
   sendButton: {
     marginLeft: 10,

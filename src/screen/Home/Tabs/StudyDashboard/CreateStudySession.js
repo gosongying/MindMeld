@@ -142,6 +142,7 @@ const CreateStudySession = ({ navigation }) => {
       autoCorrect={false}
       clearButtonMode='while-editing'
       value={sessionName}
+      placeholderTextColor={'gray'}
       onChangeText={(text) => setSessionName(text)}/>
 
       <View>
@@ -151,15 +152,16 @@ const CreateStudySession = ({ navigation }) => {
         onChangeText={(text) => setSessionDescription(text)}
         style={styles.input2} 
         multiline
-        placeholder='Description'
+        placeholder='Enter description'
         autoCapitalize='none'
         autoCorrect={false}
-        blurOnSubmit
+        placeholderTextColor={'gray'}
         clearButtonMode='while-editing'
+        blurOnSubmit
         />
       </View>
 
-      <View style={styles.checkboxContainer}>
+      {/* <View style={styles.checkboxContainer}>
         <Text style={styles.checkboxLabel}>Enable Study Mode</Text>
         <TouchableOpacity
           style={[styles.checkbox, studyModeEnabled && styles.checkboxActive]}
@@ -167,7 +169,7 @@ const CreateStudySession = ({ navigation }) => {
         >
           {studyModeEnabled && <Text style={styles.checkmark}>&#x2713;</Text>}
         </TouchableOpacity>
-      </View>
+      </View> */}
       <Text style={styles.subheading}>Select Date</Text>
       <TouchableOpacity style={styles.calendarButton} onPress={showDatePicker}>
         <Text style={styles.calendarButtonText}>
@@ -268,6 +270,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#DC582A',
   },
   input1: {
+    fontSize: 15,
     borderWidth: 1,
     borderColor: '#CCCCCC',
     borderRadius: 10,

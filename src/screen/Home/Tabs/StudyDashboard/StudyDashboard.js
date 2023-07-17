@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, View, FlatList, SafeAreaView } from 'react-native';
 
 import Features from '../../../../components/Home/Study/Features';
-import StudyMode from '../../../../components/Home/Study/StudyMode';
+import SearchBuddy from '../../../../components/Home/Study/SearchBuddy';
 import StudyWhat from '../../../../components/Home/Study/StudyWhat';
 import HelloName from '../../../../components/Home/Study/HelloName';
 import { useNavigation } from '@react-navigation/native';
@@ -10,8 +10,6 @@ import { useNavigation } from '@react-navigation/native';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { auth, database } from "../../../../../firebase"
 import { goOffline, update, ref, increment, runTransaction, remove } from 'firebase/database';
-
-import About from '../Settings/About';
 
 const StudyDashboard = () => {
   const [isGuest, setIsGuest] = useState(false);
@@ -40,8 +38,9 @@ const StudyDashboard = () => {
     },
     {
       id: '2',
-      title: 'studyMode',
-      component: StudyMode,
+      title: 'SearchBuddy',
+      component: SearchBuddy,
+      hide: isGuest
     },
     {
       id: '3',
@@ -81,7 +80,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   listContentContainer: {
-    flexGrow: 1,
+    // flexGrow: 1,
     justifyContent: 'space-between',
   },
   optionContainer: {
