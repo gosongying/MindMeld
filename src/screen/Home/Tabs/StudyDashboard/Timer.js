@@ -75,7 +75,7 @@ const CountdownTimer = () => {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity onPress={() => setShowModal(true)}>
+      <TouchableOpacity onPress={() => setShowModal(true)} testID='setTime'>
         <Text style={styles.timeText}>{formatTime(time)}</Text>
       </TouchableOpacity>
       <View style={styles.line} />

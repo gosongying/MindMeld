@@ -33,8 +33,8 @@ const Clock = ({ navigation }) => {
     return () => clearInterval(interval);
   }, []);
 
-  const goToHome = () => navigation.navigate('StudyDashboard');
-
+  const goToHome = () => navigation.goBack();
+  
   return (
     <View style={styles.container}>
       <View style={styles.header}>

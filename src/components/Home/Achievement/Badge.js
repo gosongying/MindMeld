@@ -54,7 +54,7 @@ const Badge = () => {
         setUsername(user.username);
         setPhoto(user.photo);
         setXp(user.xp);
-        setNumberOfStudyBuddies(user.friendList ? user.friendList.length : 0);
+        setNumberOfStudyBuddies(user.friendList? user.friendList.length: 0);
         setNumberOfFeeds(user.numberOfFeeds);
         setNumberOfComments(user.numberOfComments);   
         setTimeInStudySession(user.timeInSession);

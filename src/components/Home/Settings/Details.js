@@ -11,7 +11,6 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import * as ImagePicker from 'expo-image-picker';
 import { ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage"
 import Fontisto from 'react-native-vector-icons/Fontisto';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { Dimensions } from 'react-native';
 
 const screenWidth = Dimensions.get('window').width;
@@ -22,7 +21,7 @@ const Details = ({ navigation }) => {
   //but not navigating to the page first. It will function well when the 
   //profile page is done.
 
-  const currentUser = auth.currentUser;
+  const currentUser = auth?auth.currentUser:null;
 
   const oldUsername = currentUser ? currentUser.displayName : null;
 
@@ -47,7 +46,7 @@ const Details = ({ navigation }) => {
 
   useEffect(() => {
     if (!isAnonymous) {
-      const userRef = ref(database, 'userId/' + currentUser.uid);
+      const userRef = ref(database, 'userId/' + currentUser?.uid);
   
       const unsubscribe = onValue(userRef, (snapshot) => {
         if (snapshot.exists()) {
@@ -109,7 +108,7 @@ const Details = ({ navigation }) => {
     //if the username changes
     const newUsernameRef = databaseRef(database, 'usernames/' + newUsername.trim());
     const oldUsernameRef = databaseRef(database, 'usernames/' + oldUsername);
-    const userIdRef = databaseRef(database, 'userId/' + currentUser.uid);
+    const userIdRef = databaseRef(database, 'userId/' + currentUser?.uid);
     try {
       //retrieve user's old data
       get(oldUsernameRef)
@@ -126,7 +125,7 @@ const Details = ({ navigation }) => {
           return oldUser.val();
         }
       })
-      .then((result) => {
+      .then(async (result) => {
         if (result.committed) {
           //if set username successfully
           Alert.alert("Success", 'Username updated')
@@ -135,7 +134,7 @@ const Details = ({ navigation }) => {
             username: newUsername.trim()
           })
           updateProfile(currentUser, {
-          displayName: newUsername.trim(),
+            displayName: newUsername.trim(),
           }).then(() => {
             setLoading(false);
             setIsEditingUsername(false);
@@ -201,7 +200,7 @@ const Details = ({ navigation }) => {
       const newImage = await uploadImageAsync(result.assets[0].uri)
       .catch((error) => console.log(error));
 
-      update(databaseRef(database, 'userId/' + currentUser.uid), {
+      update(databaseRef(database, 'userId/' + currentUser?.uid), {
         photo: newImage
       }).catch((error) => {
         console.log(error);
@@ -302,6 +301,7 @@ const Details = ({ navigation }) => {
             onSubmitEditing={handleChangedUsername}
             autoCapitalize='none'
             autoFocus={true}
+            testID='usernameInput'
             />
           ) : (
             <View style={styles.nameAndEdit}>
@@ -323,22 +323,24 @@ const Details = ({ navigation }) => {
                 <View style={styles.icons}>
                 <TouchableOpacity 
                 onPress={editUsername}
-                disabled={isLoading}>
+                disabled={isLoading}
+                testID='editUsername'>
                   <Ionicons name="create" size={20} />
                 </TouchableOpacity>
 
                 <TouchableOpacity 
                 onPress={selectImageLibrary}
-                disabled={isLoading}>
+                disabled={isLoading}
+                testID='selectImageLibrary'>
                   <FontAwesome name={'photo'} size={15} />
                 </TouchableOpacity>
 
                 <TouchableOpacity 
                 onPress={selectImageCamera}
-                disabled={isLoading}>
+                disabled={isLoading}
+                testID='selectImageCamera'>
                   <MaterialCommunityIcons name={'camera-outline'} size={19} />
                 </TouchableOpacity>
-
 
                 </View>
               )}

@@ -22,6 +22,7 @@ const Tasks = ({ navigation }) => {
   const [taskTime, setTaskTime] = useState('');
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [showMessage, setShowMessage] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -76,7 +77,8 @@ const Tasks = ({ navigation }) => {
   const addTask = () => {
     if (newTask.trim() !== '') {
       setShowModal(true);
-      setTaskTime('');
+      setTaskTime(`${selectedDate.getDate()}/${selectedDate.getMonth() + 1} ${selectedDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`);
+      //setTaskTime('');
       Keyboard.dismiss(); 
     }
   };
@@ -88,6 +90,13 @@ const Tasks = ({ navigation }) => {
       return updatedTasks;
     });
   };  
+
+  const handleShowMessage = () => {
+    setShowMessage(true);
+    setTimeout(() => {
+        setShowMessage(false) 
+    }, 2000);
+  };
 
   const removeTask = (index) => {
     setTasks((prevTasks) => {
@@ -116,7 +125,7 @@ const Tasks = ({ navigation }) => {
 
   const minimumDate = new Date(new Date().getTime() + 60000); 
 
-  const goToHome = () => navigation.navigate('StudyDashboard');
+  const goToHome = () => navigation.goBack();
   const confirmReset = () => {
     setShowModal2(true)
     
@@ -136,23 +145,29 @@ const Tasks = ({ navigation }) => {
           <Text style={styles.back}>{'\u2190'}</Text>
         </TouchableOpacity>
         <Text style={styles.title}>Tasks</Text>
-        <TouchableOpacity style={styles.closeButton} onPress={confirmReset}>
+        <TouchableOpacity style={styles.closeButton} onPress={confirmReset} testID='reset'>
           <AntDesign name="close" size={24} color="#fff" />
         </TouchableOpacity>
       </View>
 
+      {showMessage && (
+        <View style={styles.message}> 
+            <Text style={styles.messageText}>Hold to remove</Text>
+        </View>
+      )}
         <View style={styles.taskContainer}>
           <FlatList
             data={tasks}
             renderItem={({ item, index }) => (
               <TouchableOpacity
                 style={styles.taskItem}
-                onPress={() => toggleTask(index)}
+                onPress={handleShowMessage}
                 onLongPress={() => removeTask(index)}
+                testID={`${index}`}
               >
-                <View style={styles.checkbox}>
+                <TouchableOpacity style={styles.checkbox} onPress={() => toggleTask(index)} testID={`check${index}`}>
                   {item.checked && <Text style={styles.checkmark}>{'\u2713'}</Text>}
-                </View>
+                </TouchableOpacity>
                 <View style={styles.taskContent}>
                   <Text style={[styles.taskText, item.checked && styles.checkedText]}>
                     {item.title}
@@ -174,7 +189,7 @@ const Tasks = ({ navigation }) => {
             placeholder="Enter a new task"
             placeholderTextColor="#777777"
           />
-          <TouchableOpacity style={styles.addButton} onPress={addTask}>
+          <TouchableOpacity style={styles.addButton} onPress={addTask} testID='add'>
             <Text style={styles.addButtonText}>Add</Text>
           </TouchableOpacity>
         </View>
@@ -207,7 +222,7 @@ const Tasks = ({ navigation }) => {
                <TouchableOpacity style={styles.cancelButton} onPress={handleCancel}>
                  <Text style={styles.buttonText}>Cancel</Text>
                </TouchableOpacity>
-               <TouchableOpacity style={styles.confirmButton} onPress={handleConfirm}>
+               <TouchableOpacity style={styles.confirmButton} onPress={handleConfirm} testID='confirm'>
                   <Text style={styles.buttonText}>Confirm</Text>
                </TouchableOpacity>
               </View>
@@ -423,7 +438,23 @@ const styles = StyleSheet.create({
   },  
   datePickerText: {
     textAlign: 'center'
-  }
+  },
+  message: {
+    position: 'absolute',
+    width: 120,
+    height: 30,
+    backgroundColor: 'rgba(0,80,200, 0.5)',
+    top: 110,
+    left: 130,
+    zIndex: 1,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems:'center'
+  },
+  messageText: {
+    fontSize: 16,
+    color: 'white'
+  },
 });
 
 export default Tasks;

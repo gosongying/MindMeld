@@ -6,6 +6,7 @@ import {
   View,
   Text,
   StatusBar,
+  Alert,
 } from "react-native";
 import CarouselCard from "../../components/Authentication/CarouselCard";
 import { signInAnonymously, onAuthStateChanged, updateProfile } from "firebase/auth";
@@ -14,9 +15,6 @@ import { set, ref } from "firebase/database";
 
 
 const LandingPage = ({navigation}) => {
-
-  console.log("Landing")
-  console.log(navigation.getState().routes)
 
   const [isLoading, setLoading] = useState(false);
 
@@ -30,11 +28,11 @@ const LandingPage = ({navigation}) => {
     navigation.replace("Signup");  //go to signup screen
   }
 
-  const continueAsGuest = () => {  //to signin anonymously
+  const continueAsGuest = async () => {  //to signin anonymously
 
     setLoading(true);
 
-    signInAnonymously(auth)
+    /*signInAnonymously(auth)
     .then(() => {
       updateProfile(auth.currentUser, {
         displayName: 'Guest'
@@ -44,21 +42,23 @@ const LandingPage = ({navigation}) => {
         navigation.replace("Home");
       });
       })
-      .catch((error) => console.log(error));
-  };
+      .catch((error) => console.log(error));*/
 
-  /*useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        navigation.replace("Home");  //if signin anonymously successfully, navigate to Home screen
-        console.log(user);
-      } 
-    });
-    //to unsubscribe from the listener
-    return () => {
-      unsubscribe();
-    };
-  }, []);*/
+    try {
+      await signInAnonymously(auth)
+      .then(() => {
+        navigation.replace('Home');
+      })
+
+      const currentUser = auth? auth.currentUser: null;
+      updateProfile(currentUser, {
+        displayName: 'Guest'
+      })
+    } catch (error) {
+      console.log(error);
+      Alert.alert('Error');
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>

@@ -6,10 +6,9 @@ import { ref, runTransaction, set, get, onValue, update, child } from 'firebase/
 import Fontisto from 'react-native-vector-icons/Fontisto';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { AntDesign } from '@expo/vector-icons';
-import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
 
 const FriendListSetting = ({navigation}) => {
-    const currentUser = auth.currentUser;
+    const currentUser = auth?.currentUser;
 
     const [username, setUsername] = useState('');
     const [isAddingFriend, setIsAddingFriend] = useState(false);
@@ -26,7 +25,7 @@ const FriendListSetting = ({navigation}) => {
     useEffect(() => {
         //listen to the change of friend list
         //to get the latest friend list
-        const unsubscribe = onValue(ref(database, 'userId/' + currentUser.uid), async (snapshot) => {
+        const unsubscribe = onValue(ref(database, 'userId/' + currentUser?.uid), async (snapshot) => {
         let friends = [];
         const friendList = snapshot.val().friendList ? snapshot.val().friendList : [];
         if (friendList) {
@@ -192,7 +191,7 @@ const FriendListSetting = ({navigation}) => {
     const addFriend = (id) => {
         try {
             const userRef = ref(database, 'userId/');
-            const me = child(userRef, currentUser.uid);
+            const me = child(userRef, currentUser?.uid);
             const other = child(userRef, id);
             const newFriendList = [...friendListId, id];
             //update current user friendlist
@@ -210,11 +209,11 @@ const FriendListSetting = ({navigation}) => {
                     const friendList = profile.friendList;
                     if (friendList) {
                         //if the user has friends before
-                        friendList.push(currentUser.uid);
+                        friendList.push(currentUser?.uid);
                         return profile;
                     } else {
                         //if the user did not have friends before
-                        profile.friendList = [currentUser.uid];
+                        profile.friendList = [currentUser?.uid];
                         return profile;
                     }
                 } else {
@@ -285,7 +284,10 @@ const FriendListSetting = ({navigation}) => {
                     value={username}
                     onChangeText={(text) => setUsername(text)}>
                     </TextInput>
-                    <TouchableOpacity style={styles.addIcon} onPress={() => setIsAddingFriend(true)}>
+                    <TouchableOpacity 
+                    style={styles.addIcon} 
+                    testID='addFriend'
+                    onPress={() => setIsAddingFriend(true)}>
                         <Ionicons 
                         name='person-add-outline' 
                         size={30} 
@@ -306,7 +308,7 @@ const FriendListSetting = ({navigation}) => {
 
             {/* Prompt for adding friend */}
             <Modal visible={isAddingFriend || isCheckingFriend} transparent animationType='fade'>
-                { friendOrFriendSearched ? (
+                 { friendOrFriendSearched ? (
                     <View style={styles.userSearchedContainer}>
                         <View style={styles.userSearched}>
                             <View style={styles.backAndAdd}>
@@ -315,10 +317,10 @@ const FriendListSetting = ({navigation}) => {
                                 onPress={back}>
                                     <Text style={styles.back2}>{'\u2190'}</Text >  
                                 </TouchableOpacity>
-                                { friendOrFriendSearchedId === currentUser.uid ? (
+                                { friendOrFriendSearchedId === currentUser?.uid ? (
                                     <View style={{height: 40,width:40}}/>
                                 ) : !friendListId.includes(friendOrFriendSearchedId) ? (
-                                    <TouchableOpacity onPress={() => addFriend(friendOrFriendSearchedId)}>
+                                    <TouchableOpacity onPress={() => addFriend(friendOrFriendSearchedId)} testID='add'>
                                         <Ionicons name='add' size={40} style={{color:'white'}}/>
                                     </TouchableOpacity>
                                 ) : (
@@ -360,7 +362,7 @@ const FriendListSetting = ({navigation}) => {
                             </View>
                         </View>
                     </View>
-                ) : (
+                    ) : (
                     <View style={styles.promptContainer}>
                       <View style={styles.prompt}>
                         <Text style={styles.promptText}>Add Friends</Text>
@@ -375,10 +377,12 @@ const FriendListSetting = ({navigation}) => {
                             clearButtonMode='while-editing'
                             autoCorrect={false}
                             autoFocus
+                            testID='Enter username'
                             />
                             <TouchableOpacity 
                             style={styles.searchIcon}
-                            onPress={() => handleSearchFriend(usernameAdded)}>
+                            onPress={() => handleSearchFriend(usernameAdded)}
+                            testID='searchFriend'>
                                 <Ionicons 
                                 name='search' 
                                 color='white' 

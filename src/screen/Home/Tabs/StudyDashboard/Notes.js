@@ -56,7 +56,7 @@ const Notes = ({ navigation }) => {
     Keyboard.dismiss();
   };
 
-  const goToHome = () => navigation.navigate('StudyDashboard');
+  const goToHome = () => navigation.goBack();
 
   return (
     <KeyboardAvoidingView style={styles.container} behavior="height">
@@ -66,7 +66,7 @@ const Notes = ({ navigation }) => {
         </TouchableOpacity>
         <Text style={styles.title}>Notes</Text>
         <View style={styles.buttons}>
-          <TouchableOpacity style={styles.closeButton} onPress={clearNotes}>
+          <TouchableOpacity style={styles.closeButton} onPress={clearNotes} testID='clear'>
             <AntDesign name="close" size={24} color="#fff" />
           </TouchableOpacity>
           <TouchableOpacity style={styles.doneButton} onPress={handleDonePress}>
