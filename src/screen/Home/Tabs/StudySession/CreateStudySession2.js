@@ -25,6 +25,12 @@ const CreateStudySession2 = ({ navigation }) => {
   const [sessionName, setSessionName] = useState('');
   const [sessionDescription, setSessionDescription] = useState('');
 
+  useEffect(() => {
+    const currentDate = new Date(); // Get the current date
+    currentDate.setMinutes(currentDate.getMinutes() + 1); // Add 1 minute to the current time
+  }, []);
+
+
   const minimumDate = new Date(new Date().getTime() + 60000);
   const minimumEnd = startTime? new Date(startTime.getTime() + 60000): new Date(minimumDate.getTime() + 60000);
 
@@ -201,6 +207,7 @@ const CreateStudySession2 = ({ navigation }) => {
       />
       <DateTimePickerModal
         isVisible={isStartTimePickerVisible}
+        date={minimumDate}
         mode='time'
         onConfirm={handleStartTimeConfirm}
         onCancel={hideStartTimePicker}
@@ -209,6 +216,7 @@ const CreateStudySession2 = ({ navigation }) => {
       />
       <DateTimePickerModal
         isVisible={isEndTimePickerVisible}
+        date={minimumEnd}
         mode="time"
         onConfirm={handleEndTimeConfirm}
         onCancel={hideEndTimePicker}

@@ -202,6 +202,7 @@ const CreateStudySession = ({ navigation }) => {
       />
       <DateTimePickerModal
         isVisible={isStartTimePickerVisible}
+        date={minimumDate}
         mode='time'
         onConfirm={handleStartTimeConfirm}
         onCancel={hideStartTimePicker}
@@ -210,6 +211,7 @@ const CreateStudySession = ({ navigation }) => {
       />
       <DateTimePickerModal
         isVisible={isEndTimePickerVisible}
+        date={minimumEnd}
         mode="time"
         onConfirm={handleEndTimeConfirm}
         onCancel={hideEndTimePicker}
