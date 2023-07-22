@@ -267,7 +267,7 @@ const FriendListSetting = ({navigation}) => {
                     >
                     <Text style={styles.back}>{'\u2190'}</Text >  
                     </TouchableOpacity>
-                    <Text style={styles.headerText}>Study Buddies</Text>
+                    <Text style={styles.headerText}>Study Buddy</Text>
                 </View>
                 <View style={styles.searchContainer}>
                 

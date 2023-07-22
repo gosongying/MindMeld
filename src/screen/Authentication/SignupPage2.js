@@ -298,7 +298,7 @@ const SignupPage2 = ({ navigation}) => {
                   onPress={selectImageLibrary}
                   disabled={isLoading}
                   testID='1'>
-                    <FontAwesome name={'photo'} size={30} />
+                    <FontAwesome name={'photo'} size={28} />
                   </TouchableOpacity>
                   <TouchableOpacity 
                   style={styles.pictureText} 
