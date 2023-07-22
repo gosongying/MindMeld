@@ -98,13 +98,13 @@ const StudySession = ({navigation}) => {
                                 });
                             }
                         } else {
-                            ended.push(id);
+                            ended.push(sessionObj.id);
                             return;
                         }
                     })
                     .catch((error) => {
                         console.log(error);
-                        Alert.alert("An error occurs");
+                        Alert.alert("An error occurs1");
                     });
                     return;
                 }));
@@ -385,13 +385,8 @@ const StudySession = ({navigation}) => {
                 //add the session into user's ongoing sessions
                 runTransaction(child(db, 'userId/' + currentUser?.uid), (user) => {
                     if (user) {
-                        if (user.ongoingSessions) {
-                            user.ongoingSessions.push(session.id);
-                            return user;
-                        } else {
-                            user.ongoingSessions = [session.id];
-                            return user;
-                        }
+                        user.ongoingSessions = session.id;
+                        return user;
                     } else {
                         return user;
                     }
@@ -630,10 +625,7 @@ const SessionHeader = ({setIsCheckingInvitation, setSessionName, invitationIds})
 
                 <TouchableOpacity
                     style={styles.news}
-                    onPress={() => {
-                        console.log(invitationIds.length);
-                        setIsCheckingInvitation(true);
-                    }}
+                    onPress={() => setIsCheckingInvitation(true)}
                     >
                     {invitationIds.length >= 0 && (
                         <View style={styles.notificationContainer}>
@@ -845,7 +837,7 @@ const styles = StyleSheet.create({
     inProgress: {
         position: 'absolute',
         width: 120,
-        top: -60,
+        top: -50,
         right: 5,
         borderRadius: 10,
         backgroundColor: '#8A2BE2',

@@ -14,9 +14,7 @@ import { auth } from '../../../../../firebase';
 
 const CreateStudySession2 = ({ navigation }) => {
 
-  const isAnonymous = auth.currentUser.isAnonymous;
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-  const [studyModeEnabled, setStudyModeEnabled] = useState(isAnonymous);
   const [selectedDate, setSelectedDate] = useState(null);
   const [isStartTimePickerVisible, setStartTimePickerVisibility] = useState(false);
   const [isEndTimePickerVisible, setEndTimePickerVisibility] = useState(false);
@@ -24,12 +22,6 @@ const CreateStudySession2 = ({ navigation }) => {
   const [endTime, setEndTime] = useState(null);
   const [sessionName, setSessionName] = useState('');
   const [sessionDescription, setSessionDescription] = useState('');
-
-  useEffect(() => {
-    const currentDate = new Date(); // Get the current date
-    currentDate.setMinutes(currentDate.getMinutes() + 1); // Add 1 minute to the current time
-  }, []);
-
 
   const minimumDate = new Date(new Date().getTime() + 60000);
   const minimumEnd = startTime? new Date(startTime.getTime() + 60000): new Date(minimumDate.getTime() + 60000);
@@ -97,27 +89,9 @@ const CreateStudySession2 = ({ navigation }) => {
     } else if (!endTime) {
       Alert.alert("Please select end time");
     } else {
-      if (isAnonymous) {
-        //anonymous user does not have study buddy feature
-        navigation.navigate('SelectToDo', {
-          sessionName, 
-          sessionDescription,
-          studyModeEnabled,
-          selectedDate: selectedDate.toDateString(),
-          startTime: {
-            string: startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), 
-            timestamp: selectedDate.setHours(startTime.getHours(), startTime.getMinutes(), startTime.getSeconds(), startTime.getMilliseconds())
-          },
-          endTime:  {
-            string: endTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            timestamp: selectedDate.setHours(endTime.getHours(), endTime.getMinutes(), endTime.getSeconds(), endTime.getMilliseconds())
-          }
-        });
-      } else { 
         navigation.navigate('SelectBuddies', {
           sessionName, 
           sessionDescription,
-          studyModeEnabled,
           selectedDate: selectedDate.toDateString(),
           startTime: {
             string: startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), 
@@ -128,7 +102,6 @@ const CreateStudySession2 = ({ navigation }) => {
             timestamp: selectedDate.setHours(endTime.getHours(), endTime.getMinutes(), endTime.getSeconds(), endTime.getMilliseconds())
           }
         });
-      }
     }
   };
 
@@ -207,7 +180,6 @@ const CreateStudySession2 = ({ navigation }) => {
       />
       <DateTimePickerModal
         isVisible={isStartTimePickerVisible}
-        date={minimumDate}
         mode='time'
         onConfirm={handleStartTimeConfirm}
         onCancel={hideStartTimePicker}
@@ -216,7 +188,6 @@ const CreateStudySession2 = ({ navigation }) => {
       />
       <DateTimePickerModal
         isVisible={isEndTimePickerVisible}
-        date={minimumEnd}
         mode="time"
         onConfirm={handleEndTimeConfirm}
         onCancel={hideEndTimePicker}

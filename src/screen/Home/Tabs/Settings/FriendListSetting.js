@@ -95,7 +95,7 @@ const FriendListSetting = ({navigation}) => {
                             style={styles.avatar}/>
                         )}
                         {/* status indicator */}
-                        {item.status > 0 && <View style={styles.statusIndicator}/>}
+                        {item.status && <View style={styles.statusIndicator}/>}
                         <View style={styles.friendInfo}>
                             <View style={styles.nameAndGender}>
                                 <Text style={styles.friendName} numberOfLines={1}>{item.username}</Text>
@@ -109,7 +109,7 @@ const FriendListSetting = ({navigation}) => {
                         <TouchableOpacity onPress={() => handleChat(item)}>
                             <Ionicons name="chatbubble-outline" size={25} style={{right: 40}} />
                         </TouchableOpacity>
-                        <TouchableOpacity onPress={() => setDeletingFriend(item)}>
+                        <TouchableOpacity onPress={() => setDeletingFriend(item)} testID={`${item.uid}`}>
                             <MaterialIcons 
                             name={"delete"}
                             size={25} 

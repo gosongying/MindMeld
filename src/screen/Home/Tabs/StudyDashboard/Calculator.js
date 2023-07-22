@@ -30,7 +30,7 @@ const Calculator = ({ navigation }) => {
       setResult(result);
     } catch (error) {
       Alert.alert('Incorrect mathematical expression');
-      console.log(error);
+      //console.log(error);
     }
   };
 

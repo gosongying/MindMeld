@@ -2,8 +2,11 @@ import React from 'react';
 import { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, FlatList, KeyboardAvoidingView, Dimensions, Keyboard, Alert, Modal, ScrollView} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import {auth, database} from '../../../../firebase';
+import {increment, onValue, ref, runTransaction} from 'firebase/database';
+import { onAuthStateChanged } from 'firebase/auth';
 
-import firebase from 'firebase/compat/app';
+/*import firebase from 'firebase/compat/app';
 import 'firebase/compat/database';
 import 'firebase/compat/auth';
 
@@ -21,24 +24,26 @@ if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
 }
 
-const database = firebase.database();
+const database = firebase.database();*/
 
 const useUsername = (uid) => {
   const [username, setUsername] = useState(null);
 
   useEffect(() => {
-    const userIdRef = firebase.database().ref(`userId/${uid}/username`);
+    const userIdRef = ref(database, `userId/${uid}/username`);
 
     const handleSnapshot = (snapshot) => {
       const username = snapshot.val();
       setUsername(username);
     };
 
-    userIdRef.on('value', handleSnapshot);
+    const unsubscribe = onValue(userIdRef, handleSnapshot);
+    //userIdRef.on('value', handleSnapshot);
 
     return () => {
       // Cleanup the event listener when the component unmounts
-      userIdRef.off('value', handleSnapshot);
+      //userIdRef.off('value', handleSnapshot);
+      unsubscribe();
     };
   }, [uid]);
 
@@ -65,8 +70,8 @@ const PostScreen = ({ route, navigation }) => {
   const username = useUsername(post.userId);
 
   const editPost = () => {
-    const postRef = database.ref(`posts/${currentPostId}`);
-    postRef.update({
+    const postRef = ref(database, `posts/${currentPostId}`);
+    update(postRef, {
       title: editedPostTitle,
       content: editedPostContent,
     });
@@ -85,35 +90,58 @@ const PostScreen = ({ route, navigation }) => {
 
   useEffect(() => {
     // Check if the post exists
-    const postRef = firebase.database().ref(`posts/${post.id}`);
-    const postListener = postRef.on('value', (snapshot) => {
+    const postRef = ref(database, `posts/${post.id}`);
+    const unsubscribe = onValue(postRef, (snapshot) => {
+      const postData = snapshot.val();
+      if(!postData) {
+        Alert.alert('Post Deleted', 'The post you are viewing has been deleted.', [
+          { text: 'OK', onPress: () => navigation.goBack() }
+        ]);
+      }
+    })
+
+    /*const postListener = postRef.on('value', (snapshot) => {
       const postData = snapshot.val();
       if (!postData) {
         Alert.alert('Post Deleted', 'The post you are viewing has been deleted.', [
           { text: 'OK', onPress: () => navigation.goBack() }
         ]);
       }
-    });
+    });*/
   
     return () => {
       // Cleanup event listener when the component unmounts
-      postRef.off('value', postListener);
+      //postRef.off('value', postListener);
+      unsubscribe();
     };
   }, [navigation, post.id]);
   ;
 
   useEffect(() => {
     // Check the user authentication status
-    const authListener = firebase.auth().onAuthStateChanged((user) => {
-      setUserAuthenticated(!!user);
+    const authListener = onAuthStateChanged(auth, (user) => {
+      setUserAuthenticated(user);
     });
   
     // Fetch the comments for the post from the database
-    const postCommentsRef = database.ref(`posts/${post.id}/comments`);
+    const postCommentsRef = ref(database, `posts/${post.id}/comments`);
     // Remove the previous listener before adding a new one
-    postCommentsRef.off('value');
+    //postCommentsRef.off('value');
 
-    const commentsListener = postCommentsRef.on('value', (snapshot) => {
+    const commentsListener = onValue(postCommentsRef, (snapshot) => {
+      const data = snapshot.val();
+      if(data) {
+        const commentArray = Object.keys(data).map((key) => ({
+          id: key,
+          ...data[key],
+        }));
+        setComments(commentArray);
+      } else {
+        setComments([]);
+      }
+    });
+
+    /*const commentsListener = postCommentsRef.on('value', (snapshot) => {
       const data = snapshot.val();
       if (data) {
         const commentArray = Object.keys(data).map((key) => ({
@@ -124,18 +152,23 @@ const PostScreen = ({ route, navigation }) => {
       } else {
         setComments([]);
       }
-    });
+    });*/
   
     // Listen for changes to the comments count specifically
-    const commentsCountRef = database.ref(`posts/${post.id}/commentsCount`);
-    const commentsCountListener = commentsCountRef.on('value', (snapshot) => {
+    const commentsCountRef = ref(database, `posts/${post.id}/commentsCount`);
+    const commentsCountListener = onValue(commentsCountRef, (snapshot) => {
       const commentsCount = snapshot.val();
       setCommentsCount(commentsCount);
-    });
+    })
+
+    /*const commentsCountListener = commentsCountRef.on('value', (snapshot) => {
+      const commentsCount = snapshot.val();
+      setCommentsCount(commentsCount);
+    });*/
   
     // Listen for changes to the title, content, and isClosed properties of the post
-    const postRef = database.ref(`posts/${post.id}`);
-    const postListener = postRef.on('value', (snapshot) => {
+    const postRef = ref(database, `posts/${post.id}`);
+    const postListener = onValue(postRef, (snapshot) => {
       const postData = snapshot.val();
       if (
         postData &&
@@ -148,13 +181,31 @@ const PostScreen = ({ route, navigation }) => {
         setPostIsClosed(postData.isClosed);
         Alert.alert('Post Updated', 'The post has been modified.');
       }
-    });
+    })
+
+    /*const postListener = postRef.on('value', (snapshot) => {
+      const postData = snapshot.val();
+      if (
+        postData &&
+        (postTitle !== postData.title ||
+          postContent !== postData.content ||
+          postIsClosed !== postData.isClosed)
+      ) {
+        setPostTitle(postData.title);
+        setPostContent(postData.content);
+        setPostIsClosed(postData.isClosed);
+        Alert.alert('Post Updated', 'The post has been modified.');
+      }
+    });*/
   
     return () => {
       authListener(); // Remove the auth listener
-      postCommentsRef.off('value', commentsListener); // Remove the comments listener
-      commentsCountRef.off('value', commentsCountListener); // Remove the comments count listener
-      postRef.off('value', postListener); // Remove the post listener
+      //postCommentsRef.off('value', commentsListener); // Remove the comments listener
+      //commentsCountRef.off('value', commentsCountListener); // Remove the comments count listener
+      //postRef.off('value', postListener); // Remove the post listener
+      commentsListener();
+      commentsCountListener();
+      postListener();
     };
   }, [post.id]);
 
@@ -162,11 +213,11 @@ const PostScreen = ({ route, navigation }) => {
 
   const CommentItem = ({ item }) => {
     console.log(item);
-    console.log(firebase.auth().currentUser);
+    console.log(auth.currentUser);
     const [displayName, setDisplayName] = useState('');
 
     useEffect(() => {
-      const userIdRef = firebase.database().ref(`userId/${item.uid}/username`);
+      const userIdRef = ref(database, `userId/${item.uid}/username`);
     
       const handleSnapshot = (snapshot) => {
         const commentUsername = snapshot.val();
@@ -174,15 +225,17 @@ const PostScreen = ({ route, navigation }) => {
         setDisplayName(displayName);
       };
     
-      userIdRef.on('value', handleSnapshot);
+      const unsubscribe = onValue(userIdRef, handleSnapshot);
+      //userIdRef.on('value', handleSnapshot);
     
       return () => {
-        userIdRef.off('value', handleSnapshot);
+        //userIdRef.off('value', handleSnapshot);
+        unsubscribe();
       };
     }, [item.uid]);
     
   
-    const isCurrentUser = item.uid === firebase.auth().currentUser?.uid;
+    const isCurrentUser = item.uid === auth.currentUser?.uid;
 
     const deleteComment = (postId) => {
       if (post.isClosed) {
@@ -190,15 +243,22 @@ const PostScreen = ({ route, navigation }) => {
         return;
       }
   
-      const commentRef = database.ref(`posts/${post.id}/comments/${item.id}`);
-      commentRef.remove();
-      const postRef = database.ref(`posts/${postId}`);
-      postRef.transaction((post) => {
+      const commentRef = ref(database, `posts/${post.id}/comments/${item.id}`);
+      remove(commentRef);
+      const postRef = ref(database, `posts/${postId}`);
+      runTransaction(postRef, (post) => {
         if (post) {
           post.commentsCount = (post.commentsCount || 0) - 1;
         }
         return post;
-      });
+      })
+
+      /*ostRef.transaction((post) => {
+        if (post) {
+          post.commentsCount = (post.commentsCount || 0) - 1;
+        }
+        return post;
+      });*/
     };
     return (
       <View
@@ -211,7 +271,7 @@ const PostScreen = ({ route, navigation }) => {
           <View style={{ flexDirection: 'row' }}>
             <Text style={styles.username}>{displayName}</Text>
 
-            {firebase.auth().currentUser?.uid === item?.uid && (
+            {auth.currentUser?.uid === item?.uid && (
               <View style={{ flexDirection: 'row', marginLeft: 10, marginTop: -2 }}>
                 <TouchableOpacity
                   style={{ marginRight: 3 }}
@@ -229,6 +289,7 @@ const PostScreen = ({ route, navigation }) => {
                 <TouchableOpacity
                   style={{ marginLeft: 3 }}
                   onPress={() => deleteComment(post.id)}
+                  testID={`${item.id}`}
                 >
                   <Ionicons name="trash" size={18} color="red" />
                 </TouchableOpacity>
@@ -249,11 +310,11 @@ const PostScreen = ({ route, navigation }) => {
   };
 
   const addComment = (postId, comment) => {
-    const uid = firebase.auth().currentUser.uid;
-    const postCommentsRef = database.ref(`posts/${postId}/comments`);
-    const postRef = database.ref(`posts/${postId}`);
+    const uid = auth.currentUser.uid;
+    const postCommentsRef = ref(database, `posts/${postId}/comments`);
+    const postRef = ref(database, `posts/${postId}`);
 
-    const ref = database.ref('userId/' + uid);
+    const userRef = ref('userId/' + uid);
 
     // Create the comment data object
     const commentData = {
@@ -262,20 +323,20 @@ const PostScreen = ({ route, navigation }) => {
       timestamp: new Date().getTime()
     };
 
-    postCommentsRef.push(commentData);
+    push(postCommentsRef, commentData);
 
-    postRef.update({
-      commentsCount: firebase.database.ServerValue.increment(1),
+    update(postRef, {
+      commentsCount: increment(1)//firebase.database.ServerValue.increment(1),
     })
 
     // Adds 1 XP to the user
-    ref.update({
-      xp: firebase.database.ServerValue.increment(1),
+    update(userRef, {
+      xp: increment(1)//firebase.database.ServerValue.increment(1),
     });
 
     // Adds 1 to number of Comments
-    ref.update({
-      numberOfComments: firebase.database.ServerValue.increment(1),
+    update(userRef, {
+      numberOfComments: increment(1)//firebase.database.ServerValue.increment(1),
     });
 
     scrollToBottom();
@@ -349,9 +410,9 @@ const scrollToBottom = () => {
 const scrollViewRef = useRef(null);
 
 const editComment = (newText) => {
-  const commentRef = database.ref(`posts/${post.id}/comments/${selectedItem.id}`);
+  const commentRef = ref(database, `posts/${post.id}/comments/${selectedItem.id}`);
   console.log(commentRef);
-  commentRef.update({ comment: newText });
+  update(commentRef, { comment: newText });
 
   setEditedComment('');
   setEditCommentModal(false);
@@ -427,7 +488,7 @@ const editComment = (newText) => {
         </View>
       ) : (
         <View style={styles.commentInputContainer}>
-          {firebase.auth().currentUser && firebase.auth().currentUser.isAnonymous ? (
+          {auth.currentUser && auth.currentUser.isAnonymous ? (
             <View style={styles.commentInputContainer}>
               <TextInput
                 style={[styles.commentInput, { backgroundColor: '#E0E0E0',  textAlign: 'center' }]}

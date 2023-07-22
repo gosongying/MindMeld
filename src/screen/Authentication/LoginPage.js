@@ -12,9 +12,11 @@ import {
   Modal
 } from "react-native";
 
-import { auth } from "../../../firebase"
+import { auth, database } from "../../../firebase"
 
 import { signInWithEmailAndPassword, sendPasswordResetEmail } from "firebase/auth";
+
+import {get, ref, runTransaction} from 'firebase/database';
 
 const LoginPage = ({navigation}) => {
     
@@ -103,22 +105,42 @@ const LoginPage = ({navigation}) => {
     };
   }, []);*/
 
-  const loginUser = (email, password) => {
+  const loginUser = async (email, password) => {
 
     setFirstLoading(true);
     setLeaving(true);
 
-    signInWithEmailAndPassword(auth, email, password)
-    .then((userCredential) => {
-      //user signin successfully
-      const user = userCredential.user;
-      if (user.displayName) {
-        //if the user did set username
-        navigation.replace("Home");
-      } else {
-        //if the user has not set username yet
-        navigation.replace("Signup2");
-      }
+    await signInWithEmailAndPassword(auth, email, password)
+    .then(async (userCredential) => {
+      await get(ref(database, 'userId/' + userCredential.user.uid))
+      .then((snapshot) => {
+        if (snapshot.exists()) {
+          if (snapshot.val().status) {
+            //if the account is logged in
+            setFirstLoading(false);
+            setLeaving(false);
+            Alert.alert('This account is being logged in by other device');
+            return;
+          } else {
+            if (userCredential.user.displayName) {
+              //if the user did set username
+              navigation.replace("Home");
+            } else {
+              Alert.alert('aa')
+              //if the user has not set username yet
+              navigation.replace("Signup2");
+            }
+          }
+        } else {
+          if (userCredential.user.displayName) {
+            //if the user did set username
+            navigation.replace("Home");
+          } else {
+            //if the user has not set username yet
+            navigation.replace("Signup2");
+          }
+        }
+      });
     })
     .catch((error) => {
       //handle error when login

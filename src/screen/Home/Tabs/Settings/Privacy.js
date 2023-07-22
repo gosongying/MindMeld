@@ -41,7 +41,7 @@ import { runTransaction, ref, onValue, get, set, push } from 'firebase/database'
         .catch((error) => {
           console.error("Failed to get interests:", error);
         });
-    }, [currentUser.uid]);
+    }, []);
 
     const goToHome = () => navigation.goBack();
 
@@ -81,6 +81,39 @@ import { runTransaction, ref, onValue, get, set, push } from 'firebase/database'
     const handleConfirmation = async () => {
       setIsLoading(true);
       try {
+        //check for validation of password
+        /*if (newPassword1 === '' && newPassword2 !== '') {
+          Alert.alert("Enter your password");
+          setIsLoading(false);
+          return;
+        } 
+    
+        if (newPassword1 !== '' && newPassword2 === '') {
+          Alert.alert("Confirm your password")
+          setIsLoading(false);
+          return;
+        } 
+    
+        if (newPassword1 !== newPassword2) {
+          Alert.alert("Passwords do not match");
+          setIsLoading(false);
+          return;
+        }
+
+        await Promise.all([
+          updateEmail(currentUser, newEmail),
+          newPassword1 && updatePassword(currentUser, newPassword1),
+          //const interestsRef = ref(database, `userId/${currentUser.uid}/interests`);
+          set(ref(database, `userId/${currentUser.uid}/interests`), interests)
+        ])
+        .then(() => {
+          goToHome();
+          setIsLoading(false);
+          Alert.alert('Successfully updated changes');
+        })*/
+
+
+
         await updateEmail(currentUser, newEmail)
         .then(async () => {
           //check for validation of password
@@ -106,10 +139,12 @@ import { runTransaction, ref, onValue, get, set, push } from 'firebase/database'
           .then(() => {
            // Update the interests in the database
             const interestsRef = ref(database, `userId/${currentUser.uid}/interests`);
-            set(interestsRef, interests);
-            goToHome();
-            setIsLoading(false);
-            Alert.alert("Updated changes");
+            set(interestsRef, interests)
+            .then(() => {
+              goToHome();
+              setIsLoading(false);
+              Alert.alert('Successfully updated changes');
+            });
           });
         });
       } catch (error) {
@@ -122,6 +157,7 @@ import { runTransaction, ref, onValue, get, set, push } from 'firebase/database'
         } else if (errorCode === "auth/weak-password") {
           Alert.alert("Password must be at least 6 characters");
         } else {
+          console.log(error)
           Alert.alert("Error");
         }
       }

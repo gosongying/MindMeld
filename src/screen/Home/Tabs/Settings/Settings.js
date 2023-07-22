@@ -63,7 +63,7 @@ const Settings = ({navigation}) => {
           if (currentUser && !currentUser.isAnonymous) { // Check if currentUser exists and is not anonymous
             runTransaction(ref(database, 'userId/' + id), (profile) => {
               if (profile) {
-                profile.status--;
+                profile.status = false;
                 return profile;
               } else {
                 return profile;

@@ -2,7 +2,6 @@ import { render, fireEvent, act } from '@testing-library/react-native';
 import React from 'react';
 import Timer from '../src/screen/Home/Tabs/StudyDashboard/Timer';
 import Stopwatch from '../src/screen/Home/Tabs/StudyDashboard/Stopwatch';
-import { getBytes } from 'firebase/storage';
 
 jest.useFakeTimers();
 

@@ -111,7 +111,7 @@ const Badge = () => {
       name: 'Time Tracker',
       icon: faClock,
       description: 'Spend 1 hour in the Study Session',
-      progress: timeInStudySession.toFixed(1),
+      progress: timeInStudySession,
       requirement: 1,
       requirementString: 'hour',
       unlocked: timeInStudySession >= 1
@@ -121,7 +121,7 @@ const Badge = () => {
       name: 'Time Alchemist',
       icon: faStopwatch,
       description: 'Spend 10 hours in the Study Session',
-      progress: timeInStudySession.toFixed(1),
+      progress: timeInStudySession,
       requirement: 10,
       requirementString: 'hours',
       unlocked: timeInStudySession >= 10
@@ -131,7 +131,7 @@ const Badge = () => {
       name: 'Hourglass Sage',
       icon: faHourglass,
       description: 'Spend 25 hours in the Study Session',
-      progress: timeInStudySession.toFixed(1),
+      progress: timeInStudySession,
       requirement: 25,
       requirementString: 'hours',
       unlocked: timeInStudySession >= 25
@@ -141,7 +141,7 @@ const Badge = () => {
       name: 'Master of Time',
       icon: faHourglass2,
       description: 'Spend 100 hours in the Study Session',
-      progress: timeInStudySession.toFixed(1),
+      progress: timeInStudySession,
       requirement: 100,
       requirementString: 'hours',
       unlocked: timeInStudySession >= 100

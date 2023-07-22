@@ -16,7 +16,8 @@ const SearchBuddy = () => {
     const [isLoading, setIsLoading] = useState(false);
   
     const position = new Animated.ValueXY();
-    
+
+
     const onRelease = (event, gesture) => {
         const { dx } = gesture;
       
@@ -61,7 +62,6 @@ const SearchBuddy = () => {
         if (snapshot.exists()) {
           const currentUser = snapshot.val();
           const currentUserInterests = currentUser.interests || [];
-          setUserInterest(currentUserInterests);
           const currentUserFriends = currentUser.friendList || [];
     
           const unsubscribeAllUsers = onValue(allUsersRef, (snapshot) => {
@@ -76,11 +76,9 @@ const SearchBuddy = () => {
                 // Compare interests (at least one common interest)
                 const userInterests = user.interests || [];
                 const commonInterests = currentUserInterests.filter(interest => userInterests.includes(interest));
-                console.log(commonInterests);
                 setCommonInterests(commonInterests);
                 return commonInterests.length > 0; 
               });
-
                 // Shuffle the cards
                 // const shuffledUsers = matchedUsers.slice().sort(() => 0.5 - Math.random())
                 setUsers(matchedUsers);
@@ -120,10 +118,9 @@ const SearchBuddy = () => {
       }
     
     const renderCards = () => {
-
         const nextCardOpacity = position.x.interpolate({
             inputRange: [-SCREEN_WIDTH / 2, 0, SCREEN_WIDTH / 2],
-            outputRange: [1, 0.5, 1],
+            outputRange: [1, 0, 1],
             extrapolate: 'clamp'
           });
         
@@ -171,17 +168,14 @@ const SearchBuddy = () => {
           }
         });
       };
-
-      const nextCard = () => {
-        setCurrentIndex((prevIndex) => prevIndex + 1);
-        resetPosition();
-      };
+      
   
       const handleYup = (card) => {
         // Add Friend
         console.log(users);
         console.log("Added as Friend: ", card.name);
         console.log("User ID: ", card.uid);
+
         setCurrentIndex(currentIndex - 1);
         nextCard();
         setIsLoading(true);
@@ -189,6 +183,7 @@ const SearchBuddy = () => {
         const currentUserUid = auth.currentUser?.uid;
       
         const friendListRef = ref(database, `userId/${currentUserUid}/friendList`);
+
         const otherFriendListRef = ref(database, `userId/${card.uid}/friendList`);
       
         // Use Promise.all to handle both database update operations
@@ -227,6 +222,8 @@ const SearchBuddy = () => {
             setIsLoading(false);
             console.log("Error adding friend:", error);
           });
+      
+        nextCard();
       };
   
     const handleNope = (card) => {
@@ -235,6 +232,12 @@ const SearchBuddy = () => {
       nextCard();
     };
   
+    const nextCard = () => {
+      setCurrentIndex((prevIndex) => prevIndex + 1);
+      resetPosition();
+    };
+  
+
     const Card = ({ card }) => {
       const level = Math.floor(card.xp / 100) + 1;
       const trophyColour = level < 10 ? "#808080" : level < 20 ? "#B87333" : level < 30 ? '#C0C0C0' : level < 40 ? 'gold' : level < 50 ? '#50C878' : '#6EB2D4';
@@ -254,6 +257,7 @@ const SearchBuddy = () => {
     
 
       return (
+        <View style={{flex: 1}}>
         <View style={styles.card}>
           {card.photo ? (
             <Image source={{ uri: card.photo }} style={styles.profilePicture} />
@@ -263,7 +267,7 @@ const SearchBuddy = () => {
               style={styles.profilePicture}
             />
           )}
-          <View style={{ flexDirection: 'row', alignItems: 'center'}}>
+          <View style={{ flexDirection: 'row' }}>
             <Text style={styles.username}>{card.username}</Text>
             {card.gender === 'male' ? (
               <Fontisto name="male" size={18} color="dodgerblue" style={{ marginLeft: 10, marginTop: 11 }} />
@@ -274,7 +278,10 @@ const SearchBuddy = () => {
             )}
           </View>
 
-            <View style={{ flexDirection: 'column', alignItems: 'flex-start', alignSelf: 'flex-start', marginTop: 20}}>
+        <View>
+            
+        </View>
+          <View style={{marginVertical: 10, alignItems: 'flex-start', width: '100%'}}>
             <Text style={styles.interestsLabel}>Achievements</Text>
             <View style={styles.levelContainer}>
                 <Text style={styles.levelText}>Level {level}</Text>
@@ -288,23 +295,16 @@ const SearchBuddy = () => {
                     />
                 </View>
             </View>
+          </View>
           
-          
-            {card.interests ? (
-                <View style={{}}>
-                    <Text style={[styles.interestsLabel, {marginTop: 10}]}>Common Interests</Text>
-                    <Text style={styles.interests}>
-                    {userInterest
-                        .filter((interest) => card.interests.includes(interest))
-                        .join(", ")}
-                    </Text>
-                </View>
-                ) : (
-                <Text style={styles.interests}>No common interests</Text>
-                )}
+          {card.interests ? (
+            <View style={{width: '100%'}}>
+                <Text style={styles.interestsLabel}>Common Interests</Text>
+                <Text style={styles.interests}>{commonInterests.join(", ")}</Text>
             </View>
-          
-
+            ) : (
+            <Text style={styles.interests}>No common interests</Text>
+            )}
             {currentIndex === users.indexOf(card) && (
                 <Animated.View
                 style={{
@@ -355,6 +355,7 @@ const SearchBuddy = () => {
                 </Text>
                 </Animated.View>
             )}
+            </View>
             </View>
         );
     };
@@ -421,7 +422,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#FFF',
         borderRadius: 10,
         padding: 20,
-        height: 350,
+        height: 300,
         width: 300,
     },
     cardText: {
@@ -438,7 +439,6 @@ const styles = StyleSheet.create({
         width: 110,
         height: 110,
         borderRadius: 60,
-        marginTop: 15, 
     },
     levelContainer: {
         flexDirection: 'row',

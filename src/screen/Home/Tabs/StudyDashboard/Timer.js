@@ -66,10 +66,12 @@ const CountdownTimer = () => {
     const newTime = parseInt(tempInputTime, 10);
     if (!isNaN(newTime)) {
       // Delay the update of time by 100 milliseconds
-      setTimeout(() => {
+      const timeout = setTimeout(() => {
         setTime(newTime);
         setInputTime(tempInputTime);
       }, 100);
+
+      return () => clearTimeout(timeout);
     }
   };
 

@@ -3,6 +3,7 @@ import { auth } from "../../../firebase"
 import { StyleSheet, View, Text, Image } from "react-native";
 
 const EntryPage = ({navigation}) => {
+    console.log('Entry')
 
     useEffect(() => {
         const delay = setTimeout(() => {
