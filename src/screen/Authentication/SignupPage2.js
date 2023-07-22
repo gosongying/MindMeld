@@ -129,7 +129,7 @@ const SignupPage2 = ({ navigation}) => {
         groupList: [],
         photo: photo,
         uid: userId,
-        status: 0,
+        status: false,
         xp: 0,
         timeInSession: 0,
         numberOfFeeds: 0,

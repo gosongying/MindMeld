@@ -40,9 +40,9 @@ const SelectBuddies = ({navigation, route}) => {
     useEffect(() => {
         //listen to the change of friend list
         //to get the latest friend list
-        const unsubscribe = onValue(ref(database, 'userId/' + currentUser.uid), async (snapshot) => {
+        const unsubscribe = onValue(ref(database, 'userId/' + currentUser?.uid), async (snapshot) => {
           let friends = [];
-          const friendList = snapshot.val().friendList ? snapshot.val().friendList : [];
+          const friendList = snapshot.val()?.friendList ? snapshot.val().friendList : [];
           if (friendList) {
             setFriendListId(friendList);
             //to make sure friendlist is added before set
@@ -174,7 +174,7 @@ const SelectBuddies = ({navigation, route}) => {
                             style={styles.avatar}/>
                         )}
                         {/* status indicator */}
-                        {item.status > 0 && <View style={styles.statusIndicator}/>}
+                        {item.status  && <View style={styles.statusIndicator}/>}
                         <View style={styles.friendInfo}>
                             <View style={styles.nameAndGender}>
                                 <Text style={styles.friendName} numberOfLines={1}>{item.username}</Text>

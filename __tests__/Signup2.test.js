@@ -24,6 +24,10 @@ const navigation = {
     replace: jest.fn()
 };
 
+afterEach(() => {
+    navigation.replace.mockRestore()
+})
+
 describe('selectImageLibrary function', () => {
     it('Should select and set image when permission is granted and image is chosen', async () => {
         //virtually render the screen

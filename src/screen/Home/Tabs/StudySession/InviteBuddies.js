@@ -131,7 +131,7 @@ const InviteBuddies = ({
                             style={styles.avatar}/>
                         )}
                         {/* status indicator */}
-                        {item.status > 0 && <View style={styles.statusIndicator}/>}
+                        {item.status && <View style={styles.statusIndicator}/>}
                         <View style={styles.friendInfo}>
                             <View style={styles.nameAndGender}>
                                 <Text style={styles.friendName} numberOfLines={1}>{item.username}</Text>
@@ -171,6 +171,7 @@ const InviteBuddies = ({
     };
 
     const next = () => {
+        console.log(buddiesInvited)
         buddiesInvited.forEach(id => {
             const userRef = ref(database, 'userId/' + id);
             runTransaction(userRef, (profile) => {
@@ -182,6 +183,7 @@ const InviteBuddies = ({
                     }
                 } else {
                   profile.invitationList = [sessionId];
+                  console.log(profile.invitationList)
                   return profile;
                 }
               } else {

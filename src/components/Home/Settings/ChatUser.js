@@ -240,7 +240,7 @@ const styles = StyleSheet.create({
   },
   messageContent: {
     fontSize: 16,
-    maxWidth: '85%',
+    maxWidth: '80%',
   },
   headerContainer: {
     height: 110,

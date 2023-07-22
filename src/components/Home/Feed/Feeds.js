@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, ScrollView, Keyboard, Dimensions, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import * as ImagePicker from 'expo-image-picker';
-import { getDatabase, ref, set, push, update, remove, onValue, get } from "firebase/database";
+import { child, ref, set, push, update, remove, onValue, get, increment } from "firebase/database";
+import {database, auth} from '../../../../firebase';
+import { onAuthStateChanged } from 'firebase/auth';
 
-import firebase from 'firebase/compat/app';
+/*import firebase from 'firebase/compat/app';
 import 'firebase/compat/database';
 import 'firebase/compat/auth';
 
@@ -22,7 +23,7 @@ if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
 }
 
-const database = firebase.database();
+const database = firebase.database();*/
 
 
 const DynamicTimeText = ({ timestamp }) => {
@@ -124,9 +125,23 @@ const Feeds = ( {navigation}) => {
   };
   
   const createNewPost = () => {
-    const userId = firebase.auth().currentUser.uid;
-    console.log(userId);
+    const userId = auth?.currentUser.uid;
 
+      const userRef = ref(database, 'userId/' + userId);
+
+      // Adds 5 XP to the user
+      update(userRef, {
+        xp: increment(5)//firebase.database.ServerValue.increment(5),
+      });
+
+      // Adds 1 to number of Post
+      update(userRef, {
+        numberOfFeeds: increment(1)//firebase.database.ServerValue.increment(1),
+      });
+      
+      // Save the post data to the Realtime Database
+      const newPostRef = ref(database, 'posts/')//.push();
+      const key = push(newPostRef).key;
       const postData = {
         title: newPostTitle,
         userId: userId,
@@ -134,24 +149,11 @@ const Feeds = ( {navigation}) => {
         isClosed: false,
         timestamp: new Date().getTime(),
         commentsCount: 0,
-        comments: []
+        comments: [],
+        id: key
       }
-
-      const ref = database.ref('userId/' + userId);
-
-      // Adds 5 XP to the user
-      ref.update({
-        xp: firebase.database.ServerValue.increment(5),
-      });
-
-      // Adds 1 to number of Post
-      ref.update({
-        numberOfFeeds: firebase.database.ServerValue.increment(1),
-      });
-      
-      // Save the post data to the Realtime Database
-      const newPostRef = database.ref('posts').push();
-      newPostRef.set(postData);
+      set(child(newPostRef, key), postData);
+      //newPostRef.set(postData);
 
       // Close the modal and reset the input values and scroll to top.
       scrollViewRef.current.scrollTo({ y: 0, animated: true });
@@ -163,15 +165,30 @@ const Feeds = ( {navigation}) => {
   
   useEffect(() => {
     // Check the user authentication status
-    firebase.auth().onAuthStateChanged((user) => {
+    onAuthStateChanged(auth, (user) => {
         if (user) {
-        setUserAuthenticated(true);
+          setUserAuthenticated(true);
         } else {
-        setUserAuthenticated(false);
+          setUserAuthenticated(false);
         }
     });
+    const unsubscribe = onValue(ref(database, 'posts'), snapshot => {
+      const data = snapshot.val();
+      if(data) {
+        /*const postArray = Object.keys(data).map((key) => ({
+          id: key,
+          ...data[key]
+        }));*/
+        const postArray = Object.keys(data).map((key) => ({
+          ...data[key]
+        }));
+        setPosts(postArray);
+      } else {
+        setPosts([]);
+      }
+    });
     // Fetch the posts from the database on component mount
-    database.ref('posts').on('value', (snapshot) => {
+    /*database.ref('posts').on('value', (snapshot) => {
       const data = snapshot.val();
       if (data) {
         const postArray = Object.keys(data).map((key) => ({
@@ -182,11 +199,13 @@ const Feeds = ( {navigation}) => {
       } else {
         setPosts([]);
       }
-    });
+    });*/
 
     if (showModal) {
       titleInputRef.current.focus();
     }
+
+    return () => unsubscribe();
   }, [showModal]);
 
 
@@ -211,8 +230,8 @@ const closePost = (postId) => {
           text: 'Confirm',
           style: 'destructive',
           onPress: () => {
-            const postRef = database.ref(`posts/${postId}`);
-            postRef.update({
+            const postRef = ref(database, `posts/${postId}`);
+            update(postRef, {
               isClosed: true,
             });
           },
@@ -241,8 +260,9 @@ const closePost = (postId) => {
         {
           text: 'Delete',
           style: 'destructive',
-          onPress: () => {
-            database.ref(`posts/${postId}`).remove();
+          onPress: async () => {
+            await remove(ref(database, `posts/${postId}`));
+            //database.ref(`posts/${postId}`).remove();
           },
         },
       ]
@@ -250,8 +270,8 @@ const closePost = (postId) => {
   };
 
   const editPost = () => {
-    const postRef = database.ref(`posts/${currentPostId}`);
-    postRef.update({
+    const postRef = ref(database, `posts/${currentPostId}`);
+    update(postRef, {
       title: editedPostTitle,
       content: editedPostContent,
     });
@@ -299,12 +319,13 @@ const closePost = (postId) => {
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => {
-            if (firebase.auth().currentUser && firebase.auth().currentUser.isAnonymous) {
+            if (auth?.currentUser && auth?.currentUser.isAnonymous) {
               Alert.alert('Error', 'Guests cannot create posts');
             } else {
               setShowModal(true);
             }
           }}
+          testID='add'
           style={styles.newFeedButton}>
           <Ionicons name="add" size={36} color="#8A2BE2" />
         </TouchableOpacity>
@@ -316,6 +337,7 @@ const closePost = (postId) => {
             key={post.id}
             style={styles.forumItem}
             onPress={() => navigateToFeed(post)} // Pass the selected post to the navigateToFeed function
+            testID={`${post.id}`}
           >
 
             <View>
@@ -349,7 +371,7 @@ const closePost = (postId) => {
                 <View style={styles.timeSinceCreation}>
                  <DynamicTimeText timestamp={post.timestamp} />
                     {/* Lock, Edit and Delete Pressables */}
-                    {userAuthenticated && post.userId === firebase.auth().currentUser.uid && (
+                    {userAuthenticated && post.userId === auth?.currentUser.uid && (
                       <View style={styles.postButtons}>
                           {post.isClosed ? (
                           <TouchableOpacity
@@ -362,6 +384,7 @@ const closePost = (postId) => {
                           <TouchableOpacity
                               style={styles.closeButton}
                               onPress={() => closePost(post.id)}
+                              testID={`close${post.id}`}
                           >
                               <Ionicons name="lock-open-outline" size={22} color="green" />
                           </TouchableOpacity>
@@ -376,6 +399,7 @@ const closePost = (postId) => {
                               openEditModal(post);
                               }
                           }}
+                          testID={`edit${post.id}`}
                           >
                           <Ionicons name="pencil" size={22} color="#8A2BE2" />
                           </TouchableOpacity>
@@ -383,6 +407,7 @@ const closePost = (postId) => {
                           <TouchableOpacity
                           style={styles.deleteButton}
                           onPress={() => deletePost(post.id)}
+                          testID={`delete${post.id}`}
                           >
                           <Ionicons name="trash" size={22} color="red" />
                           </TouchableOpacity>

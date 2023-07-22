@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Alert, Pressable, Text } from 'react-native';
+import { Alert, AppState, Pressable, Text } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import StudyDashboardTab from './Tabs/StudyDashboardTab';
@@ -9,6 +9,7 @@ import SettingTab from './Tabs/SettingTab';
 import StudySessionTab from './Tabs/StudySessionTab';
 import { update, ref, onDisconnect, serverTimestamp, goOnline, onValue, increment, runTransaction, remove } from 'firebase/database';
 import { database, auth } from '../../../firebase';
+import { signOut } from 'firebase/auth';
 
 const HomePage = ({navigation}) => {
   const currentUser = auth.currentUser;
@@ -16,19 +17,54 @@ const HomePage = ({navigation}) => {
   console.log("Home");
 
   useEffect(() => {
+
     const userIdRef = ref(database, 'userId/' + currentUser.uid);
+
+    const handleStateChange = (state) => {
+      if (state === 'background' || state === 'inactive') {
+        runTransaction(userIdRef, (user) => {
+          if (user) {
+            user.status = false;
+            return user;
+          } else {
+            return user;
+          }
+        })
+      } else if (state === 'active') {
+        runTransaction(userIdRef, (profile) => {
+          if (profile) {
+            if (profile.status) {
+              signOut(auth)
+              .then(() => {
+                navigation.replace('Landing');
+                Alert.alert("You have been signed out");
+              })
+              .catch((error) => {
+                Alert.alert('Error');
+                console.log(error);
+              });
+              return profile;
+            } else {
+              profile.status = true;
+              return profile;
+            }
+          } else {
+            return profile;
+          }
+        });
+      }
+    }
+
+    const subscribe = AppState.addEventListener('change', handleStateChange);
+
     try {
       if (!currentUser.isAnonymous) {
         // to handle user online status when user closes the app suddenly
-        onDisconnect(userIdRef).update({ status: increment(-1) });
-        // to handle user ongoing sessions when user closes the app suddenly
-        onDisconnect(userIdRef).update({
-          ongoingSessions: null
-        });
+        onDisconnect(userIdRef).update({ status: false, ongoingSessions: null });
         // use runTransaction to update the number of online account correctly
         runTransaction(userIdRef, (profile) => {
           if (profile) {
-            profile.status++;
+            profile.status = true;
             return profile;
           } else {
             return profile;
@@ -41,7 +77,32 @@ const HomePage = ({navigation}) => {
     } catch (error) {
       console.log(error);
     }
+    return () => subscribe.remove();
   }, []);
+
+  /*useEffect(() => {
+    const userIdRef = ref(database, 'userId/' + currentUser.uid);
+    try {
+      if (!currentUser.isAnonymous) {
+        // to handle user online status when user closes the app suddenly
+        onDisconnect(userIdRef).update({ status: false, ongoingSessions: null });
+        // use runTransaction to update the number of online account correctly
+        /*runTransaction(userIdRef, (profile) => {
+          if (profile) {
+            profile.status = true;
+            return profile;
+          } else {
+            return profile;
+          }
+        });
+      } else {
+        // if anonymous user, then delete the account
+        onDisconnect(userIdRef).remove();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }, []);*/
 
   const Tab = createBottomTabNavigator();
 

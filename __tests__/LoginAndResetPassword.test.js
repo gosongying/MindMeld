@@ -3,8 +3,10 @@ import LoginPage from '../src/screen/Authentication/LoginPage';
 import LandingPage from '../src/screen/Authentication/LandingPage';
 import { signInWithEmailAndPassword, signInAnonymously, updateProfile, sendPasswordResetEmail } from 'firebase/auth';
 import { Alert } from 'react-native';
+import {get, ref} from 'firebase/database';
 
 jest.mock('firebase/auth');
+jest.mock('firebase/database');
 
 const navigation = {
   replace: jest.fn()
@@ -32,13 +34,21 @@ describe('loginUser function', () => {
     const userCredential = { user: { displayName: 'test' }};
 
     signInWithEmailAndPassword.mockResolvedValue(userCredential);
+    get.mockResolvedValue({exists: () => true, val: () => ({status: false})});
+    ref.mockReturnValue();
 
-    await fireEvent.changeText(emailInput, 'test@example.com');
-    await fireEvent.changeText(passwordInput, 'password');
-    await fireEvent.press(loginButton);
+    await act(async () => {
+      await fireEvent.changeText(emailInput, 'test@example.com');
+      await fireEvent.changeText(passwordInput, 'password');
+      await fireEvent.press(loginButton);
+    });
     
     expect(signInWithEmailAndPassword).toHaveBeenCalledWith(undefined, 'test@example.com', 'password');
+    expect(get).toHaveBeenCalled()
     expect(navigation.replace).toHaveBeenCalledWith('Home');
+
+    signInWithEmailAndPassword.mockRestore();
+    get.mockRestore();
   });
 
   it('Navigate to Signup2 screen if user login successfully and does not have a display name', async () => {
@@ -53,10 +63,14 @@ describe('loginUser function', () => {
     const userCredential = { user: { displayName: null }};
 
     signInWithEmailAndPassword.mockResolvedValue(userCredential);
+    get.mockResolvedValue({exists: () => false, val: () => {status: false}});
+    ref.mockReturnValue();
 
-    await fireEvent.changeText(emailInput, 'test@example.com');
-    await fireEvent.changeText(passwordInput, 'password');
-    await fireEvent.press(loginButton);
+    await act(async () => {
+      await fireEvent.changeText(emailInput, 'test@example.com');
+      await fireEvent.changeText(passwordInput, 'password');
+      await fireEvent.press(loginButton);
+    });
     
     expect(signInWithEmailAndPassword).toHaveBeenCalledWith(undefined, 'test@example.com', 'password');
     expect(navigation.replace).toHaveBeenCalledWith('Signup2');

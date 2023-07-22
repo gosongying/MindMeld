@@ -17,13 +17,13 @@ const SessionRoom = ({route, navigation}) => {
 
   useEffect(() => {
     const interval = setInterval(() => {
-        updateTimeStay();
-      }, 60000);
-      return () => {
-        clearInterval(interval);
-      }
+      updateTimeStay();
+    }, 60000);
 
-  }, [])
+    return () => {
+      clearInterval(interval);
+    }
+  }, []);
 
   const updateTimeStay = () => {
     try {

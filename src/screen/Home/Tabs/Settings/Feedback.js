@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { TouchableOpacity, StyleSheet, Text, View, TextInput, Alert, Keyboard, TouchableWithoutFeedback, KeyboardAvoidingView, ScrollView, Platform } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import {auth, database} from '../../../../../firebase';
+import {ref, push} from 'firebase/database'; 
 
-import firebase from 'firebase/compat/app';
+/*import firebase from 'firebase/compat/app';
 import 'firebase/compat/database';
 import 'firebase/compat/auth';
 
@@ -21,7 +23,7 @@ if (!firebase.apps.length) {
 }
 
 const database = firebase.database();
-const auth = firebase.auth();
+const auth = firebase.auth();*/
 
 
 const Feedback = ({ navigation }) => {
@@ -52,7 +54,7 @@ const Feedback = ({ navigation }) => {
         userName: user.displayName || 'Unknown User',
       };
 
-      await database.ref('feedbacks').push(feedbackData);
+      await ref('feedbacks').push(feedbackData);
 
       Alert.alert('Success', 'Thank you for your feedback!');
       setFeedbackTitle('');
