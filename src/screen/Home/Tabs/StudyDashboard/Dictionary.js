@@ -21,7 +21,7 @@ const Dictionary = ({ navigation }) => {
 
   const handleSearch = async () => {
     try {
-      const apiKey = '08ac014c-67c5-4237-841d-0ee87e8cb982';
+      const apiKey = process.env.EXPO_PUBLIC_DICT_API_KEY;
       const apiUrl = `https://www.dictionaryapi.com/api/v3/references/collegiate/json/${word}?key=${apiKey}`;
 
       const response = await axios.get(apiUrl);
