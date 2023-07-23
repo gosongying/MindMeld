@@ -30,7 +30,7 @@ const SessionRoom = ({route, navigation}) => {
       runTransaction(ref(database, 'userId/' + auth.currentUser.uid), (user) => {
         //to update the user time stay in the session every minute.
         if (user) {
-          user.upcomingSessions = user.upcomingSessions.map((sessionObj) => sessionObj.id === session.id? {...sessionObj, timeStay: sessionObj.timeStay + 1}: sessionObj);
+          user.upcomingSessions = user.upcomingSessions? user.upcomingSessions.map((sessionObj) => sessionObj.id === session.id? {...sessionObj, timeStay: sessionObj.timeStay + 1}: sessionObj): [];
           user.timeInSession = user.timeInSession + (1 / 60);
           console.log('update time')
           return user;
