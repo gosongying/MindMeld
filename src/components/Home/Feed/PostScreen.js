@@ -3,28 +3,9 @@ import { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, FlatList, KeyboardAvoidingView, Dimensions, Keyboard, Alert, Modal, ScrollView} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import {auth, database} from '../../../../firebase';
-import {increment, onValue, ref, runTransaction} from 'firebase/database';
+import {increment, onValue, ref, runTransaction, push, update, remove} from 'firebase/database';
 import { onAuthStateChanged } from 'firebase/auth';
 
-/*import firebase from 'firebase/compat/app';
-import 'firebase/compat/database';
-import 'firebase/compat/auth';
-
-const firebaseConfig = {
-  apiKey: "AIzaSyBW9gyTZcDHmnAIzCXQKfKmrz1yCrot2ZQ",
-  authDomain: "orbital-265b4.firebaseapp.com",
-  databaseURL: "https://orbital-265b4-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "orbital-265b4",
-  storageBucket: "orbital-265b4.appspot.com",
-  messagingSenderId: "927371819112",
-  appId: "1:927371819112:web:0320800c1c8e8edf9763dd"
-};
-
-if (!firebase.apps.length) {
-  firebase.initializeApp(firebaseConfig);
-}
-
-const database = firebase.database();*/
 
 const useUsername = (uid) => {
   const [username, setUsername] = useState(null);
@@ -313,8 +294,9 @@ const PostScreen = ({ route, navigation }) => {
     const uid = auth.currentUser.uid;
     const postCommentsRef = ref(database, `posts/${postId}/comments`);
     const postRef = ref(database, `posts/${postId}`);
+    
 
-    const userRef = ref('userId/' + uid);
+    const userRef = ref(database, 'userId/' + uid);
 
     // Create the comment data object
     const commentData = {

@@ -14,7 +14,9 @@ import { auth } from '../../../../../firebase';
 
 const CreateStudySession = ({ navigation }) => {
 
+  const isAnonymous = auth.currentUser.isAnonymous;
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+  const [studyModeEnabled, setStudyModeEnabled] = useState(isAnonymous);
   const [selectedDate, setSelectedDate] = useState(null);
   const [isStartTimePickerVisible, setStartTimePickerVisibility] = useState(false);
   const [isEndTimePickerVisible, setEndTimePickerVisibility] = useState(false);
@@ -22,25 +24,12 @@ const CreateStudySession = ({ navigation }) => {
   const [endTime, setEndTime] = useState(null);
   const [sessionName, setSessionName] = useState('');
   const [sessionDescription, setSessionDescription] = useState('');
-  //const [minimumDate, setMinimumDate] = useState(new Date(new Date().getTime + 60000));
-  //const [minimumEnd, setMinimumEnd] = useState(startTime? new Date(startTime.getTime() + 60000): new Date(minimumDate.getTime() + 60000));
-  
-  //let minimumDate = new Date(new Date().getTime + 60000);
-  //let minimumEnd = startTime? new Date(startTime.getTime() + 60000): new Date(minimumDate.getTime() + 60000);
-  /*useEffect(() => {
-    const interval = setInterval(() => {
-      //minimumDate = new Date(new Date().getTime + 60000);
-      //minimumEnd = startTime? new Date(startTime.getTime() + 60000): new Date(minimumDate.getTime() + 60000);
-      setMinimumDate(new Date(new Date().getTime + 60000));
-      setMinimumEnd(startTime? new Date(startTime.getTime() + 60000): new Date(minimumDate.getTime() + 60000));
-    }, 60000);
 
-    return () => clearInterval(interval);
-  }, []);*/
   const minimumDate = new Date(new Date().getTime() + 60000);
   const minimumEnd = startTime? new Date(startTime.getTime() + 60000): new Date(minimumDate.getTime() + 60000);
 
-  const goToHome = () => navigation.goBack();
+  const goToHome = () => navigation.navigate('StudyDashboard');
+
 
   const showDatePicker = () => {
     setDatePickerVisibility(true);
@@ -104,19 +93,38 @@ const CreateStudySession = ({ navigation }) => {
     } else if (!endTime) {
       Alert.alert("Please select end time");
     } else {
-      navigation.navigate('SelectBuddies', {
-        sessionName, 
-        sessionDescription,
-        selectedDate: selectedDate.toDateString(),
-        startTime: {
-          string: startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), 
-          timestamp: selectedDate.setHours(startTime.getHours(), startTime.getMinutes(), startTime.getSeconds(), startTime.getMilliseconds())
-        },
-        endTime:  {
-          string: endTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          timestamp: selectedDate.setHours(endTime.getHours(), endTime.getMinutes(), endTime.getSeconds(), endTime.getMilliseconds())
-        }
-      });
+      if (isAnonymous) {
+        //anonymous user does not have study buddy feature
+        navigation.navigate('SelectToDo', {
+          sessionName, 
+          sessionDescription,
+          studyModeEnabled,
+          selectedDate: selectedDate.toDateString(),
+          startTime: {
+            string: startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), 
+            timestamp: selectedDate.setHours(startTime.getHours(), startTime.getMinutes(), startTime.getSeconds(), startTime.getMilliseconds())
+          },
+          endTime:  {
+            string: endTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            timestamp: selectedDate.setHours(endTime.getHours(), endTime.getMinutes(), endTime.getSeconds(), endTime.getMilliseconds())
+          }
+        });
+      } else { 
+        navigation.navigate('SelectBuddies', {
+          sessionName, 
+          sessionDescription,
+          studyModeEnabled,
+          selectedDate: selectedDate.toDateString(),
+          startTime: {
+            string: startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), 
+            timestamp: selectedDate.setHours(startTime.getHours(), startTime.getMinutes(), startTime.getSeconds(), startTime.getMilliseconds())
+          },
+          endTime:  {
+            string: endTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            timestamp: selectedDate.setHours(endTime.getHours(), endTime.getMinutes(), endTime.getSeconds(), endTime.getMilliseconds())
+          }
+        });
+      }
     }
   };
 
@@ -163,25 +171,25 @@ const CreateStudySession = ({ navigation }) => {
         </TouchableOpacity>
       </View> */}
       <Text style={styles.subheading}>Select Date</Text>
-      <TouchableOpacity style={styles.calendarButton} onPress={showDatePicker} testID='date'>
+      <TouchableOpacity style={styles.calendarButton} onPress={showDatePicker}>
         <Text style={styles.calendarButtonText}>
           {selectedDate ? selectedDate.toDateString() : 'Select Date'}
         </Text>
       </TouchableOpacity>
       <Text style={styles.subheading}>Select Time</Text>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-        <TouchableOpacity style={styles.startTimeButton} onPress={showStartTimePicker} testID='startTime'>
+        <TouchableOpacity style={styles.startTimeButton} onPress={showStartTimePicker}>
             <Text style={styles.startTimeButtonText}>
             {startTime ? startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Select Start Time'}
             </Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.endTimeButton} onPress={showEndTimePicker} testID='endTime'>
+        <TouchableOpacity style={styles.endTimeButton} onPress={showEndTimePicker}>
             <Text style={styles.endTimeButtonText}>
             {endTime ? endTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Select End Time'}
             </Text>
         </TouchableOpacity>
       </View>
-      <TouchableOpacity style={styles.createButton} onPress={createStudySession} testID='CreateStudySession'>
+      <TouchableOpacity style={styles.createButton} onPress={createStudySession}>
         <Text style={styles.createButtonText}>Create Study Session</Text>
       </TouchableOpacity>
       <DateTimePickerModal
@@ -191,25 +199,24 @@ const CreateStudySession = ({ navigation }) => {
         onCancel={hideDatePicker}
         textColor="#000000"
         minimumDate={minimumDate}
-        testID='datePicker'
       />
       <DateTimePickerModal
         isVisible={isStartTimePickerVisible}
+        date={minimumDate}
         mode='time'
         onConfirm={handleStartTimeConfirm}
         onCancel={hideStartTimePicker}
         textColor="#000000"
         minimumDate={minimumDate}
-        testID='startTimePicker'
       />
       <DateTimePickerModal
         isVisible={isEndTimePickerVisible}
+        date={minimumEnd}
         mode="time"
         onConfirm={handleEndTimeConfirm}
         onCancel={hideEndTimePicker}
         textColor="#000000"
         minimumDate={minimumEnd}
-        testID='endTimePicker'
       />
     </SafeAreaView>
   );

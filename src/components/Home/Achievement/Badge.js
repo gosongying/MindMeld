@@ -57,7 +57,7 @@ const Badge = () => {
         setNumberOfStudyBuddies(user.friendList? user.friendList.length: 0);
         setNumberOfFeeds(user.numberOfFeeds);
         setNumberOfComments(user.numberOfComments);   
-        setTimeInStudySession(user.timeInSession);
+        setTimeInStudySession(user.timeInSession.toFixed(1));
       }
       return () => {
         unsubscribe();
