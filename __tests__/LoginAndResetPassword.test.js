@@ -114,7 +114,7 @@ describe('resetPassword function', () => {
     const forgotPassword = getByText('Forgot your password?');
 
     await act(async () => {
-      fireEvent.press(forgotPassword);
+      await fireEvent.press(forgotPassword);
     })
 
     const emailResetInput = getByTestId('1');
@@ -140,8 +140,8 @@ describe('resetPassword function', () => {
     const forgotPassword = getByText('Forgot your password?');
 
     //to make the reset password modal visible
-    await act(() => {
-      fireEvent.press(forgotPassword);
+    await act(async() => {
+      await fireEvent.press(forgotPassword);
     })
 
     const emailResetInput = getByTestId('1');

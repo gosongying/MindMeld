@@ -120,7 +120,7 @@ const SelectToDo = ({ navigation, route }) => {
   };
 
   const createSession = async () => {
-    const currentUser = auth.currentUser;
+    const currentUser = auth?.currentUser;
     const sessionRef = ref(database, 'sessions/');
     const chatRef = ref(database, 'chat/');
     const newSessionKey = push(sessionRef).key;
