@@ -498,8 +498,7 @@ const Calculator = ({ navigation }) =&gt; {
 &nbsp;
   const handleCalculation = async () =&gt; {
     try {
-      const apiKey = 'Y36GEU-TW4VU6G736';
-      const apiUrl = `http://api.wolframalpha.com/v1/result?appid=${apiKey}&amp;i=${encodeURIComponent(
+      const apiUrl = `http://api.wolframalpha.com/v1/result?appid=${process.env.EXPO_PUBLIC_CALC_API_KEY}&amp;i=${encodeURIComponent(
         input
       )}`;
 &nbsp;

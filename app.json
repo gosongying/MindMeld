@@ -2,6 +2,7 @@
   "expo": {
     "name": "MindMeld",
     "slug": "mindmeld",
+    "description": "MeldMeld is an app that aims to revolutionize the studying process, transforming it into a fun and rewarding journey while bidding farewell to distractions",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -40,9 +41,9 @@
     ],
     "extra": {
       "eas": {
-        "projectId": "0c7ac2e1-8eb2-42b4-acc7-62d0e693d615"
+        "projectId": "948a46ed-ae98-44fc-b2d9-4d19ed96fa30"
       }
     },
-    "owner": "kanna-1"
+    "owner": "mindmeld5724"
   }
 }
