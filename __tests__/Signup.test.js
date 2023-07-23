@@ -2,8 +2,23 @@ import { render, fireEvent, act } from '@testing-library/react-native';
 import SignupPage from '../src/screen/Authentication/SignupPage';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { Alert } from 'react-native';
+import { initializeApp } from "firebase/app";
+import { getStorage } from "firebase/storage";
+import { getAuth } from 'firebase/auth';
+import { getDatabase } from 'firebase/database';
 
 jest.mock('firebase/auth');
+jest.mock('firebase/app');
+jest.mock('firebase/database');
+jest.mock('firebase/storage');
+
+beforeEach(() => {
+    initializeApp.mockImplementation(() => {});
+    getAuth.mockImplementation(() => {});
+    getDatabase.mockImplementation(() => {});
+    getStorage.mockImplementation(() => {});
+});
+
 
 let alertSpy;
 
@@ -35,10 +50,12 @@ describe('signupUser function', () => {
     
         createUserWithEmailAndPassword.mockResolvedValue(userCredential);
     
-        await fireEvent.changeText(emailInput, 'test@example.com');
-        await fireEvent.changeText(passwordInput1, 'password');
-        await fireEvent.changeText(passwordInput2, 'password');
-        await fireEvent.press(signupButton);
+        await act(async () => {
+            await fireEvent.changeText(emailInput, 'test@example.com');
+            await fireEvent.changeText(passwordInput1, 'password');
+            await fireEvent.changeText(passwordInput2, 'password');
+            await fireEvent.press(signupButton);
+        })
         
         expect(createUserWithEmailAndPassword).toHaveBeenCalledWith(undefined, 'test@example.com', 'password');
         expect(navigation.replace).toHaveBeenCalledWith('Signup2');
