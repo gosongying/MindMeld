@@ -16,11 +16,11 @@ const Calculator = ({ navigation }) => {
 
   const [input, setInput] = useState('');
   const [result, setResult] = useState('');
+  
 
   const handleCalculation = async () => {
     try {
-      const apiKey = 'Y36GEU-TW4VU6G736';
-      const apiUrl = `http://api.wolframalpha.com/v1/result?appid=${apiKey}&i=${encodeURIComponent(
+      const apiUrl = `http://api.wolframalpha.com/v1/result?appid=${process.env.EXPO_PUBLIC_CALC_API_KEY}&i=${encodeURIComponent(
         input
       )}`;
 
