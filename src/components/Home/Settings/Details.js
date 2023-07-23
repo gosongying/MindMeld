@@ -325,7 +325,7 @@ const Details = ({ navigation }) => {
                 onPress={editUsername}
                 disabled={isLoading}
                 testID='editUsername'>
-                  <Ionicons name="create" size={20} />
+                  <Ionicons name="create" size={18} />
                 </TouchableOpacity>
 
                 <TouchableOpacity 

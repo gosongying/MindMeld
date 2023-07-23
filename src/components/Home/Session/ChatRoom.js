@@ -129,7 +129,7 @@ const ChatRoom = ({ navigation, session }) => {
     return () => {
       subscribe.remove();
     }
-  })
+  }, [])
   
   const renderMessageItems = () => {
     return messages.map((item) => {
