@@ -11,7 +11,9 @@
   },
   "jest": {
     "preset": "jest-expo",
-    "setupFiles": ["./setupASMock.js"],
+    "setupFiles": [
+      "./setupASMock.js"
+    ],
     "transformIgnorePatterns": [
       "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|sentry-expo|native-base|react-native-svg|firebase|@firebase|@react-native-async-storage/async-storage|@fortawesome)"
     ]
@@ -31,6 +33,7 @@
     "@supabase/supabase-js": "^2.22.0",
     "axios": "^1.4.0",
     "context": "^3.0.7",
+    "dotenv": "^16.3.1",
     "expo": "~48.0.15",
     "expo-image-picker": "~14.1.1",
     "expo-status-bar": "~1.4.4",
@@ -45,7 +48,6 @@
     "react-native-checkbox": "^2.0.0",
     "react-native-clock-analog": "^0.0.3",
     "react-native-date-picker": "^4.2.13",
-    "react-native-dotenv": "^3.4.8",
     "react-native-dropdown-picker": "^5.4.6",
     "react-native-dropdown-select-list": "^2.0.4",
     "react-native-image-crop-picker": "^0.40.0",
@@ -69,6 +71,8 @@
     "@testing-library/react-native": "^12.1.2",
     "nodemon": "^2.0.22",
     "prettier": "2.8.8",
+    "react-native-config": "^1.5.1",
+    "react-native-dotenv": "^3.4.9",
     "xhr2": "^0.2.1"
   },
   "private": true

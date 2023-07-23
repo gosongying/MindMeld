@@ -10,9 +10,15 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import Settings from './src/screen/Home/Tabs/Settings/Settings';
 import EntryPage from './src/screen/Authentication/EntryPage';
+import Config from 'react-native-config';
+
 const App = () => {
 
   const Stack = createStackNavigator();
+
+  console.log(Config.CALC_API_KEY);
+  console.log(Config.DICT_API_KEY);
+  console.log(Config.FIREBASE_API_KEY);
 
   return (
     <NavigationContainer>

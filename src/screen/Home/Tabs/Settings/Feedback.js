@@ -4,28 +4,6 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import {auth, database} from '../../../../../firebase';
 import {ref, push} from 'firebase/database'; 
 
-/*import firebase from 'firebase/compat/app';
-import 'firebase/compat/database';
-import 'firebase/compat/auth';
-
-const firebaseConfig = {
-  apiKey: "AIzaSyBW9gyTZcDHmnAIzCXQKfKmrz1yCrot2ZQ",
-  authDomain: "orbital-265b4.firebaseapp.com",
-  databaseURL: "https://orbital-265b4-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "orbital-265b4",
-  storageBucket: "orbital-265b4.appspot.com",
-  messagingSenderId: "927371819112",
-  appId: "1:927371819112:web:0320800c1c8e8edf9763dd"
-};
-
-if (!firebase.apps.length) {
-  firebase.initializeApp(firebaseConfig);
-}
-
-const database = firebase.database();
-const auth = firebase.auth();*/
-
-
 const Feedback = ({ navigation }) => {
   const [feedbackTitle, setFeedbackTitle] = useState('');
   const [feedbackText, setFeedbackText] = useState('');
