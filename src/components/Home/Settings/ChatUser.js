@@ -120,7 +120,7 @@ const ChatUser = ({ route, navigation }) => {
             )}
             <View style={{marginTop: -5}}>
                 <Text style={styles.username}>{otherUser.username}</Text>
-                {otherUser.status > 0 ? (
+                {otherUser.status ? (
                     <Text style={{ color: 'gray', marginLeft: 10 }}>Online</Text>
                     ) : (
                     <Text style={{ color: 'gray', marginLeft: 10 }}>Offline</Text>
