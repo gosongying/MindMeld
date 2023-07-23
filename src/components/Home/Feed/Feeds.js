@@ -5,26 +5,6 @@ import { child, ref, set, push, update, remove, onValue, get, increment } from "
 import {database, auth} from '../../../../firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 
-/*import firebase from 'firebase/compat/app';
-import 'firebase/compat/database';
-import 'firebase/compat/auth';
-
-const firebaseConfig = {
-  apiKey: "AIzaSyBW9gyTZcDHmnAIzCXQKfKmrz1yCrot2ZQ",
-  authDomain: "orbital-265b4.firebaseapp.com",
-  databaseURL: "https://orbital-265b4-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "orbital-265b4",
-  storageBucket: "orbital-265b4.appspot.com",
-  messagingSenderId: "927371819112",
-  appId: "1:927371819112:web:0320800c1c8e8edf9763dd"
-};
-
-if (!firebase.apps.length) {
-  firebase.initializeApp(firebaseConfig);
-}
-
-const database = firebase.database();*/
-
 
 const DynamicTimeText = ({ timestamp }) => {
   const [timeText, setTimeText] = useState('');

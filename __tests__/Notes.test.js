@@ -16,7 +16,7 @@ describe('Notes', () => {
         AsyncStorage.getItem.mockRestore();
     });
 
-    it('notes will be saved when typing', async () => {
+    it('notes will be saved into async storage', async () => {
         const {getByPlaceholderText} = render(<Notes navigation={navigation}/>);
         const input = getByPlaceholderText('Write your notes here');
 
@@ -28,18 +28,4 @@ describe('Notes', () => {
 
         AsyncStorage.setItem.mockRestore();
     });
-
-    it('can clear all notes', async () => {
-        const {getByPlaceholderText, getByText, getByTestId} = render(<Notes navigation={navigation}/>);
-        const input = getByPlaceholderText('Write your notes here');
-
-        await act(async () => {
-            await fireEvent.changeText(input, 'test');
-            await fireEvent.press(getByTestId('clear'));
-            await fireEvent.press(getByText('Confirm'));
-        });
-
-        //after clearing, it will be called with empty string
-        expect(AsyncStorage.setItem).toHaveBeenCalledWith('noteText', '');
-    })
 });

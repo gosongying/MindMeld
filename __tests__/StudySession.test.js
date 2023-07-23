@@ -34,8 +34,8 @@ afterEach(() => {
     setTimeoutSpy.mockRestore();
 });
 
-describe('Chat Room', () => {
-    it('can send message', async () => {
+describe('Study Session', () => {
+    it('can send message in the chat room', async () => {
         const session = {
             chatId: 'test',
             sessionName: 'test',

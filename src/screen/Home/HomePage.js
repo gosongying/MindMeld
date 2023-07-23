@@ -21,6 +21,7 @@ const HomePage = ({navigation}) => {
     const userIdRef = ref(database, 'userId/' + currentUser.uid);
 
     const handleStateChange = (state) => {
+      console.log(state)
       if (state === 'background' || state === 'inactive') {
         runTransaction(userIdRef, (user) => {
           if (user) {
