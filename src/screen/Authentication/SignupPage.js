@@ -17,7 +17,6 @@ import { createUserWithEmailAndPassword, onAuthStateChanged } from "firebase/aut
 
 const SignupPage = ({navigation}) => {
 
-  console.log("Signup")
   const [name, setName] = useState("");
 
   const [password1, setPassword1] = useState("");
@@ -84,7 +83,6 @@ const SignupPage = ({navigation}) => {
     .then(() => {
       //signup successfully
       navigation.replace("Signup2");
-      console.log("Signup successfully");
     })
     .catch((error) => {
       //handle error when signup

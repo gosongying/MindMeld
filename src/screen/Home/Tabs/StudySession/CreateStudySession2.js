@@ -14,9 +14,7 @@ import { auth } from '../../../../../firebase';
 
 const CreateStudySession2 = ({ navigation }) => {
 
-  const isAnonymous = auth.currentUser.isAnonymous;
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-  const [studyModeEnabled, setStudyModeEnabled] = useState(isAnonymous);
   const [selectedDate, setSelectedDate] = useState(null);
   const [isStartTimePickerVisible, setStartTimePickerVisibility] = useState(false);
   const [isEndTimePickerVisible, setEndTimePickerVisibility] = useState(false);
@@ -91,27 +89,9 @@ const CreateStudySession2 = ({ navigation }) => {
     } else if (!endTime) {
       Alert.alert("Please select end time");
     } else {
-      if (isAnonymous) {
-        //anonymous user does not have study buddy feature
-        navigation.navigate('SelectToDo', {
-          sessionName, 
-          sessionDescription,
-          studyModeEnabled,
-          selectedDate: selectedDate.toDateString(),
-          startTime: {
-            string: startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), 
-            timestamp: selectedDate.setHours(startTime.getHours(), startTime.getMinutes(), startTime.getSeconds(), startTime.getMilliseconds())
-          },
-          endTime:  {
-            string: endTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            timestamp: selectedDate.setHours(endTime.getHours(), endTime.getMinutes(), endTime.getSeconds(), endTime.getMilliseconds())
-          }
-        });
-      } else { 
         navigation.navigate('SelectBuddies', {
           sessionName, 
           sessionDescription,
-          studyModeEnabled,
           selectedDate: selectedDate.toDateString(),
           startTime: {
             string: startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), 
@@ -122,12 +102,11 @@ const CreateStudySession2 = ({ navigation }) => {
             timestamp: selectedDate.setHours(endTime.getHours(), endTime.getMinutes(), endTime.getSeconds(), endTime.getMilliseconds())
           }
         });
-      }
     }
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} onPress={() => Keyboard.dismiss()}>
       <TouchableOpacity style={styles.backButton} onPress={goToHome}>
         <Text style={styles.back}>{'\u2190'}</Text>
       </TouchableOpacity>
@@ -140,6 +119,7 @@ const CreateStudySession2 = ({ navigation }) => {
       autoCorrect={false}
       clearButtonMode='while-editing'
       value={sessionName}
+      placeholderTextColor={'gray'}
       onChangeText={(text) => setSessionName(text)}/>
 
       <View>
@@ -149,15 +129,16 @@ const CreateStudySession2 = ({ navigation }) => {
         onChangeText={(text) => setSessionDescription(text)}
         style={styles.input2} 
         multiline
-        placeholder='Description'
+        clearButtonMode='while-editing'
+        placeholder='Enter description'
         autoCapitalize='none'
         autoCorrect={false}
+        placeholderTextColor={'gray'}
         blurOnSubmit
-        clearButtonMode='while-editing'
         />
       </View>
 
-      <View style={styles.checkboxContainer}>
+      {/* <View style={styles.checkboxContainer}>
         <Text style={styles.checkboxLabel}>Enable Study Mode</Text>
         <TouchableOpacity
           style={[styles.checkbox, studyModeEnabled && styles.checkboxActive]}
@@ -165,7 +146,8 @@ const CreateStudySession2 = ({ navigation }) => {
         >
           {studyModeEnabled && <Text style={styles.checkmark}>&#x2713;</Text>}
         </TouchableOpacity>
-      </View>
+      </View> */}
+
       <Text style={styles.subheading}>Select Date</Text>
       <TouchableOpacity style={styles.calendarButton} onPress={showDatePicker}>
         <Text style={styles.calendarButtonText}>
@@ -266,11 +248,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#DC582A',
   },
   input1: {
+    fontSize: 15,
     borderWidth: 1,
     borderColor: '#CCCCCC',
     borderRadius: 10,
     padding: 10,
     marginBottom: 20,
+    fontWeight: 'normal',
   },
   input2: {
     fontSize: 15,
@@ -282,6 +266,7 @@ const styles = StyleSheet.create({
     width: "100%",
     textAlign: 'left',
     paddingHorizontal: 10,
+    fontWeight: 'normal',
   },
   calendarButton: {
     backgroundColor: '#DCDCDC',

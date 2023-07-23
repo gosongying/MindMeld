@@ -1,28 +1,8 @@
 import React, { useState } from 'react';
 import { TouchableOpacity, StyleSheet, Text, View, TextInput, Alert, Keyboard, TouchableWithoutFeedback, KeyboardAvoidingView, ScrollView, Platform } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-
-import firebase from 'firebase/compat/app';
-import 'firebase/compat/database';
-import 'firebase/compat/auth';
-
-const firebaseConfig = {
-  apiKey: "AIzaSyBW9gyTZcDHmnAIzCXQKfKmrz1yCrot2ZQ",
-  authDomain: "orbital-265b4.firebaseapp.com",
-  databaseURL: "https://orbital-265b4-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "orbital-265b4",
-  storageBucket: "orbital-265b4.appspot.com",
-  messagingSenderId: "927371819112",
-  appId: "1:927371819112:web:0320800c1c8e8edf9763dd"
-};
-
-if (!firebase.apps.length) {
-  firebase.initializeApp(firebaseConfig);
-}
-
-const database = firebase.database();
-const auth = firebase.auth();
-
+import {auth, database} from '../../../../../firebase';
+import {ref, push} from 'firebase/database'; 
 
 const Feedback = ({ navigation }) => {
   const [feedbackTitle, setFeedbackTitle] = useState('');
@@ -52,7 +32,8 @@ const Feedback = ({ navigation }) => {
         userName: user.displayName || 'Unknown User',
       };
 
-      await database.ref('feedbacks').push(feedbackData);
+      await push(ref(database, 'feedbacks'), feedbackData);
+      //await ref('feedbacks').push(feedbackData);
 
       Alert.alert('Success', 'Thank you for your feedback!');
       setFeedbackTitle('');

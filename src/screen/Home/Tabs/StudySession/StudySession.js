@@ -22,6 +22,7 @@ const StudySession = ({navigation}) => {
     const [currentTimestamp, setCurrentTimestamp] = useState(new Date().getTime());
     const [sessionDeleted, setSessionDelected] = useState('');
     const [sessionName, setSessionName] = useState('');
+    const [xpEarned, setXpEarned] = useState(0);
 
     const currentUser = auth.currentUser;
 
@@ -36,7 +37,7 @@ const StudySession = ({navigation}) => {
 
     useEffect(() => {
         // to remove all ongoing sessions
-        runTransaction(ref(database, 'userId/' + currentUser.uid), (user) => {
+        runTransaction(ref(database, 'userId/' + currentUser?.uid), (user) => {
             if (user) {
                 if (user.ongoingSessions) {
                     user.ongoingSessions = null;
@@ -48,7 +49,7 @@ const StudySession = ({navigation}) => {
                 return user;
             }
         })
-    }, [])
+    }, []);
 
     useEffect(() => {
         const unsubscribe = onValue(ref(database, 'userId/' + currentUser?.uid), async (snapshot) => {
@@ -56,9 +57,8 @@ const StudySession = ({navigation}) => {
             let ended = [];
             const sessionList = snapshot.exists()? (snapshot.val().upcomingSessions? snapshot.val().upcomingSessions: []): [];
             if (sessionList.length > 0) {
-                await Promise.all(sessionList.map(async (id) => {
-                    console.log(currentUser.displayName)
-                    const sessionRef = ref(database, 'sessions/' + id);
+                await Promise.all(sessionList.map(async (sessionObj) => {
+                    const sessionRef = ref(database, 'sessions/' + sessionObj.id);
                     await get(sessionRef)
                     .then(async (session) => {
                         if (session.exists()) {
@@ -98,13 +98,13 @@ const StudySession = ({navigation}) => {
                                 });
                             }
                         } else {
-                            ended.push(id);
+                            ended.push(sessionObj.id);
                             return;
                         }
                     })
                     .catch((error) => {
                         console.log(error);
-                        Alert.alert("An error occurs");
+                        Alert.alert("An error occurs1");
                     });
                     return;
                 }));
@@ -126,13 +126,29 @@ const StudySession = ({navigation}) => {
                     })
 
                 });
-                const newSessionsList = sessionList.filter((id) => !ended.includes(id));
-                update(ref(database, 'userId/' + currentUser.uid), {
-                    upcomingSessions: newSessionsList
+                let xp = 0;
+                const newSessionsList = sessionList.filter((sessionObj) => {
+                    if (!ended.includes(sessionObj.id)) {
+                        return true;
+                    } else {
+                        //if ended includes
+                        xp += sessionObj.timeStay;
+                        return false;
+                    }
+                });
+                runTransaction(ref(database, 'userId/' + currentUser?.uid), (user) => {
+                    if (user) {
+                        user.upcomingSessions = newSessionsList;
+                        user.xp += xp;
+                        return user;
+                    } else {
+                        return user;
+                    }
                 })
                 .then(() => {
                     setSessionIds(newSessionsList);
                     setSessionData(sessions);
+                    setXpEarned(xp);
                 })
                 .catch((error) => {
                     console.log(error);
@@ -152,7 +168,7 @@ const StudySession = ({navigation}) => {
         //to check if any invitation expired
         //listen to the change of invitation list
         //to get the latest invitation list
-        const unsubscribe = onValue(ref(database, 'userId/' + currentUser.uid), async (snapshot) => {
+        const unsubscribe = onValue(ref(database, 'userId/' + currentUser?.uid), async (snapshot) => {
             let invitation = [];
             let expired = [];
             const invitationList = snapshot.exists()? (snapshot.val().invitationList? snapshot.val().invitationList: []): [];
@@ -209,7 +225,7 @@ const StudySession = ({navigation}) => {
                     return;
                 }));
                 const newInvitationList = invitationList.filter((id) => !expired.includes(id));
-                update(ref(database, 'userId/' + currentUser.uid), {
+                update(ref(database, 'userId/' + currentUser?.uid), {
                     invitationList: newInvitationList
                 })
                 .then(() => {
@@ -247,22 +263,22 @@ const StudySession = ({navigation}) => {
         try {
                 await runTransaction(child(db, 'sessions/' + session.id), (session2) => {
                     if (session2) {
-                        session2.participants.push(currentUser.uid);
+                        session2.participants.push(currentUser?.uid);
                         return session2;
                     } else {
                         return session2;
                     }
                 }).then(() => {
                     //remove the invitation from the user
-                runTransaction(child(db, 'userId/' + currentUser.uid), (user) => {
+                runTransaction(child(db, 'userId/' + currentUser?.uid), (user) => {
                     if (user) {
                         if (user.invitationList) {
                             user.invitationList = user.invitationList.filter((id) => id !== session.id);
                         }
                         if (user.upcomingSessions) {
-                            user.upcomingSessions.push(session.id);
+                            user.upcomingSessions.push({id: session.id, timeStay: 0});
                         } else {
-                            user.upcomingSessions = [session.id];
+                            user.upcomingSessions = [{id: session.id, timeStay: 0}];
                         }
                         return user;
                     } else {
@@ -284,7 +300,7 @@ const StudySession = ({navigation}) => {
         //add the user into participants list of the session
         try {
             //remove the invitation from the user
-            runTransaction(ref(database, 'userId/' + currentUser.uid), (user) => {
+            runTransaction(ref(database, 'userId/' + currentUser?.uid), (user) => {
                 if (user) {
                     user.invitationList = user.invitationList.filter((id) => id !== sessionId);
                     return user;
@@ -304,12 +320,21 @@ const StudySession = ({navigation}) => {
     const deleteSession = (sessionId) => {
         try {
             const db = ref(database);
-            const userRef = child(db, 'userId/' + currentUser.uid);
+            const userRef = child(db, 'userId/' + currentUser?.uid);
             const sessionRef = child(db, 'sessions/' + sessionId);
+            let xp = 0;
             runTransaction(userRef, (user) => {
                 if (user) {
                     //to delete the session from user's upcoming sessions
-                    user.upcomingSessions = user.upcomingSessions.filter((id) => id !== sessionId);
+                    user.upcomingSessions = user.upcomingSessions.filter((session) => {
+                        if (session.id === sessionId) {
+                            xp = session.timeStay;
+                            return false;
+                        } else {
+                            return true;
+                        }
+                    });
+                    user.xp += xp;
                     return user;
                 } else {
                     return user;
@@ -317,13 +342,13 @@ const StudySession = ({navigation}) => {
             });
             runTransaction(sessionRef, (session) => {
                 if (session) {
-                    if (session.host === currentUser.uid) {
+                    if (session.host === currentUser?.uid) {
                         //only host can delete the whole study session
                         remove(child(db, 'chat/' + sessionId));
                         return null;
                     } else {
                         //to delete the user from session's participants
-                        session.participants = session.participants.filter((uid) => uid !== currentUser.uid);
+                        session.participants = session.participants.filter((uid) => uid !== currentUser?.uid);
                         return session;
                     }
                 } else {
@@ -331,6 +356,7 @@ const StudySession = ({navigation}) => {
                 }
             }).then(() =>{
                 setSessionDelected('');
+                setXpEarned(xp);
             });
         } catch(error) {
             console.log(error);
@@ -357,15 +383,10 @@ const StudySession = ({navigation}) => {
                     }
                 }), */
                 //add the session into user's ongoing sessions
-                runTransaction(child(db, 'userId/' + currentUser.uid), (user) => {
+                runTransaction(child(db, 'userId/' + currentUser?.uid), (user) => {
                     if (user) {
-                        if (user.ongoingSessions) {
-                            user.ongoingSessions.push(session.id);
-                            return user;
-                        } else {
-                            user.ongoingSessions = [session.id];
-                            return user;
-                        }
+                        user.ongoingSessions = session.id;
+                        return user;
                     } else {
                         return user;
                     }
@@ -398,7 +419,7 @@ const StudySession = ({navigation}) => {
                         <Text style={styles.text2}>Host: {item.hostName}</Text>
                         <Text style={styles.text2}>Participants: {item.participantsName.join(', ')}</Text>
                         <Text style={styles.text2}>To-do's: {item.tasks ? item.tasks.map((task) => task.title).join(', ') : ''}</Text>
-                        <Text style={[styles.text2, !item.studyModeEnabled && {textDecorationLine: 'line-through'}]}>Study Mode</Text>
+                        {/* <Text style={[styles.text2, !item.studyModeEnabled && {textDecorationLine: 'line-through'}]}>Study Mode</Text> */}
                     </View>
                     <View style={styles.acceptOrDecline2}>
                         {inProgress && (
@@ -563,6 +584,21 @@ const StudySession = ({navigation}) => {
                     </View>
                 </View>
             </Modal>
+            {/* to display the duration user stayed in the previous session */}
+            <Modal
+            visible={xpEarned > 0}
+            animationType="fade"
+            transparent>
+                <View style={styles.timeBackground}>
+                    <View style={styles.timeContainer}>
+                        <Text style={styles.congrats}>Congratulations!!!</Text>
+                        <Text style={styles.xpEarned}>You have earned a total of {xpEarned} XP from previous study sessions.</Text>
+                        <TouchableOpacity style={styles.continueButton} onPress={() => setXpEarned(0)}>
+                            <Text style={styles.continue}>Continue</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
         </View>
     );
 };
@@ -589,10 +625,7 @@ const SessionHeader = ({setIsCheckingInvitation, setSessionName, invitationIds})
 
                 <TouchableOpacity
                     style={styles.news}
-                    onPress={() => {
-                        console.log(invitationIds.length);
-                        setIsCheckingInvitation(true);
-                    }}
+                    onPress={() => setIsCheckingInvitation(true)}
                     >
                     {invitationIds.length >= 0 && (
                         <View style={styles.notificationContainer}>
@@ -654,7 +687,8 @@ const styles = StyleSheet.create({
         fontSize: 24,
         fontWeight: 'bold',
         color: '#FFF',
-        bottom: 10
+        bottom: 10,
+        marginLeft: 15,
     },
     news: {
         left: 45,
@@ -803,7 +837,7 @@ const styles = StyleSheet.create({
     inProgress: {
         position: 'absolute',
         width: 120,
-        bottom: 95,
+        top: -50,
         right: 5,
         borderRadius: 10,
         backgroundColor: '#8A2BE2',
@@ -906,7 +940,43 @@ const styles = StyleSheet.create({
         color: 'gray',
         textAlign: 'center',
         marginTop: 10,
-      },
+    },
+    timeBackground: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: "rgba(0, 0, 0, 0.5)"
+    },
+    timeContainer: {
+        height: '30%',
+        width: '75%',
+        borderRadius: 20,
+        backgroundColor: "lavender",
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    congrats: {
+        fontSize: 25,
+        fontWeight: 'bold',
+        bottom: 30,
+    },
+    xpEarned: {
+        fontSize: 18,
+        maxWidth: '90%'
+    },
+    continue: {
+        fontSize: 16,
+        color: 'white'
+    },
+    continueButton: {
+        height: '15%',
+        width: '80%',
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 20,
+        backgroundColor: 'dodgerblue',
+        top: 40
+    }
 });
 
 export default StudySession;

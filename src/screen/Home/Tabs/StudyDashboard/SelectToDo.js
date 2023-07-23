@@ -9,7 +9,8 @@ import {
   KeyboardAvoidingView,
   Modal,
   Keyboard,
-  Animated
+  Animated,
+  Alert
 } from 'react-native';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { AntDesign } from '@expo/vector-icons';
@@ -98,11 +99,7 @@ const SelectToDo = ({ navigation, route }) => {
 
   //move to home screen
   const goToHome = () => {
-    if (auth.currentUser.isAnonymous) {
-        navigation.pop(2);
-    } else {
-        navigation.pop(3);
-    }
+    navigation.pop(3);
   }
   const confirmReset = () => {
     setShowModal2(true);
@@ -122,7 +119,7 @@ const SelectToDo = ({ navigation, route }) => {
     }, 2000);
   };
 
-  const createSession = () => {
+  const createSession = async () => {
     const currentUser = auth.currentUser;
     const sessionRef = ref(database, 'sessions/');
     const chatRef = ref(database, 'chat/');
@@ -136,23 +133,23 @@ const SelectToDo = ({ navigation, route }) => {
       set(child(sessionRef, newSessionKey), {
         ...route.params,
         tasks,
-        participants: [currentUser.uid],
-        host: currentUser.uid,
+        participants: [currentUser?.uid],
+        host: currentUser?.uid,
         id: newSessionKey,
         chatId: newSessionKey
     })
     ])
     .then(() => {
       Promise.all([
-        runTransaction(ref(database, 'userId/' + currentUser.uid), (profile) => {
+        runTransaction(ref(database, 'userId/' + currentUser?.uid), (profile) => {
           if (profile) {
             if (profile.upcomingSessions) {
               //if the user has other upcoming sessions
-              profile.upcomingSessions.push(newSessionKey);
+              profile.upcomingSessions.push({id: newSessionKey, timeStay: 0});
               return profile;
             } else {
               //if the user does have any upcoming sessions so far
-              profile.upcomingSessions = [newSessionKey];
+              profile.upcomingSessions = [{id: newSessionKey, timeStay: 0}];
               return profile;
             }
           } else {
@@ -195,6 +192,10 @@ const SelectToDo = ({ navigation, route }) => {
           useNativeDriver: true,
         }),
         Animated.spring(translateY, {
+          toValue: 100,
+          useNativeDriver: true,
+        }),
+        Animated.spring(translateY, {
           toValue: 0,
           useNativeDriver: true,
         }),
@@ -202,7 +203,7 @@ const SelectToDo = ({ navigation, route }) => {
     setTimeout(() => {
         setShowText(false);
         createSession();
-    }, 2000);
+    }, 3500);
 };
 
   return (

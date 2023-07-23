@@ -3,6 +3,7 @@ import { View, Text, FlatList, Image, TouchableOpacity, StyleSheet, Modal, TextI
 import Fontisto from 'react-native-vector-icons/Fontisto';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
 
 import { auth, database } from '../../../../../firebase';
 import { get, onValue, ref, runTransaction, child } from 'firebase/database';
@@ -114,8 +115,11 @@ useEffect(() => {
     }, []);
 
     const clickUser = (user) => {
-        setParticipantClicked(user)
-    };
+        const level = Math.floor(user.xp / 100) + 1;
+        const trophyColour = level<10?"#808080":level<20?"#B87333":level<30? '#C0C0C0':level<40?'gold':level<50?'#50C878':'#6EB2D4';
+        const trophyText = level<10?'Iron':level<20?'Bronze':level<30?'Silver':level<40?'Gold':level<50?'Emerald':'Diamond';
+        setParticipantClicked({...user, trophyColour: trophyColour, trophyText: trophyText, level: level});
+    }
 
     const renderFriendItem = ({ item }) => {
         const isPresent = item.ongoingSessions? item.ongoingSessions.includes(sessionId): false;
@@ -135,7 +139,7 @@ useEffect(() => {
                             style={styles.avatar}/>
                         )}
                         {/* status indicator */}
-                        {item.status > 0 && <View style={styles.statusIndicator}/>}
+                        {item.status && <View style={styles.statusIndicator}/>}
                         <View style={styles.friendInfo}>
                             <View style={styles.nameAndGender}>
                                 <Text style={styles.friendName} numberOfLines={1}>{item.username}</Text>
@@ -265,7 +269,7 @@ useEffect(() => {
                                     <Ionicons name='add' size={40} style={{color:'white'}}/>
                                 </TouchableOpacity>
                             ) : (
-                                <Ionicons name="checkbox" size={40} color={'green'}/>
+                                <Ionicons name="checkmark" size={35} color={'green'}/>
                             )}
                         </View>
                         <View style={styles.photoContainer}>
@@ -289,6 +293,13 @@ useEffect(() => {
                                 ) : (
                                     <Fontisto name='female' size={15} color='pink' style={{marginLeft: 10}}/>
                                 )}
+                            </View>
+                            <View style={styles.levelContainer}>
+                                <Text style={styles.levelText}>Level {participantClicked.level}</Text>
+                                <View style={styles.trophyContainer}>
+                                <Text style={styles.trophyText}>{participantClicked.trophyText}</Text>
+                                <Ionicons name="trophy" color={participantClicked.trophyColour} style={styles.trophyIcon} size={15}/>
+                                </View>
                             </View>
                             <View style={styles.interests}>
                                 <Text style={styles.text2}>Interests: {participantClicked.interests ? participantClicked.interests.join(', ') : "-"}</Text>
@@ -368,7 +379,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 10,
         left: 20,
-        top: 5
+        top: 5,
     },
     separator: {
         height: 1,
@@ -498,20 +509,20 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
     },
     text2: {
-        fontSize: 20,
+        fontSize: 17,
         color: 'white'
     },
     interests: {
         top: 5,
     },
     statusIndicator: {
-        height: 12,
-        width: 12,
+        height: 10,
+        width: 10,
         backgroundColor: 'rgb(0, 200, 0)',
-        borderRadius: 6,
+        borderRadius: 5,
         position: 'absolute',
-        left: 40, 
-        top: 40
+        left: 41, 
+        top: 43
     },
     modalContainer: {
         flex: 1,
@@ -585,7 +596,31 @@ const styles = StyleSheet.create({
     },
     add: {
         left: 30
-    }
+    },
+    levelContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginTop: 5,
+        marginLeft: 10,
+      },
+      levelText: {
+        marginRight: 10,
+        fontSize: 18,
+        color: 'white'
+      },
+      trophyContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+      },
+      trophyText: {
+        marginRight: 5,
+        fontSize: 18,
+        color: 'white'
+      },
+      trophyIcon: {
+        marginLeft: 5,
+      },
+      
 });
 
 

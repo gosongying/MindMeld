@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
 import { auth, database } from '../../../../firebase';
-import { ref, onValue } from 'firebase/database';
+
+import { ref, onValue} from 'firebase/database';
 
 const HelloName = () => {
   
@@ -10,11 +11,12 @@ const HelloName = () => {
   const [username, setUsername] = useState('');
 
   const currentUser = auth.currentUser;
-  
+
   useEffect(() => {
     //to be synchronous with database to get
     //user most up-dated username
     //listen to user's username change
+
     if (!currentUser.isAnonymous) {
       const unsubscribe = onValue(ref(database, 'userId/' + currentUser.uid), (snapshot) => {
         if (snapshot.exists()) {

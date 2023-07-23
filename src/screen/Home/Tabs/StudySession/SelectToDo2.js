@@ -149,11 +149,11 @@ const SelectToDo2 = ({ navigation, route }) => {
           if (profile) {
             if (profile.upcomingSessions) {
               //if the user has other upcoming sessions
-              profile.upcomingSessions.push(newSessionKey);
+              profile.upcomingSessions.push({id: newSessionKey, timeStay: 0});
               return profile;
             } else {
               //if the user does have any upcoming sessions so far
-              profile.upcomingSessions = [newSessionKey];
+              profile.upcomingSessions = [{id: newSessionKey, timeStay: 0}];
               return profile;
             }
           } else {

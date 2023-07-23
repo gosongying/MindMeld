@@ -4,13 +4,13 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import { auth, database, storage } from '../../../../firebase';
 import { onValue, ref as databaseRef, get, remove, runTransaction, update } from 'firebase/database';
 import { updateProfile } from 'firebase/auth';
+import { ref } from 'firebase/database'
 import { useRef } from 'react';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import * as ImagePicker from 'expo-image-picker';
 import { ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage"
 import Fontisto from 'react-native-vector-icons/Fontisto';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { Dimensions } from 'react-native';
 
 const screenWidth = Dimensions.get('window').width;
@@ -21,7 +21,7 @@ const Details = ({ navigation }) => {
   //but not navigating to the page first. It will function well when the 
   //profile page is done.
 
-  const currentUser = auth.currentUser;
+  const currentUser = auth?auth.currentUser:null;
 
   const oldUsername = currentUser ? currentUser.displayName : null;
 
@@ -35,22 +35,33 @@ const Details = ({ navigation }) => {
 
   const [gender, setGender] = useState('');
 
+  const [xp, setXp] = useState(0);
+
+  const level = Math.floor(xp / 100) + 1;
+  const trophyColour = level<10?"#808080":level<20?"#B87333":level<30? '#C0C0C0':level<40?'gold':level<50?'#50C878':'#6EB2D4';
+  const trophyText = level<10?'Iron':level<20?'Bronze':level<30?'Silver':level<40?'Gold':level<50?'Emerald':'Diamond';
+
+
   const isAnonymous = currentUser ? currentUser.isAnonymous : null;
 
   useEffect(() => {
     if (!isAnonymous) {
-      get(databaseRef(database, 'userId/' + currentUser.uid))
-      .then((snapshot) => {
+      const userRef = ref(database, 'userId/' + currentUser?.uid);
+  
+      const unsubscribe = onValue(userRef, (snapshot) => {
         if (snapshot.exists()) {
           setGender(snapshot.val().gender);
+          setXp(snapshot.val().xp);
         }
-      })
-      .catch((error) => {
+      }, (error) => {
         console.log(error);
         Alert.alert("An error occurs");
-      })
+      });
+      return () => {
+        unsubscribe();
+      };
     }
-  }, [])
+  }, []);
 
   const editUsername = () => {
     setIsEditingUsername(true);
@@ -97,7 +108,7 @@ const Details = ({ navigation }) => {
     //if the username changes
     const newUsernameRef = databaseRef(database, 'usernames/' + newUsername.trim());
     const oldUsernameRef = databaseRef(database, 'usernames/' + oldUsername);
-    const userIdRef = databaseRef(database, 'userId/' + currentUser.uid);
+    const userIdRef = databaseRef(database, 'userId/' + currentUser?.uid);
     try {
       //retrieve user's old data
       get(oldUsernameRef)
@@ -114,7 +125,7 @@ const Details = ({ navigation }) => {
           return oldUser.val();
         }
       })
-      .then((result) => {
+      .then(async (result) => {
         if (result.committed) {
           //if set username successfully
           Alert.alert("Success", 'Username updated')
@@ -123,7 +134,7 @@ const Details = ({ navigation }) => {
             username: newUsername.trim()
           })
           updateProfile(currentUser, {
-          displayName: newUsername.trim(),
+            displayName: newUsername.trim(),
           }).then(() => {
             setLoading(false);
             setIsEditingUsername(false);
@@ -189,7 +200,7 @@ const Details = ({ navigation }) => {
       const newImage = await uploadImageAsync(result.assets[0].uri)
       .catch((error) => console.log(error));
 
-      update(databaseRef(database, 'userId/' + currentUser.uid), {
+      update(databaseRef(database, 'userId/' + currentUser?.uid), {
         photo: newImage
       }).catch((error) => {
         console.log(error);
@@ -290,12 +301,13 @@ const Details = ({ navigation }) => {
             onSubmitEditing={handleChangedUsername}
             autoCapitalize='none'
             autoFocus={true}
+            testID='usernameInput'
             />
           ) : (
             <View style={styles.nameAndEdit}>
               <View style={{flexDirection: 'row', alignItems:'center'}}>
                 <View>
-                  <Text style={[styles.name, {maxWidth: screenWidth * 0.5}]} numberOfLines={1}>{oldUsername}</Text>
+                  <Text style={[styles.name, {maxWidth: screenWidth * 0.4}]} numberOfLines={1}>{oldUsername}</Text>
                 </View>
                 {gender === 'male' ? (
                   <Fontisto name='male' size={15} color='dodgerblue' style={{marginLeft:5}}/>
@@ -311,22 +323,24 @@ const Details = ({ navigation }) => {
                 <View style={styles.icons}>
                 <TouchableOpacity 
                 onPress={editUsername}
-                disabled={isLoading}>
+                disabled={isLoading}
+                testID='editUsername'>
                   <Ionicons name="create" size={20} />
                 </TouchableOpacity>
 
                 <TouchableOpacity 
                 onPress={selectImageLibrary}
-                disabled={isLoading}>
+                disabled={isLoading}
+                testID='selectImageLibrary'>
                   <FontAwesome name={'photo'} size={15} />
                 </TouchableOpacity>
 
                 <TouchableOpacity 
                 onPress={selectImageCamera}
-                disabled={isLoading}>
+                disabled={isLoading}
+                testID='selectImageCamera'>
                   <MaterialCommunityIcons name={'camera-outline'} size={19} />
                 </TouchableOpacity>
-
 
                 </View>
               )}
@@ -342,12 +356,13 @@ const Details = ({ navigation }) => {
               )}
             </View>
           )}
+
           {!isAnonymous && (
             <View style={styles.levelContainer}>
-            <Text style={styles.levelText}>Level 10</Text>
+            <Text style={styles.levelText}>Level {level}</Text>
             <View style={styles.trophyContainer}>
-              <Text style={styles.trophyText}>Bronze</Text>
-              <Ionicons name="trophy" color="#CD7F32" style={styles.trophyIcon} />
+              <Text style={styles.trophyText}>{trophyText}</Text>
+              <Ionicons name="trophy" color={trophyColour} style={styles.trophyIcon} size={15}/>
             </View>
           </View>
           )}
@@ -435,11 +450,11 @@ const styles = StyleSheet.create({
   statusIndicator: {
     position: 'absolute',    
     backgroundColor: 'rgb(0, 200, 0)',
-    width: 14,
-    height: 14,
+    width: 12,
+    height: 12,
     borderRadius: 6,
-    bottom: 21,
-    left: 69,
+    bottom: 22,
+    left: 72,
     zIndex: 1
   },
   anonymous: {

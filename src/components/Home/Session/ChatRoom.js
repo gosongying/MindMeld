@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard, Modal, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, KeyboardAvoidingView, Modal, Alert, AppState } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 import { auth, database } from "../../../../firebase";
 import { runTransaction, ref, onValue, get } from 'firebase/database';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import { confirmButtonStyles } from 'react-native-modal-datetime-picker';
+import { Platform } from 'react-native';
 
 const ChatRoom = ({ navigation, session }) => {
   const [inputMessage, setInputMessage] = useState('');
@@ -114,7 +114,22 @@ const ChatRoom = ({ navigation, session }) => {
         goToHome();
       }
     })
-  }, [currentTimestamp])
+  }, [currentTimestamp]);
+
+  useEffect(() => {
+    const handleStateChange = (state) => {
+      console.log(state)
+      if (state === 'background' || state === 'inactive') {
+        goToHome();
+      }
+    };
+
+    const subscribe = AppState.addEventListener('change', handleStateChange);
+
+    return () => {
+      subscribe.remove();
+    }
+  }, [])
   
   const renderMessageItems = () => {
     return messages.map((item) => {
@@ -145,9 +160,9 @@ const ChatRoom = ({ navigation, session }) => {
   const goToHome = () => {
     //remove session from user ongoing session first
     try {
-      runTransaction(ref(database, 'userId/' + currentUser.uid), (user) => {
+      runTransaction(ref(database, 'userId/' + currentUser?.uid), (user) => {
         if (user) {
-          user.ongoingSessions = user.ongoingSessions.filter((id) => id !== session.id);
+          user.ongoingSessions = null;
           return user;
         } else {
           return user;
@@ -163,9 +178,11 @@ const ChatRoom = ({ navigation, session }) => {
   };
 
   const sendMessage = () => {
-    if (inputMessage.trim() === '') return;
+    if (inputMessage.trim() === '') {
+      return;
+    }
   
-    const sender = currentUser.uid;
+    const sender = currentUser?.uid;
   
     const newMessage = {
       sender,
@@ -187,15 +204,17 @@ const ChatRoom = ({ navigation, session }) => {
       } else {
         return chat;
       }
-    })
+    });
 
     setInputMessage('');
   };
 
+  const os = Platform? (Platform.OS === 'ios'? 'padding': null): null;
+
   return (
     <KeyboardAvoidingView
         style={styles.container}
-        behavior={Platform.OS === 'ios' ? 'padding' : null}
+        behavior={os}
       >
         <View style={styles.headerContainer}>
           <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', top: 15}}>
@@ -277,7 +296,7 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     right: 20,
-    top: 10
+    top: 8
   },
   quit: {
     fontSize: 20,
@@ -328,6 +347,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 10,
     paddingTop: 8,
+    fontSize: 16
   },
   sendButton: {
     marginLeft: 10,
@@ -415,7 +435,7 @@ const styles = StyleSheet.create({
   },
   messageContent: {
     fontSize: 16,
-    maxWidth: "85%"
+    maxWidth: "80%"
   },
   headerContainer: {
     height: 130,

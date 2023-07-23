@@ -8,7 +8,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { AntDesign } from '@expo/vector-icons';
 
 const FriendListSetting = ({navigation}) => {
-    const currentUser = auth.currentUser;
+    const currentUser = auth?.currentUser;
 
     const [username, setUsername] = useState('');
     const [isAddingFriend, setIsAddingFriend] = useState(false);
@@ -25,7 +25,7 @@ const FriendListSetting = ({navigation}) => {
     useEffect(() => {
         //listen to the change of friend list
         //to get the latest friend list
-        const unsubscribe = onValue(ref(database, 'userId/' + currentUser.uid), async (snapshot) => {
+        const unsubscribe = onValue(ref(database, 'userId/' + currentUser?.uid), async (snapshot) => {
         let friends = [];
         const friendList = snapshot.val().friendList ? snapshot.val().friendList : [];
         if (friendList) {
@@ -70,8 +70,11 @@ const FriendListSetting = ({navigation}) => {
 }, []);
 
     const clickUser = (user) => {
+        const level = Math.floor(user.xp / 100) + 1;
+        const trophyColour = level<10?"#808080":level<20?"#B87333":level<30? '#C0C0C0':level<40?'gold':level<50?'#50C878':'#6EB2D4';
+        const trophyText = level<10?'Iron':level<20?'Bronze':level<30?'Silver':level<40?'Gold':level<50?'Emerald':'Diamond';
         setIsCheckingFriend(true);
-        setFriendOrFriendSearched(user);
+        setFriendOrFriendSearched({...user, trophyColour: trophyColour, trophyText: trophyText, level: level});
         setFriedOrFriendSearchedId(user.uid);
     };
 
@@ -92,7 +95,7 @@ const FriendListSetting = ({navigation}) => {
                             style={styles.avatar}/>
                         )}
                         {/* status indicator */}
-                        {item.status > 0 && <View style={styles.statusIndicator}/>}
+                        {item.status && <View style={styles.statusIndicator}/>}
                         <View style={styles.friendInfo}>
                             <View style={styles.nameAndGender}>
                                 <Text style={styles.friendName} numberOfLines={1}>{item.username}</Text>
@@ -103,12 +106,15 @@ const FriendListSetting = ({navigation}) => {
                                     )}
                             </View>
                         </View>
-                        <TouchableOpacity>
+                        <TouchableOpacity onPress={() => handleChat(item)}>
+                            <Ionicons name="chatbubble-outline" size={25} style={{right: 40}} />
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => setDeletingFriend(item)} testID={`${item.uid}`}>
                             <MaterialIcons 
                             name={"delete"}
                             size={25} 
                             style={{right: 35}}
-                            onPress={() => setDeletingFriend(item)}/>
+                            />
                         </TouchableOpacity>
                     </TouchableOpacity>
                     {/* separator */}
@@ -166,7 +172,10 @@ const FriendListSetting = ({navigation}) => {
                 const userIdRef = ref(database, 'userId/' + snapshot.val().uid);
                 get(userIdRef)
                 .then((snapshot) => {
-                    setFriendOrFriendSearched(snapshot.val());
+                    const level = Math.floor(snapshot.val().xp / 100) + 1;
+                    const trophyColour = level<10?"black":level<20?"#B87333":level<30? '#C0C0C0':level<40?'gold':level<50?'#50C878':'#6EB2D4';
+                    const trophyText = level<10?'Iron':level<20?'Bronze':level<30?'Silver':level<40?'Gold':level<50?'Emerald':'Diamond';
+                    setFriendOrFriendSearched({...snapshot.val(), level: level, trophyColour: trophyColour, trophyText: trophyText});
                     setFriedOrFriendSearchedId(snapshot.val().uid);
                 })
             } else {
@@ -182,7 +191,7 @@ const FriendListSetting = ({navigation}) => {
     const addFriend = (id) => {
         try {
             const userRef = ref(database, 'userId/');
-            const me = child(userRef, currentUser.uid);
+            const me = child(userRef, currentUser?.uid);
             const other = child(userRef, id);
             const newFriendList = [...friendListId, id];
             //update current user friendlist
@@ -200,11 +209,11 @@ const FriendListSetting = ({navigation}) => {
                     const friendList = profile.friendList;
                     if (friendList) {
                         //if the user has friends before
-                        friendList.push(currentUser.uid);
+                        friendList.push(currentUser?.uid);
                         return profile;
                     } else {
                         //if the user did not have friends before
-                        profile.friendList = [currentUser.uid];
+                        profile.friendList = [currentUser?.uid];
                         return profile;
                     }
                 } else {
@@ -241,6 +250,13 @@ const FriendListSetting = ({navigation}) => {
         setFriendOrFriendSearched(null);
     }
 
+    const handleChat = (item) => {
+        const userIds = [currentUser.uid, item.uid].sort(); // Sort user IDs alphabetically
+        const chatSessionId = userIds.join('-'); // Combine user IDs
+      
+        navigation.navigate('ChatUser', { chatSessionId, otherUser: item });
+      };
+
     return (
         <View style={styles.container}>
             <View style={styles.header}>
@@ -268,12 +284,15 @@ const FriendListSetting = ({navigation}) => {
                     value={username}
                     onChangeText={(text) => setUsername(text)}>
                     </TextInput>
-                    <TouchableOpacity style={styles.addIcon}>
+                    <TouchableOpacity 
+                    style={styles.addIcon} 
+                    testID='addFriend'
+                    onPress={() => setIsAddingFriend(true)}>
                         <Ionicons 
                         name='person-add-outline' 
                         size={30} 
                         color='white'
-                        onPress={() => setIsAddingFriend(true)}/>
+                        />
                     </TouchableOpacity>
                 </View>
             </View>
@@ -289,7 +308,7 @@ const FriendListSetting = ({navigation}) => {
 
             {/* Prompt for adding friend */}
             <Modal visible={isAddingFriend || isCheckingFriend} transparent animationType='fade'>
-                { friendOrFriendSearched ? (
+                 { friendOrFriendSearched ? (
                     <View style={styles.userSearchedContainer}>
                         <View style={styles.userSearched}>
                             <View style={styles.backAndAdd}>
@@ -298,14 +317,14 @@ const FriendListSetting = ({navigation}) => {
                                 onPress={back}>
                                     <Text style={styles.back2}>{'\u2190'}</Text >  
                                 </TouchableOpacity>
-                                { friendOrFriendSearchedId === currentUser.uid ? (
+                                { friendOrFriendSearchedId === currentUser?.uid ? (
                                     <View style={{height: 40,width:40}}/>
                                 ) : !friendListId.includes(friendOrFriendSearchedId) ? (
-                                    <TouchableOpacity onPress={() => addFriend(friendOrFriendSearchedId)}>
+                                    <TouchableOpacity onPress={() => addFriend(friendOrFriendSearchedId)} testID='add'>
                                         <Ionicons name='add' size={40} style={{color:'white'}}/>
                                     </TouchableOpacity>
                                 ) : (
-                                    <Ionicons name="checkbox" size={40} color={'green'}/>
+                                    <Ionicons name="checkmark" size={35} color={'green'}/>
                                 )}
                             </View>
                             <View style={styles.photoContainer}>
@@ -330,13 +349,20 @@ const FriendListSetting = ({navigation}) => {
                                         <Fontisto name='female' size={15} color='pink' style={{marginLeft: 10}}/>
                                     )}
                                 </View>
+                                <View style={styles.levelContainer}>
+                                    <Text style={styles.levelText}>Level {friendOrFriendSearched.level}</Text>
+                                    <View style={styles.trophyContainer}>
+                                    <Text style={styles.trophyText}>{friendOrFriendSearched.trophyText}</Text>
+                                        <Ionicons name="trophy" color={friendOrFriendSearched.trophyColour} style={styles.trophyIcon} size={15}/>
+                                    </View>
+                                </View>
                                 <View style={styles.interests}>
                                     <Text style={styles.text2}>Interests: {friendOrFriendSearched.interests ? friendOrFriendSearched.interests.join(', ') : "-"}</Text>
                                 </View>
                             </View>
                         </View>
                     </View>
-                ) : (
+                    ) : (
                     <View style={styles.promptContainer}>
                       <View style={styles.prompt}>
                         <Text style={styles.promptText}>Add Friends</Text>
@@ -351,10 +377,12 @@ const FriendListSetting = ({navigation}) => {
                             clearButtonMode='while-editing'
                             autoCorrect={false}
                             autoFocus
+                            testID='Enter username'
                             />
                             <TouchableOpacity 
                             style={styles.searchIcon}
-                            onPress={() => handleSearchFriend(usernameAdded)}>
+                            onPress={() => handleSearchFriend(usernameAdded)}
+                            testID='searchFriend'>
                                 <Ionicons 
                                 name='search' 
                                 color='white' 
@@ -583,20 +611,20 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
     },
     text2: {
-        fontSize: 20,
+        fontSize: 17,
         color: 'white'
     },
     interests: {
         top: 5,
     },
     statusIndicator: {
-        height: 12,
-        width: 12,
+        height: 10,
+        width: 10,
         backgroundColor: 'rgb(0, 200, 0)',
-        borderRadius: 6,
+        borderRadius: 5,
         position: 'absolute',
-        left: 41 ,
-        top: 48
+        left: 45,
+        top: 46
     },
     modalContainer: {
         flex: 1,
@@ -652,6 +680,29 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         textAlign: 'center',
     },
+    levelContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginTop: 5,
+        marginLeft: 10,
+      },
+      levelText: {
+        marginRight: 10,
+        fontSize: 18,
+        color: 'white'
+      },
+      trophyContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+      },
+      trophyText: {
+        marginRight: 5,
+        fontSize: 18,
+        color: 'white'
+      },
+      trophyIcon: {
+        marginLeft: 5,
+      },
 })
 
 
