@@ -90,49 +90,4 @@ describe('Study Buddy', () => {
         expect(alertSpy).toHaveBeenCalledWith('Added successfully!');
         expect(runTransaction.mock.calls).toHaveLength(2);
     });
-
-    /*it('can delete friend', async () => {
-        const snapshot1 = {
-            val: () => ({
-                friendList: ['test'],
-                uid: 'test'
-            })
-        };
-        const test = {
-            username: 'test',
-            uid: 'test',
-            gender: 'male',
-            numberOfComments: 1,
-            numberOfFeeds: 5,
-            status: 0,
-            timeInSession: 10,
-            xp: 100
-        };
-
-        const snapshot2 = {
-            val: () => test
-        };
-        ref.mockReturnValue();
-        onValue.mockImplementationOnce((ref, callback) => {
-            callback(snapshot1);
-            return () => {};
-        });
-        onValue.mockImplementationOnce((ref, callback) => {
-            callback(snapshot2);
-            return () => {};
-        });
-        onValue.mockReturnValue(() => {})
-        get.mockResolvedValue({
-            val: () => test
-        });
-        child.mockReturnValue();
-        runTransaction.mockResolvedValue();
-        const {getByTestId, getByText} = render(<FriendListSetting navigation={navigation}/>);
-        await act(async () => {
-            await fireEvent.press(getByTestId('test'));
-            await fireEvent.press(getByText('Confirm'));
-        });
-        expect(alertSpy).toHaveBeenCalledWith('a')
-        expect(runTransaction.mock.calls).toHaveLength(2);
-    })*/
 });

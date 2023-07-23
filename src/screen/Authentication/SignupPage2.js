@@ -136,10 +136,13 @@ const SignupPage2 = ({ navigation}) => {
         numberOfComments: 0,
       })
     ])
+    .then(() => {
+      navigation.replace("Home");
+    })
     .catch(error => {
       Alert.alert("Error")
     })
-    navigation.replace('Home');
+    //navigation.replace('Home');
   
     }
   });

@@ -43,7 +43,7 @@ const Settings = ({navigation}) => {
     setIsNavigating(true); // Set the navigation flag
 
     if (screen === 'Landing') {  //when Logout is clicked.
-      if (auth.currentUser.isAnonymous) {
+      if (auth?.currentUser.isAnonymous) {
         auth.currentUser.delete()
           .then(() => {
             console.log("Guest user deleted successfully");
@@ -54,7 +54,7 @@ const Settings = ({navigation}) => {
           });
           return;
       }
-      const currentUser = auth.currentUser;
+      const currentUser = auth?.currentUser;
       const id = currentUser ? currentUser.uid : null; // Check if currentUser exists before accessing its uid property
       signOut(auth)
         .then(() => {

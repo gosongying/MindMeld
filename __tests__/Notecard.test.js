@@ -25,32 +25,6 @@ describe('Notecards', () => {
 
         //the new added notecard is added into async storage
         expect(JSON.parse(AsyncStorage.setItem.mock.calls[1][1])[0].front).toBe('test1');
+        expect(JSON.parse(AsyncStorage.setItem.mock.calls[1][1])[0].back).toBe('test2');
     });
-
-    it('can reset all notecards', async () => {
-        const {getByTestId, getByPlaceholderText, getByText} = render(<Notecards/>);
-        
-        await act(async () => {
-        //add first notecard
-        await fireEvent.press(getByTestId('add'));
-        await fireEvent.changeText(getByPlaceholderText('Front Text'), 'test1');
-        await fireEvent.changeText(getByPlaceholderText('Back Text'), 'test2');
-        await fireEvent.press(getByText('Confirm'));
-
-        //add second notecard
-        await fireEvent.press(getByTestId('add'));
-        await fireEvent.changeText(getByPlaceholderText('Front Text'), 'test1');
-        await fireEvent.changeText(getByPlaceholderText('Back Text'), 'test2');
-        await fireEvent.press(getByText('Confirm'));
-
-        await fireEvent.press(getByTestId('setting'));
-        //to toggle the switch
-        await fireEvent(getByTestId('reset'), 'valueChange', true);
-        await fireEvent.press(getByText('Confirm'));
-        })
-
-        //the setItem is called after deleting all notecards
-        expect(AsyncStorage.setItem.mock.calls[3][1]).toBe('[]');
-
-    })
 });

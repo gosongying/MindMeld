@@ -25,20 +25,7 @@ describe('Timer', () => {
         await fireEvent.press(startButton);
 
         expect(setIntervalSpy).toHaveBeenCalled();
-    });
-
-    /*it('can stop the timer', async () => {
-        const {getByText} = render(<Timer/>);
-        const startButton = getByText('Start');
-
-        await fireEvent.press(startButton);
-        const stopButton = getByText('Stop');
-        await fireEvent.press(stopButton);
-        
-        //only be called once when the timer started
-        expect(setIntervalSpy.mock.calls).toHaveLength(1);
-
-    });*/
+    });  
 
     it('can set time', async () => {
         const {getByText, getByTestId, getByPlaceholderText} = render(<Timer/>);

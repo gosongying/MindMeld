@@ -125,7 +125,6 @@ const FriendListSetting = ({navigation}) => {
     };
 
     const deleteFriend = (user) => {
-        console.log(user);
         const userRef = ref(database, 'userId/');
         const me = child(userRef, currentUser.uid);
         const other = child(userRef, user.uid);

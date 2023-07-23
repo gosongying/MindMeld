@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Pressable, StyleSheet, ImageBackground, Dimensions, Image, Animated, PanResponder, Alert} from 'react-native';
+import { View, Text, Pressable, StyleSheet, ImageBackground, Dimensions, Image, Animated, PanResponder, Alert, ActivityIndicator} from 'react-native';
 import { auth, database } from '../../../../firebase'
 import { ref, onValue, update, push, get, set } from 'firebase/database'
 import Fontisto from 'react-native-vector-icons/Fontisto';
@@ -11,7 +11,9 @@ const SCREEN_HEIGHT = Dimensions.get('window').height;
 const SearchBuddy = () => {
     const [users, setUsers] = useState([]);
     const [currentIndex, setCurrentIndex] = useState(0);
-    const [commonInterests, setCommonInterests] = useState(0)
+    const [userInterest, setUserInterest] = useState([])
+    const [commonInterests, setCommonInterests] = useState(0);
+    const [isLoading, setIsLoading] = useState(false);
   
     const position = new Animated.ValueXY();
 
@@ -19,9 +21,9 @@ const SearchBuddy = () => {
     const onRelease = (event, gesture) => {
         const { dx } = gesture;
       
-        if (dx > 110) {
+        if (dx > 160) {
           handleYup(users[currentIndex]);
-        } else if (dx < -110) {
+        } else if (dx < -160) {
           handleNope(users[currentIndex]);
         }
         resetPosition();
@@ -77,8 +79,9 @@ const SearchBuddy = () => {
                 setCommonInterests(commonInterests);
                 return commonInterests.length > 0; 
               });
-    
-              setUsers(matchedUsers);
+                // Shuffle the cards
+                // const shuffledUsers = matchedUsers.slice().sort(() => 0.5 - Math.random())
+                setUsers(matchedUsers);
             }
           });
     
@@ -106,8 +109,7 @@ const SearchBuddy = () => {
           ...position.getTranslateTransform(),
         ],
       };
-      
-  
+    
     const renderCards = () => {
         const nextCardOpacity = position.x.interpolate({
             inputRange: [-SCREEN_WIDTH / 2, 0, SCREEN_WIDTH / 2],
@@ -163,70 +165,55 @@ const SearchBuddy = () => {
   
       const handleYup = (card) => {
         // Add Friend
+        console.log(users);
         console.log("Added as Friend: ", card.name);
         console.log("User ID: ", card.uid);
+
+        setCurrentIndex(currentIndex - 1);
+        nextCard();
+        setIsLoading(true);
       
         const currentUserUid = auth.currentUser?.uid;
       
-        // Retrieve the current friendList array from the database
         const friendListRef = ref(database, `userId/${currentUserUid}/friendList`);
-        get(friendListRef)
-          .then((snapshot) => {
-            const friendList = snapshot.val() || [];
 
-            console.log(friendList);
-      
-            // Check if the friend UID already exists in the friendList
-            if (friendList.includes(card.uid)) {
-              Alert.alert("Error", "Friend already added.");
-              return;
-            }
-      
-            // Update the friendList locally
-            const updatedFriendList = [...friendList, card.uid];
-      
-            // Set the updated friendList array to the database
-            set(friendListRef, updatedFriendList)
-              .then(() => {
-                Alert.alert("Success", "Friend added successfully!");
-              })
-              .catch((error) => {
-                Alert.alert("Error", "Failed to add friend. Please try again.");
-                console.log("Error adding friend:", error);
-              });
-          })
-          .catch((error) => {
-            Alert.alert("Error", "Failed to retrieve friend list. Please try again.");
-            console.log("Error retrieving friend list:", error);
-          });
-
-        // Retrieve the current friendList array from the database
         const otherFriendListRef = ref(database, `userId/${card.uid}/friendList`);
-        get(otherFriendListRef)
-          .then((snapshot) => {
-            const otherFriendList = snapshot.val() || [];
-
-            console.log(otherFriendList);
+      
+        // Use Promise.all to handle both database update operations
+        Promise.all([
+          get(friendListRef),
+          get(otherFriendListRef),
+        ])
+          .then((snapshots) => {
+            const [currentUserFriendListSnapshot, otherUserFriendListSnapshot] = snapshots;
+            const currentUserFriendList = currentUserFriendListSnapshot.val() || [];
+            const otherUserFriendList = otherUserFriendListSnapshot.val() || [];
       
             // Check if the friend UID already exists in the friendList
-            if (otherFriendList.includes(currentUserUid)) {
+            if (currentUserFriendList.includes(card.uid) || otherUserFriendList.includes(currentUserUid)) {
               Alert.alert("Error", "Friend already added.");
+              setIsLoading(false);
               return;
             }
       
-            // Update the friendList locally
-            const updatedOtherFriendList = [...otherFriendList, currentUserUid];
+            // Update the friendList arrays locally
+            const updatedCurrentUserFriendList = [...currentUserFriendList, card.uid];
+            const updatedOtherUserFriendList = [...otherUserFriendList, currentUserUid];
       
-            // Set the updated friendList array to the database
-            set(otherFriendListRef, updatedOtherFriendList)
-              .then(() => {
-              })
-              .catch((error) => {
-                console.log("Error adding friend:", error);
-              });
+            // Set the updated friendList arrays to the database
+            return Promise.all([
+              set(friendListRef, updatedCurrentUserFriendList),
+              set(otherFriendListRef, updatedOtherUserFriendList),
+            ]);
+          })
+          .then(() => {
+            Alert.alert("Success", "Friend added successfully!");
+            setIsLoading(false);
           })
           .catch((error) => {
-            console.log("Error retrieving friend list:", error);
+            Alert.alert("Error", "Failed to add friend. Please try again.");
+            setIsLoading(false);
+            console.log("Error adding friend:", error);
           });
       
         nextCard();
@@ -377,7 +364,10 @@ const SearchBuddy = () => {
         <View style={styles.overlay}>
           <Text style={styles.title}>Buddy Search</Text>
           <Text style={styles.description}>Search for Study Buddies to study together with.</Text>
-          {users.length > currentIndex ? (
+          {isLoading ? (
+            // Show the loading animation while isLoading is true
+            <ActivityIndicator size="large" color="blue" />
+          ) : users.length > currentIndex ? (
             renderCards().reverse()
           ) : (
             <NoMoreCards />

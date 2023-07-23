@@ -232,51 +232,8 @@ describe('handleConfirmDetails', () => {
             await fireEvent.press(getByText('Next'));
         });
         
+        expect(navigation.replace).not.toHaveBeenCalled()
         expect(alertSpy).toHaveBeenCalled();
     })
 })
-
-/*describe('uploadImageAsync', () => {
-    it('should upload image and return download url', async () => {
-        const mockUri = 'image-uri';
-        const mockCurrentUser = { uid: 'user-uid' };
-        const mockBlob = { close: jest.fn() };
-        const mockFileRef = { path: 'storage-path' };
-        const mockDownloadURL = 'download-url';
-
-        const mockUploadBytes = jest.fn().mockResolvedValue();
-        const mockGetDownloadURL = jest.fn().mockResolvedValue(mockDownloadURL);
-
-        storageRef.mockImplementation(() => mockFileRef);
-        uploadBytes.mockImplementation(mockUploadBytes);
-        getDownloadURL.mockImplementation(mockGetDownloadURL);
-        uploadImageAsync.mockReturnValueOnce(mockDownloadURL)
-
-        const result = await uploadImageAsync(mockUri, mockCurrentUser);
-
-        // Verify the function calls
-        expect(storageRef).toHaveBeenCalledWith(expect.any(Object), 'Images/' + mockCurrentUser.uid);
-        expect(uploadBytes).toHaveBeenCalledWith(mockFileRef, expect.any(Object));
-        expect(getDownloadURL).toHaveBeenCalledWith(mockFileRef);
-
-        // Verify the return value
-        expect(result).toBe(mockDownloadURL);
-
-        // Verify that the blob is closed
-        expect(mockBlob.close).toHaveBeenCalled();
-    });
-});*/
-
-/*class MockXMLHttpRequest {
-    constructor() {
-      this.onload = jest.fn();
-      this.onerror = jest.fn();
-      this.responseType = '';
-      this.open = jest.fn(),
-      this.send = jest.fn()
-    }
-  
-  }
-  
-  global.XMLHttpRequest = MockXMLHttpRequest;*/
 

@@ -70,34 +70,6 @@ describe('Create Study Session', () => {
         });
     });
 
-   /*it('error when session name, date, start time or end time are not selected', async () => {
-        const {getByPlaceholderText, getByTestId, getByText} = render(<CreateStudySession navigation={navigation}/>);
-        const sessionName = getByPlaceholderText('Enter session name');
-        const date = getByTestId('date');
-        const startTime = getByTestId('startTime');
-        const endTime = getByTestId('endTime');
-        const create = getByTestId('CreateStudySession');
-        const  now = new Date();
-        await act(async () => {
-            await fireEvent.press(create);
-            expect(alertSpy).toHaveBeenCalledWith('Session Name cannot be empty');
-            alertSpy.mockRestore();
-            await fireEvent.changeText(sessionName, 'test');
-            await fireEvent.press(create);
-            expect(alertSpy).toHaveBeenCalledWith('Please select date');
-            alertSpy.mockRestore();
-            await fireEvent.press(date);
-            await fireEvent(getByTestId('datePicker'), 'confirm', now);
-            await fireEvent.press(create);
-            expect(alertSpy).toHaveBeenCalledWith('Please select start time');
-            alertSpy.mockRestore();
-            await fireEvent.press(startTime);
-            await fireEvent(getByTestId('startTime'), 'confirm', now);
-            await fireEvent.press(create);
-            expect(alertSpy).toHaveBeenCalledWith('Please select end time');
-        });
-    })*/
-
     it('start time must be before end time', async () => {
         const {getByPlaceholderText, getByTestId, getByText} = render(<CreateStudySession navigation={navigation}/>);
         const end = new Date();
@@ -151,50 +123,3 @@ describe('Create Study Session', () => {
         expect(navigation.pop).toHaveBeenCalledWith(3)
     })
 });
-
-/*describe('Select Buddies', () => {
-    it('ss', async () => {
-        const friendList = ['test1', 'test2'];
-        const snapshot1 = {val: () => {friendList: friendList}};
-        const test1 = {
-            username: 'test1',
-            xp: 100,
-            interests: ['Engineering, Law and Legal Studies'],
-            uid: 'test1',
-            photo: 'test1',
-            status: 1,
-            friendList: friendList
-        };
-        const test2 = {
-            username: 'test2',
-            xp: 10,
-            interests: ['Health and Medical, Arts and Fine Arts'],
-            uid: 'test2',
-            photo: 'test2',
-            status: 1,
-            friendList: friendList
-        };
-        const snapshot2 = {val: () => test1};
-        const snapshot3 = {val: () => test2};
-        ref.mockReturnValue();
-        get.mockResolvedValueOnce({val: () => test1}).mockResolvedValueOnce({val: () => test2});
-        onValue
-        .mockImplementationOnce((ref, callback) => {
-            callback(snapshot1);
-            //return () => {};
-        })
-        .mockImplementationOnce((ref, callback) => {
-            callback(snapshot2);
-            //return () => {}
-        })
-        .mockImplementationOnce((ref, callback) => {
-            callback(snapshot3);
-            //return () => {}
-        });
-
-        render(<SelectBuddies/>)
-
-        expect(get).toHaveBeenCalled()
-    });
-});*/
-
