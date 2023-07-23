@@ -64,6 +64,7 @@ const Settings = ({navigation}) => {
             runTransaction(ref(database, 'userId/' + id), (profile) => {
               if (profile) {
                 profile.status = false;
+                profile.ongoingSessions = null;
                 return profile;
               } else {
                 return profile;
