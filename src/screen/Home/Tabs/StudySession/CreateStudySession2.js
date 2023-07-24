@@ -17,7 +17,7 @@ const CreateStudySession2 = ({ navigation }) => {
   const isAnonymous = auth.currentUser.isAnonymous;
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [studyModeEnabled, setStudyModeEnabled] = useState(isAnonymous);
-  const [selectedDate, setSelectedDate] = useState(null);
+  //const [selectedDate, setSelectedDate] = useState(null);
   const [isStartTimePickerVisible, setStartTimePickerVisibility] = useState(false);
   const [isEndTimePickerVisible, setEndTimePickerVisibility] = useState(false);
   const [startTime, setStartTime] = useState(null);
@@ -88,9 +88,6 @@ const CreateStudySession2 = ({ navigation }) => {
     if (!sessionName) {
       Alert.alert('Session Name cannot be empty');
       return;
-    } else if (!selectedDate) {
-      Alert.alert("Please select date");
-      return;
     } else if (!startTime) {
       Alert.alert("Please select start time");
       return;
@@ -103,14 +100,14 @@ const CreateStudySession2 = ({ navigation }) => {
           sessionName, 
           sessionDescription,
           studyModeEnabled,
-          selectedDate: selectedDate.toDateString(),
+          //selectedDate: selectedDate.toDateString(),
           startTime: {
-            string: startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), 
-            timestamp: selectedDate.setHours(startTime.getHours(), startTime.getMinutes(), startTime.getSeconds(), startTime.getMilliseconds())
+            string: startTime.toLocaleTimeString([], { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }), 
+            timestamp: startTime.getTime()//selectedDate.setHours(startTime.getHours(), startTime.getMinutes(), startTime.getSeconds(), startTime.getMilliseconds())
           },
           endTime:  {
-            string: endTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            timestamp: selectedDate.setHours(endTime.getHours(), endTime.getMinutes(), endTime.getSeconds(), endTime.getMilliseconds())
+            string: endTime.toLocaleTimeString([], { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
+            timestamp: endTime.getTime()//selectedDate.setHours(endTime.getHours(), endTime.getMinutes(), endTime.getSeconds(), endTime.getMilliseconds())
           }
         });
       } else { 
@@ -118,14 +115,14 @@ const CreateStudySession2 = ({ navigation }) => {
           sessionName, 
           sessionDescription,
           studyModeEnabled,
-          selectedDate: selectedDate.toDateString(),
+          //selectedDate: selectedDate.toDateString(),
           startTime: {
-            string: startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), 
-            timestamp: selectedDate.setHours(startTime.getHours(), startTime.getMinutes(), startTime.getSeconds(), startTime.getMilliseconds())
+            string: startTime.toLocaleTimeString([], { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }), 
+            timestamp: startTime.getTime()//selectedDate.setHours(startTime.getHours(), startTime.getMinutes(), startTime.getSeconds(), startTime.getMilliseconds())
           },
           endTime:  {
-            string: endTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            timestamp: selectedDate.setHours(endTime.getHours(), endTime.getMinutes(), endTime.getSeconds(), endTime.getMilliseconds())
+            string: endTime.toLocaleTimeString([], { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
+            timestamp: endTime.getTime()//selectedDate.setHours(endTime.getHours(), endTime.getMinutes(), endTime.getSeconds(), endTime.getMilliseconds())
           }
         });
       }
@@ -175,49 +172,50 @@ const CreateStudySession2 = ({ navigation }) => {
         </TouchableOpacity>
       </View> */}
 
-      <Text style={styles.subheading}>Select Date</Text>
+      {/*<Text style={styles.subheading}>Select Date</Text>
       <TouchableOpacity style={styles.calendarButton} onPress={showDatePicker}>
         <Text style={styles.calendarButtonText}>
           {selectedDate ? selectedDate.toDateString() : 'Select Date'}
         </Text>
-      </TouchableOpacity>
+    </TouchableOpacity>*/}
       <Text style={styles.subheading}>Select Time</Text>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
         <TouchableOpacity style={styles.startTimeButton} onPress={showStartTimePicker}>
             <Text style={styles.startTimeButtonText}>
-            {startTime ? startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Select Start Time'}
+            {startTime ? startTime.toLocaleTimeString([], { day: 'numeric',year: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : 'Select Start Time'}
             </Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.endTimeButton} onPress={showEndTimePicker}>
             <Text style={styles.endTimeButtonText}>
-            {endTime ? endTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Select End Time'}
+            {endTime ? endTime.toLocaleTimeString([], { day: 'numeric',year: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : 'Select End Time'}
             </Text>
         </TouchableOpacity>
       </View>
       <TouchableOpacity style={styles.createButton} onPress={createStudySession}>
         <Text style={styles.createButtonText}>Create Study Session</Text>
       </TouchableOpacity>
-      <DateTimePickerModal
+      {/*<DateTimePickerModal
         isVisible={isDatePickerVisible}
         mode="date"
         onConfirm={handleDateConfirm}
         onCancel={hideDatePicker}
         textColor="#000000"
         minimumDate={minimumDate}
-      />
+    />*/}
       <DateTimePickerModal
         isVisible={isStartTimePickerVisible}
         date={minimumDate}
-        mode='time'
+        mode='datetime'
         onConfirm={handleStartTimeConfirm}
         onCancel={hideStartTimePicker}
         textColor="#000000"
         minimumDate={minimumDate}
+        maximumDate={endTime}
       />
       <DateTimePickerModal
         isVisible={isEndTimePickerVisible}
         date={minimumEnd}
-        mode="time"
+        mode="datetime"
         onConfirm={handleEndTimeConfirm}
         onCancel={hideEndTimePicker}
         textColor="#000000"

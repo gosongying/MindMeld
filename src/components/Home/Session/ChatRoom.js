@@ -22,7 +22,7 @@ const ChatRoom = ({ navigation, session }) => {
   // To scroll to bottom of scrollList 
   const scrollViewRef = useRef(null);
 
-  const currentUser = auth?.currentUser;
+  const currentUser = auth.currentUser;
   
   // To listen for new messages and update the messages state
   useEffect(() => {
@@ -267,9 +267,6 @@ const ChatRoom = ({ navigation, session }) => {
             <View style={styles.labelContainer}>
               <Text style={styles.label}>Session Information:</Text>
             </View>
-              <Text style={styles.label1}>
-                Date: {session.selectedDate}
-              </Text>
               <Text style={styles.label2}>
                 Start Time: {session.startTime.string}
               </Text>
