@@ -26,6 +26,7 @@ const StudySession = ({navigation}) => {
 
     const currentUser = auth.currentUser;
 
+
     useEffect(() => {
         const interval = setInterval(() => {
             setCurrentTimestamp(new Date().getTime());
@@ -401,6 +402,7 @@ const StudySession = ({navigation}) => {
 
     const renderSession = ({item}) => {
         const inProgress = item.startTime.timestamp < currentTimestamp;
+        console.log(item.startTime);
         if (item.sessionName.startsWith(sessionName) || item.sessionName === sessionName || !sessionName) {
             return (
                 <View style={[styles.session, inProgress && {backgroundColor: 'lavender'}]}>
@@ -408,12 +410,14 @@ const StudySession = ({navigation}) => {
                         <Text style={styles.sessionName2}>{item.sessionName}</Text>
                         <Text style={styles.sessionDescription2}>{item.sessionDescription}</Text>
                         <View style={styles.separator}/>
-                        <View style={{flexDirection: 'row', alignItems:'center', right: 1}}>
-                            <Ionicons name='time-outline' size={20}/>
-                            <Text style={[{marginLeft: 5}, styles.text]}>{item.startTime.string} - 
-                            {'\n'}
-                            {item.endTime.string}</Text>
-                        </View>
+                            <View style={{flexDirection: 'row'}}>
+                                <Ionicons name='calendar-outline' size={20}/>
+                                <Text style={[{marginLeft: 5}, styles.text]}>{item.startTime.string.slice(0, 11)} - {item.endTime.string.slice(0, 11)}</Text>
+                            </View>
+                            <View style={{flexDirection: 'row'}}>
+                                <Ionicons name='time-outline' size={20}/>
+                                <Text style={[{marginLeft: 5}, styles.text]}>{item.startTime.string.slice(-5)} - {item.endTime.string.slice(-5)}</Text>
+                            </View>
                         <Text style={styles.text2}>Host: {item.hostName}</Text>
                         <Text style={styles.text2}>Participants: {item.participantsName.join(', ')}</Text>
                         <Text style={styles.text2}>To-do's: {item.tasks ? item.tasks.map((task) => task.title).join(', ') : ''}</Text>

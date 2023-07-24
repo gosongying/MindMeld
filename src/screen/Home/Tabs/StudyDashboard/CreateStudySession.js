@@ -34,7 +34,7 @@ const CreateStudySession = ({ navigation }) => {
   const minimumDate = new Date(new Date().getTime() + 60000);
   const minimumEnd = startTime? new Date(startTime.getTime() + 60000): new Date(minimumDate.getTime() + 60000);
 
-  const goToHome = () => navigation.navigate('StudySession');
+  const goToHome = () => navigation.navigate('StudyDashboard');
 
   const showDatePicker = () => {
     setDatePickerVisibility(true);
