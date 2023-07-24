@@ -244,6 +244,7 @@ const ToDoList = ({ navigation, session }) => {
                 </TouchableOpacity>
                 <DateTimePickerModal
                   isVisible={showDatePicker}
+                  date={minimumDate}
                   mode="datetime"
                   onConfirm={handleDateConfirm}
                   onCancel={() => setShowDatePicker(false)}

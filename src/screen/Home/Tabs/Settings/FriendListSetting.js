@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, View, Text, FlatList, TouchableOpacity, Image, TextInput, Modal, Alert } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { auth, database } from "../../../../../firebase";
-import { ref, runTransaction, set, get, onValue, update, child } from 'firebase/database';
+import { ref, runTransaction, set, get, onValue, update, child, remove } from 'firebase/database';
 import Fontisto from 'react-native-vector-icons/Fontisto';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { AntDesign } from '@expo/vector-icons';
@@ -129,6 +129,7 @@ const FriendListSetting = ({navigation}) => {
         const me = child(userRef, currentUser.uid);
         const other = child(userRef, user.uid);
         const newFriendList = friendListId.filter((id) => id !== user.uid);
+
         try {
             runTransaction(me, (profile) => {
                 if (profile) {
@@ -151,11 +152,23 @@ const FriendListSetting = ({navigation}) => {
                 }
             }).then(() => {
                 setDeletingFriend(null);
-            })
-        } catch (error) { 
-            console.log(error);
-            Alert.alert("Error");
-        }
+            });
+        
+        const userIds = [currentUser.uid, user.uid].sort(); 
+        const chatSessionId = userIds.join('-'); 
+        const chatSessionRef = ref(database, 'chat/' + chatSessionId);
+        
+        // Remove chat session from the database
+        remove(chatSessionRef).then(() => {
+            console.log('Chat session removed successfully!');
+        }).catch((error) => {
+            console.error('Error removing chat session:', error);
+        });
+
+     } catch (error) {
+        console.log(error);
+        Alert.alert('Error');
+      }
     };
 
     const handleSearchFriend = (username) => {

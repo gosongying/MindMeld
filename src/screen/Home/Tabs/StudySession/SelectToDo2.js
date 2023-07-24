@@ -286,6 +286,7 @@ const SelectToDo2 = ({ navigation, route }) => {
                 </TouchableOpacity>
                 <DateTimePickerModal
                   isVisible={showDatePicker}
+                  date={minimumDate}
                   mode="datetime"
                   onConfirm={handleDateConfirm}
                   onCancel={() => setShowDatePicker(false)}
