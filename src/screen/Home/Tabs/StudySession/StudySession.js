@@ -408,13 +408,11 @@ const StudySession = ({navigation}) => {
                         <Text style={styles.sessionName2}>{item.sessionName}</Text>
                         <Text style={styles.sessionDescription2}>{item.sessionDescription}</Text>
                         <View style={styles.separator}/>
-                        <View style={{flexDirection: 'row', alignItems:'center'}}>
-                            <Fontisto name='date' size={16}/>
-                            <Text style={[{marginLeft: 10}, styles.text]}>{item.selectedDate}</Text>
-                        </View>
                         <View style={{flexDirection: 'row', alignItems:'center', right: 1}}>
                             <Ionicons name='time-outline' size={20}/>
-                            <Text style={[{marginLeft: 5}, styles.text]}>{item.startTime.string} - {item.endTime.string}</Text>
+                            <Text style={[{marginLeft: 5}, styles.text]}>{item.startTime.string} - 
+                            {'\n'}
+                            {item.endTime.string}</Text>
                         </View>
                         <Text style={styles.text2}>Host: {item.hostName}</Text>
                         <Text style={styles.text2}>Participants: {item.participantsName.join(', ')}</Text>
@@ -454,13 +452,11 @@ const StudySession = ({navigation}) => {
                         <Text style={styles.sessionName}>{item.sessionName}</Text>
                         <Text style={styles.sessionDescription}>{item.sessionDescription}</Text>
                         <View style={styles.separator}/>
-                        <View style={{flexDirection: 'row', alignItems:'center'}}>
-                            <Fontisto name='date' size={16}/>
-                            <Text style={[{marginLeft: 10}, styles.text]}>{item.selectedDate}</Text>
-                        </View>
                         <View style={{flexDirection: 'row', alignItems:'center', right: 1}}>
                             <Ionicons name='time-outline' size={20}/>
-                            <Text style={[{marginLeft: 5}, styles.text]}>{item.startTime.string} - {item.endTime.string}</Text>
+                            <Text style={[{marginLeft: 5}, styles.text]}>{item.startTime.string} - 
+                            {'\n'}
+                            {item.endTime.string}</Text>
                         </View>
                         <Text style={styles.text}>Host: {item.hostName}</Text>
                         <Text style={styles.text}>Participants: {item.participantsName.join(', ')}</Text>
