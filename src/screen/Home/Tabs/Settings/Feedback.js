@@ -29,7 +29,7 @@ const Feedback = ({ navigation }) => {
       const feedbackData = {
         title: feedbackTitle.trim(),
         text: feedbackText.trim(),
-        uid: user.uid
+        uid: user.isAnonymous ? 'GUEST ACCOUNT' : user.uid,
       };
 
       const feedbacksRef = ref(database, 'feedbacks/');
