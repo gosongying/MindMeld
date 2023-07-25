@@ -29,10 +29,12 @@ const Feedback = ({ navigation }) => {
       const feedbackData = {
         title: feedbackTitle.trim(),
         text: feedbackText.trim(),
-        userName: user.displayName || 'Unknown User',
+        uid: user.uid
       };
 
-      await ref('feedbacks').push(feedbackData);
+      const feedbacksRef = ref(database, 'feedbacks/');
+      await push(feedbacksRef, feedbackData);
+
 
       Alert.alert('Success', 'Thank you for your feedback!');
       setFeedbackTitle('');
