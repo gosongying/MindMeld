@@ -208,7 +208,6 @@ import { runTransaction, ref, onValue, get, set, push } from 'firebase/database'
             textAlign='left'
             value={newPassword1}
             autoCapitalize='none'
-            inputMode='none'
             clearButtonMode='while-editing'
             onChangeText={handlePassword1}
             style={[styles.passwordInput, {marginBottom: 10}]}
@@ -220,7 +219,6 @@ import { runTransaction, ref, onValue, get, set, push } from 'firebase/database'
             textAlign='left'
             value={newPassword2}
             autoCapitalize='none'
-            inputMode='none'
             clearButtonMode='while-editing'
             onChangeText={handlePassword2}
             style={styles.passwordInput}
