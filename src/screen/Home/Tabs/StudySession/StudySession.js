@@ -456,18 +456,25 @@ const StudySession = ({navigation}) => {
                         <Text style={styles.sessionName}>{item.sessionName}</Text>
                         <Text style={styles.sessionDescription}>{item.sessionDescription}</Text>
                         <View style={styles.separator}/>
-                        <View style={{flexDirection: 'row', alignItems:'center', right: 1}}>
+                        {/* <View style={{flexDirection: 'row', alignItems:'center', right: 1}}>
                             <Ionicons name='time-outline' size={20}/>
                             <Text style={[{marginLeft: 5}, styles.text]}>{item.startTime.string} - 
                             {'\n'}
                             {item.endTime.string}</Text>
-                        </View>
+                        </View> */}
+                                                    <View style={{flexDirection: 'row'}}>
+                                <Ionicons name='calendar-outline' size={20}/>
+                                <Text style={[{marginLeft: 5}, styles.text]}>{item.startTime.string.slice(0, 11)} - {item.endTime.string.slice(0, 11)}</Text>
+                            </View>
+                            <View style={{flexDirection: 'row'}}>
+                                <Ionicons name='time-outline' size={20}/>
+                                <Text style={[{marginLeft: 5}, styles.text]}>{item.startTime.string.slice(-5)} - {item.endTime.string.slice(-5)}</Text>
+                            </View>
                         <Text style={styles.text}>Host: {item.hostName}</Text>
                         <Text style={styles.text}>Participants: {item.participantsName.join(', ')}</Text>
                         <Text style={styles.text}>To-do's: {item.tasks ? item.tasks.map((task) => task.title).join(', '): ''}</Text>
-                        <Text style={[styles.text, !item.studyModeEnabled && {textDecorationLine: 'line-through'}]}>Study Mode</Text>
                     </View>
-                    <View style={styles.acceptOrDecline}>
+                    <View style={styles.acceptOrDecline3}>
                         <TouchableOpacity onPress={() => acceptInvitation(item)}>
                             <Ionicons name="checkmark" color={'green'} size={35}/>
                         </TouchableOpacity>
@@ -756,6 +763,13 @@ const styles = StyleSheet.create({
     acceptOrDecline2: {
         alignItems: 'center',
         right: 15,
+    },
+    acceptOrDecline3: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        right: 5,
+        bottom: 60
     },
     sessionInfo: {
         alignItems: 'flex-start',
