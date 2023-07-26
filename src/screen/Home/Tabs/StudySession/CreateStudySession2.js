@@ -109,11 +109,11 @@ const CreateStudySession2 = ({ navigation }) => {
           studyModeEnabled,
           //selectedDate: selectedDate.toDateString(),
           startTime: {
-            string: new Intl.DateTimeFormat([], dateOptions).format(startTime)//startTime.toLocaleTimeString([], { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }), 
+            string: new Intl.DateTimeFormat([], dateOptions).format(startTime),//startTime.toLocaleTimeString([], { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }), 
             timestamp: startTime.getTime()//selectedDate.setHours(startTime.getHours(), startTime.getMinutes(), startTime.getSeconds(), startTime.getMilliseconds())
           },
           endTime:  {
-            string: new Intl.DateTimeFormat([], dateOptions).format(endTime)//endTime.toLocaleTimeString([], { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
+            string: new Intl.DateTimeFormat([], dateOptions).format(endTime),//endTime.toLocaleTimeString([], { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
             timestamp: endTime.getTime()//selectedDate.setHours(endTime.getHours(), endTime.getMinutes(), endTime.getSeconds(), endTime.getMilliseconds())
           }
         });
