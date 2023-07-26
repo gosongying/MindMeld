@@ -109,11 +109,11 @@ const CreateStudySession = ({ navigation }) => {
           studyModeEnabled,
           //selectedDate: selectedDate.toDateString(),
           startTime: {
-            string: new Intl.DateTimeFormat([], dateOptions).format(startTime);//startTime.toLocaleTimeString([], { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }), 
+            string: new Intl.DateTimeFormat([], dateOptions).format(startTime),//startTime.toLocaleTimeString([], { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }), 
             timestamp: startTime.getTime()//selectedDate.setHours(startTime.getHours(), startTime.getMinutes(), startTime.getSeconds(), startTime.getMilliseconds())
           },
           endTime:  {
-            string: new Intl.DateTimeFormat([], dateOptions).format(endTime);//endTime.toLocaleTimeString([], { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
+            string: new Intl.DateTimeFormat([], dateOptions).format(endTime),//endTime.toLocaleTimeString([], { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
             timestamp: endTime.getTime()//selectedDate.setHours(endTime.getHours(), endTime.getMinutes(), endTime.getSeconds(), endTime.getMilliseconds())
           }
         });
@@ -173,12 +173,12 @@ const CreateStudySession = ({ navigation }) => {
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
         <TouchableOpacity style={styles.startTimeButton} onPress={showStartTimePicker}>
             <Text style={styles.startTimeButtonText}>
-            {startTime ? new Intl.DateTimeFormat([], dateOptions).format(startTime); : 'Select Start Time'}
+            {startTime ? new Intl.DateTimeFormat([], dateOptions).format(startTime) : 'Select Start Time'}
             </Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.endTimeButton} onPress={showEndTimePicker}>
             <Text style={styles.endTimeButtonText}>
-            {endTime ? new Intl.DateTimeFormat([], dateOptions).format(endTime); : 'Select End Time'}
+            {endTime ? new Intl.DateTimeFormat([], dateOptions).format(endTime) : 'Select End Time'}
             </Text>
         </TouchableOpacity>
       </View>

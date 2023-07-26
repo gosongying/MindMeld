@@ -1,6 +1,6 @@
 import React from 'react';
 import { useState, useEffect } from 'react'
-import { View, Text, Image, StyleSheet, TouchableOpacity, Modal } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity, Modal, Dimensions } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
   faUser,
@@ -45,6 +45,8 @@ const Badge = () => {
   };
 
   const currentUser = auth.currentUser;
+  const screenWidth = Dimensions.get('window').width;
+  const badgeSize = screenWidth / 4 - 22 //Adjust for padding
 
   useEffect(() => {
     const unsubscribe = onValue(ref(database, 'userId/' + currentUser.uid), (snapshot) => {
@@ -267,11 +269,11 @@ const Badge = () => {
         <Text>{100 - xp%100} XP to next level</Text>
       </View>
 
-      <View style={styles.badgesContainer}>
+      <View style={[styles.badgesContainer, {width: screenWidth}]}>
         {badges.map((badge) => (
           <TouchableOpacity 
           key={badge.id} 
-          style={styles.badgeItem}
+          style={[styles.badgeItem, { width: badgeSize, height: badgeSize }]}
           onPress={() => handleBadgePress(badge)}>
         
           <FontAwesomeIcon
@@ -378,7 +380,7 @@ const styles = StyleSheet.create({
     height: 70,
     margin: 5,
     backgroundColor: '#e6e6e6',
-    borderRadius: 35,
+    borderRadius: 100,
   },
   badgeIcon: {
     color: '',
