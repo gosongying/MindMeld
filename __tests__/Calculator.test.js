@@ -34,8 +34,8 @@ describe('Calculator', () => {
             await fireEvent.press(getByText('='));
         });
 
-        const apiKey = 'Y36GEU-TW4VU6G736';
-        const apiUrl = `http://api.wolframalpha.com/v1/result?appid=${process.env.EXPO_PUBLIC_CALC_API_KEY}&i=${encodeURIComponent(
+        const apiKey = process.env.EXPO_PUBLIC_CALC_API_KEY;
+        const apiUrl = `http://api.wolframalpha.com/v1/result?appid=${apiKey}&i=${encodeURIComponent(
             '1+2'
         )}`;
 
@@ -56,8 +56,8 @@ describe('Calculator', () => {
             await fireEvent.press(getByText('='));
         });
 
-        const apiKey = 'Y36GEU-TW4VU6G736';
-        const apiUrl = `http://api.wolframalpha.com/v1/result?appid=${process.env.EXPO_PUBLIC_CALC_API_KEY}&i=${encodeURIComponent(
+        const apiKey = process.env.EXPO_PUBLIC_CALC_API_KEY;
+        const apiUrl = `http://api.wolframalpha.com/v1/result?appid=${apiKey}&i=${encodeURIComponent(
             '+2'
         )}`;
 

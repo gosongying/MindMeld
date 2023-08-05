@@ -39,11 +39,6 @@
         }
       ]
     ],
-    "extra": {
-      "eas": {
-        "projectId": "948a46ed-ae98-44fc-b2d9-4d19ed96fa30"
-      }
-    },
 
     "owner": "mindmeld5724",
     "runtimeVersion": {

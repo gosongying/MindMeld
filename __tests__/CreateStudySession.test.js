@@ -4,22 +4,7 @@ import CreateStudySession from '../src/screen/Home/Tabs/StudyDashboard/CreateStu
 import { Alert } from 'react-native';
 import {ref, onValue, get, push, runTransaction, child, set} from 'firebase/database';
 import SelectToDo from '../src/screen/Home/Tabs/StudyDashboard/SelectToDo';
-import { initializeApp } from "firebase/app";
-import { getStorage } from "firebase/storage";
 import { getAuth } from 'firebase/auth';
-import { getDatabase } from 'firebase/database';
-
-jest.mock('firebase/auth');
-jest.mock('firebase/app');
-jest.mock('firebase/database');
-jest.mock('firebase/storage');
-
-beforeEach(() => {
-    initializeApp.mockImplementation(() => {});
-    getAuth.mockImplementation(() => {});
-    getDatabase.mockImplementation(() => {});
-    getStorage.mockImplementation(() => {});
-});
 
 const navigation = {
     navigate: jest.fn(),
@@ -36,6 +21,8 @@ afterEach(() => {
     navigation.pop.mockRestore();
 });
 
+jest.mock('firebase/database');
+jest.mock('firebase/auth')
 
 jest.useFakeTimers();
 
@@ -48,7 +35,9 @@ beforeEach(() => {
 afterEach(() => {
     setIntervalSpy.mockRestore();
     setTimeoutSpy.mockRestore();
-})
+});
+
+getAuth.mockImplementation((app) => {});
 
 describe('Create Study Session', () => {
     it('should move on to select buddy with all required field selected', async () => {
@@ -56,9 +45,6 @@ describe('Create Study Session', () => {
         const  now = new Date();
         await act(async () => {
             await fireEvent.changeText(getByPlaceholderText('Enter session name'), 'test');
-            await fireEvent.press(getByTestId('date'));
-            await fireEvent(getByTestId('datePicker'), 'confirm', now);
-            //await fireEvent.press(getByTestId('Confirm'));
             await fireEvent.press(getByTestId('startTime'));
             await fireEvent(getByTestId('startTimePicker'), 'confirm', now);
             //await fireEvent.press(getByText('Confirm'));
@@ -68,19 +54,27 @@ describe('Create Study Session', () => {
             await fireEvent.press(getByTestId('CreateStudySession'));
         });
 
+        const dateOptions = {
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false, // This enforces 24-hour format
+          };
+
         expect(alertSpy).not.toHaveBeenCalled();
         //session info matches
         expect(navigation.navigate).toHaveBeenCalledWith('SelectBuddies', {
             sessionName: 'test',
             sessionDescription: '',
-            selectedDate: now.toDateString(),
             startTime: {
-                string: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), 
-                timestamp: now.setHours(now.getHours(), now.getMinutes(), now.getSeconds(), now.getMilliseconds())
+                string: new Intl.DateTimeFormat([], dateOptions).format(now),
+                timestamp: now.getTime()
               },
               endTime:  {
-                string: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                timestamp: now.setHours(now.getHours(), now.getMinutes(), now.getSeconds(), now.getMilliseconds())
+                string: new Intl.DateTimeFormat([], dateOptions).format(now),
+                timestamp: now.getTime()
               }
         });
     });
@@ -92,8 +86,6 @@ describe('Create Study Session', () => {
 
         await act(async () => {
             await fireEvent.changeText(getByPlaceholderText('Enter session name'), 'test');
-            await fireEvent.press(getByTestId('date'));
-            await fireEvent(getByTestId('datePicker'), 'confirm', end);
             await fireEvent.press(getByTestId('endTime'));
             await fireEvent(getByTestId('endTimePicker'), 'confirm', end);
             await fireEvent.press(getByTestId('startTime'));
