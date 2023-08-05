@@ -23,9 +23,7 @@ const CreateStudySession = ({ navigation }) => {
     hour12: false, // This enforces 24-hour format
   };
 
-  const isAnonymous = auth.currentUser.isAnonymous;
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-  const [studyModeEnabled, setStudyModeEnabled] = useState(isAnonymous);
   //const [selectedDate, setSelectedDate] = useState(null);
   const [isStartTimePickerVisible, setStartTimePickerVisibility] = useState(false);
   const [isEndTimePickerVisible, setEndTimePickerVisibility] = useState(false);
@@ -106,14 +104,12 @@ const CreateStudySession = ({ navigation }) => {
         navigation.navigate('SelectBuddies', {
           sessionName, 
           sessionDescription,
-          studyModeEnabled,
-          //selectedDate: selectedDate.toDateString(),
           startTime: {
-            string: new Intl.DateTimeFormat([], dateOptions).format(startTime);//startTime.toLocaleTimeString([], { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }), 
+            string: new Intl.DateTimeFormat([], dateOptions).format(startTime),//startTime.toLocaleTimeString([], { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }), 
             timestamp: startTime.getTime()//selectedDate.setHours(startTime.getHours(), startTime.getMinutes(), startTime.getSeconds(), startTime.getMilliseconds())
           },
           endTime:  {
-            string: new Intl.DateTimeFormat([], dateOptions).format(endTime);//endTime.toLocaleTimeString([], { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
+            string: new Intl.DateTimeFormat([], dateOptions).format(endTime),//endTime.toLocaleTimeString([], { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
             timestamp: endTime.getTime()//selectedDate.setHours(endTime.getHours(), endTime.getMinutes(), endTime.getSeconds(), endTime.getMilliseconds())
           }
         });
@@ -171,18 +167,18 @@ const CreateStudySession = ({ navigation }) => {
     </TouchableOpacity>*/}
       <Text style={styles.subheading}>Select Time</Text>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-        <TouchableOpacity style={styles.startTimeButton} onPress={showStartTimePicker}>
+        <TouchableOpacity style={styles.startTimeButton} onPress={showStartTimePicker} testID='startTime'>
             <Text style={styles.startTimeButtonText}>
-            {startTime ? new Intl.DateTimeFormat([], dateOptions).format(startTime); : 'Select Start Time'}
+            {startTime ? new Intl.DateTimeFormat([], dateOptions).format(startTime) : 'Select Start Time'}
             </Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.endTimeButton} onPress={showEndTimePicker}>
+        <TouchableOpacity style={styles.endTimeButton} onPress={showEndTimePicker} testID='endTime'>
             <Text style={styles.endTimeButtonText}>
-            {endTime ? new Intl.DateTimeFormat([], dateOptions).format(endTime); : 'Select End Time'}
+            {endTime ? new Intl.DateTimeFormat([], dateOptions).format(endTime) : 'Select End Time'}
             </Text>
         </TouchableOpacity>
       </View>
-      <TouchableOpacity style={styles.createButton} onPress={createStudySession}>
+      <TouchableOpacity style={styles.createButton} onPress={createStudySession} testID='CreateStudySession'>
         <Text style={styles.createButtonText}>Create Study Session</Text>
       </TouchableOpacity>
       {/*<DateTimePickerModal
@@ -202,6 +198,7 @@ const CreateStudySession = ({ navigation }) => {
         textColor="#000000"
         minimumDate={minimumDate}
         maximumDate={endTime}
+        testID='startTimePicker'
       />
       <DateTimePickerModal
         isVisible={isEndTimePickerVisible}
@@ -211,6 +208,7 @@ const CreateStudySession = ({ navigation }) => {
         onCancel={hideEndTimePicker}
         textColor="#000000"
         minimumDate={minimumEnd}
+        testID='endTimePicker'
       />
     </SafeAreaView>
   );

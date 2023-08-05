@@ -22,7 +22,7 @@ const ChatRoom = ({ navigation, session }) => {
   // To scroll to bottom of scrollList 
   const scrollViewRef = useRef(null);
 
-  const currentUser = auth.currentUser;
+  const currentUser = auth?.currentUser;
   
   // To listen for new messages and update the messages state
   useEffect(() => {

@@ -3,22 +3,7 @@ import React from 'react';
 import { Alert } from 'react-native';
 import {ref, onValue, get, push, runTransaction, child, set} from 'firebase/database';
 import ChatRoom from '../src/components/Home/Session/ChatRoom';
-import { initializeApp } from "firebase/app";
-import { getStorage } from "firebase/storage";
 import { getAuth } from 'firebase/auth';
-import { getDatabase } from 'firebase/database';
-
-jest.mock('firebase/auth');
-jest.mock('firebase/app');
-jest.mock('firebase/database');
-jest.mock('firebase/storage');
-
-beforeEach(() => {
-    initializeApp.mockImplementation(() => {});
-    getAuth.mockImplementation(() => {});
-    getDatabase.mockImplementation(() => {});
-    getStorage.mockImplementation(() => {});
-});
 
 const navigation = {
     goBack: jest.fn()
@@ -35,6 +20,8 @@ afterEach(() => {
     //navigation.pop.mockRestore();
 });
 
+jest.mock('firebase/database');
+jest.mock('firebase/auth')
 
 jest.useFakeTimers();
 

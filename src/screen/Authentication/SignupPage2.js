@@ -63,7 +63,7 @@ const SignupPage2 = ({ navigation}) => {
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: [1, 1],
-      quality: 1,
+      quality: 0.2,
     });
 
     //get image successfully
@@ -83,7 +83,7 @@ const SignupPage2 = ({ navigation}) => {
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: [1, 1],
-      quality: 1,
+      quality: 0.2,
     });
 
     if (!result.canceled) {

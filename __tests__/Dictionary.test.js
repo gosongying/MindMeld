@@ -22,8 +22,8 @@ describe('Dictionary', () => {
             await fireEvent.press(getByText('Search'));
         });
 
-        const apiKey = '08ac014c-67c5-4237-841d-0ee87e8cb982';
-        const apiUrl = `https://www.dictionaryapi.com/api/v3/references/collegiate/json/School?key=${process.env.EXPO_PUBLIC_DICT_API_KEY}`;
+        const apiKey = process.env.EXPO_PUBLIC_DICT_API_KEY;
+        const apiUrl = `https://www.dictionaryapi.com/api/v3/references/collegiate/json/School?key=${apiKey}`;
 
         //the definition is fetched from the api 
         expect(axios.get).toHaveBeenCalledWith(apiUrl)

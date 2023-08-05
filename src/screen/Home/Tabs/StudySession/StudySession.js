@@ -24,7 +24,7 @@ const StudySession = ({navigation}) => {
     const [sessionName, setSessionName] = useState('');
     const [xpEarned, setXpEarned] = useState(0);
 
-    const currentUser = auth.currentUser;
+    const currentUser = auth?.currentUser;
 
 
     useEffect(() => {
