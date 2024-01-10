@@ -1,5 +1,9 @@
 # MindMeld Study Application
 
+MindMeld is a mobile application that provides a platform for students to plan their study schedules, study with peers remotely, combine studying with gamification elements, and reduce distractions while studying. 
+In order to make this possible, several features which will be further explored below will be implemented.
+
+
 Cloning our app will not work since we have chosen to hide our API tokens as environment variables.
 
 ## Useful Links
